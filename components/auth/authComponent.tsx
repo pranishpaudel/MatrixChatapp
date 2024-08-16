@@ -6,7 +6,7 @@ import { LoginForm } from "./loginForm";
 const AuthComponent = () => {
   return (
     <>
-      <div className="flex flex-col justify-start items-center h-[40vw] w-[40vw] border-1 border-slate-200 shadow-lg rounded-lg">
+      <div className="flex flex-col justify-start items-center h-[35vw] w-[40vw] border-1 border-slate-200 shadow-lg rounded-lg">
         <div className="flex items-center font-bold text-[45px] mt-4">
           Welcome{"  "}
           <Image
@@ -31,7 +31,7 @@ const AuthComponent = () => {
 
         <div className="h-full w-full mt-10 flex justify-center">
           <div className="w-[70%]">
-            <LoginForm />
+            <LoginForm isLoginForm={false} />
           </div>
         </div>
       </div>

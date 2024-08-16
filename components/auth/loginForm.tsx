@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import loginSchema from "@/zodSchemas/loginSchema";
+import signupSchema from "@/zodSchemas/signupSchema";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,21 +17,25 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const formSchema = z.object({
-  email: loginSchema,
-  password: loginSchema,
-});
+interface iFormProps {
+  isLoginForm: boolean;
+}
 
-export function LoginForm() {
-  const form = useForm({
+type LoginFormValues = z.infer<typeof loginSchema>;
+type SignupFormValues = z.infer<typeof signupSchema>;
+
+export function LoginForm({ isLoginForm }: iFormProps) {
+  const formSchema = isLoginForm ? loginSchema : signupSchema;
+  const defaultValuesToUse = isLoginForm
+    ? { email: "", password: "" }
+    : { email: "", password: "", confirmPassword: "" };
+
+  const form = useForm<LoginFormValues | SignupFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: defaultValuesToUse,
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: LoginFormValues | SignupFormValues) => {
     console.log(data);
   };
 
@@ -46,7 +51,7 @@ export function LoginForm() {
                 <Input
                   placeholder="Enter your email"
                   {...field}
-                  className="w-full"
+                  className="w-full h-[55px] rounded-2xl"
                 />
               </FormControl>
               <FormMessage />
@@ -59,15 +64,37 @@ export function LoginForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Enter your password" {...field} />
+                <Input
+                  placeholder="Enter your password"
+                  {...field}
+                  className="w-full h-[55px] rounded-2xl"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="flex justify-center mt-16">
+        {!isLoginForm && (
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    placeholder="Enter your password again"
+                    {...field}
+                    className="w-full h-[55px] rounded-2xl"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+        <div className="flex justify-center mt-28">
           <Button type="submit" className="w-60 rounded-2xl">
-            Login
+            {isLoginForm ? "Login" : "Signup"}
           </Button>
         </div>
       </form>
