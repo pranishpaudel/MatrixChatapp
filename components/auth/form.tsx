@@ -24,7 +24,7 @@ interface iFormProps {
 type LoginFormValues = z.infer<typeof loginSchema>;
 type SignupFormValues = z.infer<typeof signupSchema>;
 
-export function LoginForm({ isLoginForm }: iFormProps) {
+function AuthForm({ isLoginForm }: iFormProps) {
   const formSchema = isLoginForm ? loginSchema : signupSchema;
   const defaultValuesToUse = isLoginForm
     ? { email: "", password: "" }
@@ -101,3 +101,5 @@ export function LoginForm({ isLoginForm }: iFormProps) {
     </Form>
   );
 }
+
+export default AuthForm;
