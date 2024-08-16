@@ -1,7 +1,7 @@
 import imageUrls from "@/constants/Images";
 import Image from "next/image";
 import { Separator } from "../ui/separator";
-import { LoginForm } from "./loginForm";
+import AuthForm from "./form";
 
 const AuthComponent = () => {
   return (
@@ -31,7 +31,7 @@ const AuthComponent = () => {
 
         <div className="h-full w-full mt-10 flex justify-center">
           <div className="w-[70%]">
-            <LoginForm isLoginForm={false} />
+            <AuthForm isLoginForm={false} />
           </div>
         </div>
       </div>
