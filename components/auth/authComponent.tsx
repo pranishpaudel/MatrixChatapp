@@ -11,23 +11,23 @@ const AuthComponent = () => {
 
   return (
     <>
-      <div className="flex flex-col justify-start items-center h-[35vw] w-[40vw] border-1 border-slate-200 shadow-lg rounded-lg">
-        <div className="flex items-center font-bold text-[45px] mt-4">
+      <div className="flex flex-col justify-start items-center h-auto  w-[90vw] md:w-[40vw] border-1 border-slate-200 shadow-lg rounded-lg p-4 md:p-8">
+        <div className="flex items-center font-bold text-[30px] md:text-[45px] mt-4">
           Welcome{"  "}
           <Image
             src={imageUrls.fingerEmoji}
             alt="finger"
-            width={45}
-            height={45}
-            className="ml-2"
+            width={30}
+            height={30}
+            className="ml-2 md:w-[45px] md:h-[45px]"
           />
         </div>
-        <div className="mt-4 text-center font-bold text-md">
+        <div className="mt-4 text-center font-bold text-sm md:text-md">
           Fill in the details to get started into our chat application
         </div>
 
-        <div className="w-full flex flex-col items-center mt-10">
-          <div className="flex justify-evenly w-full font-bold text-2xl">
+        <div className="w-full flex flex-col items-center mt-6 md:mt-10">
+          <div className="flex justify-evenly w-full font-bold text-lg md:text-2xl">
             <div className="flex flex-col items-center">
               <button onClick={() => setIsLoginForm(true)}>Login</button>
               <Separator
@@ -45,8 +45,8 @@ const AuthComponent = () => {
           </div>
         </div>
 
-        <div className="h-full w-full mt-10 flex justify-center">
-          <div className="w-[70%]">
+        <div className="h-full w-full mt-6 md:mt-10 flex justify-center">
+          <div className="w-full md:w-[70%]">
             <AuthForm isLoginForm={isLoginForm} />
           </div>
         </div>

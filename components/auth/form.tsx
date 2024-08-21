@@ -5,6 +5,8 @@ import { z } from "zod";
 import loginSchema from "@/zodSchemas/loginSchema";
 import signupSchema from "@/zodSchemas/signupSchema";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { LoaderCircle } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -16,6 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 
 interface iFormProps {
   isLoginForm: boolean;
@@ -25,6 +28,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 function AuthForm({ isLoginForm }: iFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const formSchema = isLoginForm ? loginSchema : signupSchema;
   const defaultValuesToUse = isLoginForm
     ? { email: "", password: "" }
@@ -35,8 +39,18 @@ function AuthForm({ isLoginForm }: iFormProps) {
     defaultValues: defaultValuesToUse,
   });
 
-  const onSubmit = (data: LoginFormValues | SignupFormValues) => {
+  const onSubmit = async (data: LoginFormValues | SignupFormValues) => {
     console.log(data);
+    const APIROUTE = isLoginForm ? "/api/login" : "/api/signup";
+    try {
+      setIsSubmitting(true);
+      const response = await axios.post(APIROUTE, data);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -94,7 +108,15 @@ function AuthForm({ isLoginForm }: iFormProps) {
         )}
         <div className="flex justify-center mt-28">
           <Button type="submit" className="w-60 rounded-2xl">
-            {isLoginForm ? "Login" : "Signup"}
+            {!isSubmitting ? (
+              isLoginForm ? (
+                "Login"
+              ) : (
+                "Signup"
+              )
+            ) : (
+              <LoaderCircle className="animate-spin" />
+            )}
           </Button>
         </div>
       </form>
