@@ -1,8 +1,9 @@
 import handleZodError from "@/lib/Errors/handleZodError";
 import prisma from "@/prisma/prisma.config";
-import signupSchema from "@/zodSchemas/signupSchema";
+import loginSchema from "@/zodSchemas/loginSchema";
 import { NextResponse, NextRequest } from "next/server";
 import { z } from "zod";
+import jwt from "jsonwebtoken";
 
 interface iLoginBody {
   email: string;
@@ -12,7 +13,7 @@ interface iLoginBody {
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const reqBody = await req.json();
-    signupSchema.parse(reqBody);
+    loginSchema.parse(reqBody);
     const { email, password } = reqBody as iLoginBody;
 
     const checkExisitingUser = await prisma.user.findUnique({
@@ -26,22 +27,36 @@ export async function POST(req: NextRequest, res: NextResponse) {
         success: false,
       });
     }
-    const user = await prisma.user.create({
-      data: {
+    const checkUserLogin = await prisma.user.findFirst({
+      where: {
         email,
         password,
       },
     });
-    if (user) {
+
+    if (!checkUserLogin) {
       return NextResponse.json({
-        message: `User Registered ${email}`,
-        success: true,
+        message: `Invalid password`,
+        success: false,
       });
     }
-    return NextResponse.json({
-      message: "User not registered",
-      success: false,
+
+    const tokenData = {
+      id: checkUserLogin.id,
+      email: checkUserLogin.email,
+    };
+    const token = jwt.sign(tokenData, process.env.JWT_SECRET as string, {
+      expiresIn: "1h",
     });
+
+    const response = NextResponse.json({
+      message: "User logged in",
+      success: true,
+    });
+    response.cookies.set("token", token, {
+      httpOnly: true,
+    });
+    return response;
   } catch (error) {
     if (error instanceof z.ZodError) {
       return handleZodError(error);

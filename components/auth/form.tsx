@@ -7,6 +7,7 @@ import signupSchema from "@/zodSchemas/signupSchema";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { LoaderCircle } from "lucide-react";
+import { useAtom } from "jotai";
 import {
   Form,
   FormControl,
@@ -19,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 
 interface iFormProps {
   isLoginForm: boolean;
@@ -33,19 +35,26 @@ function AuthForm({ isLoginForm }: iFormProps) {
   const defaultValuesToUse = isLoginForm
     ? { email: "", password: "" }
     : { email: "", password: "", confirmPassword: "" };
-
+  const [formSubmissionError, setFormSubmissionError] = useState(null);
   const form = useForm<LoginFormValues | SignupFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValuesToUse,
   });
+  const [isLoginFormTemp, setIsLoginFormTemp] = useAtom(jotaiAtoms.isLoginForm);
 
   const onSubmit = async (data: LoginFormValues | SignupFormValues) => {
-    console.log(data);
+    setFormSubmissionError(null);
     const APIROUTE = isLoginForm ? "/api/login" : "/api/signup";
     try {
       setIsSubmitting(true);
       const response = await axios.post(APIROUTE, data);
-      console.log(response.data);
+
+      if (response.data.success === false) {
+        setFormSubmissionError(response.data.message);
+      }
+      if (response.data.success && !isLoginForm) {
+        setIsLoginFormTemp(true);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -56,6 +65,11 @@ function AuthForm({ isLoginForm }: iFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {formSubmissionError && (
+          <div className="text-red-600 font-bold w-full flex justify-center items-center bg-slate-100 p-2 my-4 border border-red-600 rounded-lg shadow-md">
+            {formSubmissionError}
+          </div>
+        )}
         <FormField
           control={form.control}
           name="email"

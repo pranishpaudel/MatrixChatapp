@@ -5,9 +5,11 @@ import Image from "next/image";
 import { Separator } from "../ui/separator";
 import AuthForm from "./form";
 import { useState } from "react";
+import { useAtom } from "jotai";
+import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 
 const AuthComponent = () => {
-  const [isLoginForm, setIsLoginForm] = useState(true);
+  const [isLoginForm, setIsLoginForm] = useAtom(jotaiAtoms.isLoginForm);
 
   return (
     <>
