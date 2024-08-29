@@ -62,6 +62,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
       console.log(error);
     } finally {
       setIsSubmitting(false);
+      !isLoginForm && form.reset();
     }
   };
 
