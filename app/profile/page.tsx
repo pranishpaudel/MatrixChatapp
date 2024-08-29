@@ -1,14 +1,26 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import solidColorImage from "@/constants/userProfileImage";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 const Page = () => {
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [avatarText, setAvatarText] = useState("CN");
   const [avatarColor, setAvatarColor] = useState("blue");
   const allColors = ["red", "orange", "green", "blue"];
+  useEffect(() => {
+    if (firstName && lastName) {
+      setAvatarText(
+        `${firstName[0].toLocaleUpperCase()}${lastName[0].toLocaleUpperCase()}`
+      );
+    } else {
+      setAvatarText("CN");
+    }
+  }, [firstName, lastName]);
   if (!avatarColor) return null;
   return (
     <>
@@ -17,7 +29,10 @@ const Page = () => {
         <Avatar
           className={`w-32 h-32 md:w-40 md:h-40 relative md:right-[20%] md:bottom-[10%] border-2 border-${avatarColor}-500`}
         >
-          <AvatarFallback bgColor={`bg-${avatarColor}-500 text-white`}>
+          <AvatarFallback
+            style={{ color: `rgba(255, 255, 255, 0.6)` }}
+            className={`bg-${avatarColor}-500 text-2xl font-bold`}
+          >
             {avatarText}
           </AvatarFallback>
         </Avatar>
@@ -26,16 +41,21 @@ const Page = () => {
             type="email"
             placeholder="Email"
             className="w-64 md:w-80 bg-gray-800 text-white border border-gray-700 focus:border-gray-500"
+            onChange={(e) => setEmail(e.target.value)}
           />
           <Input
             type="text"
             placeholder="First Name"
             className="w-64 md:w-80 bg-gray-800 text-white border border-gray-700 focus:border-gray-500"
+            onChange={(e) => {
+              setFirstName(e.target.value);
+            }}
           />
           <Input
             type="text"
             placeholder="Last Name"
             className="w-64 md:w-80 bg-gray-800 text-white border border-gray-700 focus:border-gray-500"
+            onChange={(e) => setLastName(e.target.value)}
           />
 
           <span className="avatarColors flex flex-row space-x-4 md:space-x-8 relative top-5">
