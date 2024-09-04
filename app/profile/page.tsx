@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/ui/modeToggle";
 
 const Page = () => {
   const [email, setEmail] = useState("");
@@ -35,6 +36,7 @@ const Page = () => {
     <>
       <div className="h-[100vh] bg-gray-900 flex flex-col md:flex-row justify-center items-center">
         <ArrowLeft className="text-white hover:text-gray-400 hover:cursor-pointer h-10 w-10 absolute top-5 md:top-[180px] right-5 md:right-[73%]" />
+        <ModeToggle />
         <Avatar
           className="w-32 h-32 md:w-40 md:h-40 relative md:right-[20%] md:bottom-[10%] border-2"
           style={{ borderColor: avatarColor }}
