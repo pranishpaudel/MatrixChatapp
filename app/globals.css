@@ -58,6 +58,9 @@
     --chart-5: 340 75% 55%;
   }
 }
+html.dark {
+  @apply bg-gray-900;
+}
 
 @layer base {
   * {
