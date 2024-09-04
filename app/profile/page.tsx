@@ -1,17 +1,19 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/modeToggle";
+import { FileImage } from "lucide-react";
 
 const Page = () => {
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [avatarText, setAvatarText] = useState("CN");
   const [avatarColor, setAvatarColor] = useState("#3B82F6"); // Default color (blue)
+  const [avatarImage, setAvatarImage] = useState(null);
+  const fileInputRef = useRef(null);
 
   const allColors = [
     { name: "red", hex: "#EF4444" },
@@ -20,15 +22,18 @@ const Page = () => {
     { name: "blue", hex: "#3B82F6" },
   ];
 
-  useEffect(() => {
-    if (firstName && lastName) {
-      setAvatarText(
-        `${firstName[0].toLocaleUpperCase()}${lastName[0].toLocaleUpperCase()}`
-      );
-    } else {
-      setAvatarText("CN");
+  const handleFileChange = (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result;
+        setAvatarImage(base64String);
+        console.log(base64String); // Log the base64 string to the console
+      };
+      reader.readAsDataURL(file);
     }
-  }, [firstName, lastName]);
+  };
 
   if (!avatarColor) return null;
 
@@ -44,25 +49,42 @@ const Page = () => {
           className="w-32 h-32 md:w-40 md:h-40 relative md:right-[20%] md:bottom-[10%] border-2"
           style={{ borderColor: avatarColor }}
         >
-          <AvatarFallback
-            style={{
-              color: "rgba(255, 255, 255, 0.6)",
-              backgroundColor: avatarColor,
-            }}
-            className="text-2xl font-bold"
-          >
-            {avatarText}
-          </AvatarFallback>
+          {avatarImage ? (
+            <AvatarImage src={avatarImage} alt="Avatar" />
+          ) : (
+            <AvatarFallback
+              style={{
+                color: "rgba(255, 255, 255, 0.6)",
+                backgroundColor: avatarColor,
+              }}
+              className="text-2xl font-bold relative"
+            >
+              <FileImage
+                className="relative h-[50px] w-[50px] text-gray-800 hover:text-gray-600 hover:cursor-pointer"
+                onClick={() => fileInputRef.current.click()}
+              />
+            </AvatarFallback>
+          )}
         </Avatar>
+
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          onChange={handleFileChange}
+        />
+
         <div className="inputSection flex flex-col space-y-4 mt-8 md:mt-0 md:absolute md:top-[33%]">
           <Input
             type="email"
+            focusRingColor="blue-500"
             placeholder="Email"
             className="w-64 md:w-80 bg-gray-800 text-white border border-gray-700 focus:border-gray-500"
             onChange={(e) => setEmail(e.target.value)}
           />
           <Input
             type="text"
+            focusRingColor="blue-500"
             placeholder="First Name"
             className="w-64 md:w-80 bg-gray-800 text-white border border-gray-700 focus:border-gray-500"
             onChange={(e) => {
@@ -71,6 +93,7 @@ const Page = () => {
           />
           <Input
             type="text"
+            focusRingColor="blue-500"
             placeholder="Last Name"
             className="w-64 md:w-80 bg-gray-800 text-white border border-gray-700 focus:border-gray-500"
             onChange={(e) => setLastName(e.target.value)}
