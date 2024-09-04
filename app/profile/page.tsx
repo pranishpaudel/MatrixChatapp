@@ -82,7 +82,7 @@ const Page = () => {
                       color: "white",
                       cursor: "pointer",
                       border: `2px solid ${
-                        avatarColor === color.hex ? color.hex : "transparent"
+                        avatarColor === color.hex ? "white" : "transparent"
                       }`,
                     }}
                     className="w-12 h-12"
