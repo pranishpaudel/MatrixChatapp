@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/modeToggle";
-import { FileImage } from "lucide-react";
+import { FilePlus } from "lucide-react";
 
 const Page = () => {
   const [email, setEmail] = useState("");
@@ -60,7 +60,7 @@ const Page = () => {
               }}
               className="text-2xl font-bold relative"
             >
-              <FileImage
+              <FilePlus
                 className="relative h-[50px] w-[50px] text-gray-800 hover:text-gray-600 hover:cursor-pointer"
                 onClick={() =>
                   fileInputRef.current && fileInputRef.current.click()
