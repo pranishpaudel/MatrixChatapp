@@ -7,3 +7,5 @@ const client = new S3Client({
     secretAccessKey: process.env.AWS_ACCESS_SECRET as string,
   },
 });
+
+export default client;
