@@ -13,7 +13,7 @@ const Page = () => {
   const [lastName, setLastName] = useState("");
   const [avatarColor, setAvatarColor] = useState("#3B82F6"); // Default color (blue)
   const [avatarImage, setAvatarImage] = useState(null);
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const allColors = [
     { name: "red", hex: "#EF4444" },
@@ -27,10 +27,11 @@ const Page = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64String = reader.result;
-        setAvatarImage(base64String);
-        console.log(base64String); // Log the base64 string to the console
+        const base64String = reader.result as string; // Type assertion
+        setAvatarImage(base64String as any);
+        console.log(base64String);
       };
+
       reader.readAsDataURL(file);
     }
   };
@@ -61,7 +62,9 @@ const Page = () => {
             >
               <FileImage
                 className="relative h-[50px] w-[50px] text-gray-800 hover:text-gray-600 hover:cursor-pointer"
-                onClick={() => fileInputRef.current.click()}
+                onClick={() =>
+                  fileInputRef.current && fileInputRef.current.click()
+                }
               />
             </AvatarFallback>
           )}
