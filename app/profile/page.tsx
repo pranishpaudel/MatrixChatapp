@@ -124,11 +124,10 @@ const Page = () => {
           </span>
         </div>
       </div>
-      <div className="absolute bottom-[10%] md:top-[60%] mt-[15px] right-[37%] ">
-        <Button className="bg-purple-500 w-[400px] hover:bg-purple-400">
-          Submit
-        </Button>
-      </div>
+
+      <Button className="absolute bottom-[10%] left-1/2 transform -translate-x-1/2 md:top-[60%] mt-[15px] bg-purple-500 w-64 md:w-80 hover:bg-purple-400">
+        Submit
+      </Button>
     </>
   );
 };
