@@ -47,7 +47,7 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
         <ModeToggle />
       </div>
       <div className="h-[100vh] bg-gray-900 flex flex-col md:flex-row justify-center items-center">
-        <ArrowLeft className="text-white hover:text-gray-400 hover:cursor-pointer h-10 w-10 absolute top-5 md:top-[180px] right-5 md:right-[73%]" />
+        <ArrowLeft className="text-white hover:text-gray-400 hover:cursor-pointer h-10 w-10 absolute top-[20%] left-5 md:top-[180px] md:right-[73%] md:left-64" />
 
         <Avatar
           className="w-32 h-32 md:w-40 md:h-40 relative md:right-[20%] md:bottom-[10%] border-2"
