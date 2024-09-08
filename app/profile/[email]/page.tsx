@@ -7,8 +7,11 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/modeToggle";
 import { FilePlus } from "lucide-react";
 
-const Page = () => {
-  const [email, setEmail] = useState("");
+interface ParamsType {
+  email: string;
+}
+const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
+  const decodedEmail = decodeURIComponent(params.email);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [avatarColor, setAvatarColor] = useState("#3B82F6"); // Default color (blue)
@@ -82,8 +85,9 @@ const Page = () => {
             type="email"
             focusRingColor="blue-500"
             placeholder="Email"
-            className="w-64 md:w-80 bg-gray-800 text-white border border-gray-700 focus:border-gray-500"
-            onChange={(e) => setEmail(e.target.value)}
+            className="w-64 md:w-80 bg-gray-800 text-gray-400 border border-gray-700 focus:border-gray-500"
+            value={decodedEmail}
+            readOnly
           />
           <Input
             type="text"
