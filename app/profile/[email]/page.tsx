@@ -85,7 +85,7 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
             type="email"
             focusRingColor="blue-500"
             placeholder="Email"
-            className="w-64 md:w-80 bg-gray-800 text-gray-400 border border-gray-700 focus:border-gray-500"
+            className="w-64 md:w-80 bg-gray-800 text-gray-400 hover:text-gray-200 border border-gray-700 focus:border-gray-500"
             value={decodedEmail}
             readOnly
           />
@@ -93,7 +93,7 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
             type="text"
             focusRingColor="blue-500"
             placeholder="First Name"
-            className="w-64 md:w-80 bg-gray-800 text-white border border-gray-700 focus:border-gray-500"
+            className="w-64 md:w-80 bg-gray-800 text-gray-300 border border-gray-700 focus:border-gray-500"
             onChange={(e) => {
               setFirstName(e.target.value);
             }}
@@ -102,7 +102,7 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
             type="text"
             focusRingColor="blue-500"
             placeholder="Last Name"
-            className="w-64 md:w-80 bg-gray-800 text-white border border-gray-700 focus:border-gray-500"
+            className="w-64 md:w-80 bg-gray-800 text-gray-300 border border-gray-700 focus:border-gray-500"
             onChange={(e) => setLastName(e.target.value)}
           />
 
