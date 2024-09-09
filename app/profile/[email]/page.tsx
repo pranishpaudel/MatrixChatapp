@@ -51,29 +51,34 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
       <div className="h-[100vh] bg-gray-900 flex flex-col md:flex-row justify-center items-center">
         <ArrowLeft className="text-white hover:text-gray-400 hover:cursor-pointer h-10 w-10 absolute top-[20%] left-5 md:top-[180px] md:right-[73%] md:left-64" />
 
-        <Avatar
-          className="w-32 h-32 md:w-40 md:h-40 relative md:right-[20%] md:bottom-[10%] border-2"
-          style={{ borderColor: avatarColor }}
-        >
-          {avatarImage ? (
-            <AvatarImage src={avatarImage} alt="Avatar" />
-          ) : (
-            <AvatarFallback
-              style={{
-                color: "rgba(255, 255, 255, 0.6)",
-                backgroundColor: avatarColor,
-              }}
-              className="text-2xl font-bold relative"
-            >
-              <FilePlus
-                className="relative h-[50px] w-[50px] text-gray-800 hover:text-gray-600 hover:cursor-pointer"
-                onClick={() =>
-                  fileInputRef.current && fileInputRef.current.click()
-                }
-              />
-            </AvatarFallback>
-          )}
-        </Avatar>
+        <div className="profile-container flex flex-col items-center md:relative md:right-[20%]">
+          <Avatar
+            className="w-32 h-32 md:w-40 md:h-40 border-2 flex justify-center items-center"
+            style={{ borderColor: avatarColor }}
+          >
+            {avatarImage ? (
+              <AvatarImage src={avatarImage} alt="Avatar" />
+            ) : (
+              <AvatarFallback
+                style={{
+                  color: "rgba(255, 255, 255, 0.6)",
+                  backgroundColor: avatarColor,
+                }}
+                className="text-2xl font-bold relative"
+              >
+                <FilePlus
+                  className="relative h-[50px] w-[50px] text-gray-800 hover:text-gray-600 hover:cursor-pointer"
+                  onClick={() =>
+                    fileInputRef.current && fileInputRef.current.click()
+                  }
+                />
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <p className="text-center mt-4 text-gray-400  text-md">
+            Profile Picture
+          </p>
+        </div>
 
         <input
           type="file"

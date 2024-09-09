@@ -70,3 +70,14 @@ html.dark {
     @apply bg-background text-foreground;
   }
 }
+
+@media (min-width: 768px) {
+  .profile-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    top: -60px; /* Move upward */
+  }
+}
