@@ -48,6 +48,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         firstName,
         lastName,
         image: profileImageBase64,
+        isProfileSetup: true,
       },
     });
 

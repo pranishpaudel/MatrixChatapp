@@ -45,6 +45,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const tokenData = {
       id: checkUserLogin.id,
       email: checkUserLogin.email,
+      isProfileSetup,
     };
     const token = jwt.sign(tokenData, process.env.JWT_SECRET as string, {
       expiresIn: "1h",
@@ -53,7 +54,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const response = NextResponse.json({
       message: "User logged in",
       success: true,
-      profileSetup: isProfileSetup,
     });
     response.cookies.set("token", token, {
       httpOnly: true,

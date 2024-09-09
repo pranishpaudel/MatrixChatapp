@@ -6,6 +6,7 @@ interface JwtValidationResult {
   success: boolean;
   userId?: string;
   email?: string;
+  isProfileSetup?: boolean;
 }
 
 const jwtValidationFunction = async function (
@@ -24,6 +25,7 @@ const jwtValidationFunction = async function (
       success: true,
       userId: verifiedJWT.id,
       email: verifiedJWT.email,
+      isProfileSetup: verifiedJWT.isProfileSetup,
     };
   } catch (error) {
     // Clear the JWT cookie if it is invalid or expired

@@ -56,7 +56,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
         setIsLoginFormTemp(true);
       }
       if (response.data.success && isLoginForm) {
-        window.location.reload();
+        window.location.href = "/";
       }
     } catch (error) {
       console.log(error);
