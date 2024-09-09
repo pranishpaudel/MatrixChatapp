@@ -1,7 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState, useRef } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, LoaderCircle, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/modeToggle";
@@ -14,8 +14,11 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
   const decodedEmail = decodeURIComponent(params.email);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [avatarColor, setAvatarColor] = useState("#3B82F6"); // Default color (blue)
   const [avatarImage, setAvatarImage] = useState(null);
+  const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const allColors = [
@@ -39,8 +42,40 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
     }
   };
   const handleSubmit = async () => {
-    console.log("submitting");
+    try {
+      setIsSubmitting(true);
+      setTimeout(() => {
+        setIsSubmitted(false);
+      }, 5000);
+      if (!firstName || !lastName || !avatarImage) {
+        setError("Please fill in all fields and select an avatar image.");
+        alert("All fields are required");
+        return;
+      }
+      console.log("submitting");
+      const response = await fetch("/api/saveUserProfile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email: decodedEmail,
+          profileImageBase64: avatarImage,
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setIsSubmitted(true);
+      }
+      console.log(data);
+    } catch (error) {
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
   if (!avatarColor) return null;
 
   return (
@@ -137,10 +172,20 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
       </div>
 
       <Button
-        className="absolute bottom-[10%] left-1/2 transform -translate-x-1/2 md:top-[60%] mt-[15px] bg-purple-500 w-64 md:w-80 hover:bg-purple-400"
+        className={`absolute bottom-[10%] left-1/2 transform -translate-x-1/2 md:top-[60%] mt-[15px] ${
+          isSubmitted ? "bg-green-500" : "bg-purple-500"
+        } w-64 md:w-80 hover:bg-purple-400 transition-all duration-500 ${
+          isSubmitted ? "shrink-width" : ""
+        }`}
         onClick={handleSubmit}
       >
-        Submit
+        {isSubmitted ? (
+          <Check className="text-white h-9 animate-tick-mark" />
+        ) : isSubmitting ? (
+          <LoaderCircle className="animate-spin" />
+        ) : (
+          "Submit"
+        )}
       </Button>
     </>
   );
