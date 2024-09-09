@@ -38,7 +38,9 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
       reader.readAsDataURL(file);
     }
   };
-
+  const handleSubmit = async () => {
+    console.log("submitting");
+  };
   if (!avatarColor) return null;
 
   return (
@@ -129,7 +131,10 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
         </div>
       </div>
 
-      <Button className="absolute bottom-[10%] left-1/2 transform -translate-x-1/2 md:top-[60%] mt-[15px] bg-purple-500 w-64 md:w-80 hover:bg-purple-400">
+      <Button
+        className="absolute bottom-[10%] left-1/2 transform -translate-x-1/2 md:top-[60%] mt-[15px] bg-purple-500 w-64 md:w-80 hover:bg-purple-400"
+        onClick={handleSubmit}
+      >
         Submit
       </Button>
     </>
