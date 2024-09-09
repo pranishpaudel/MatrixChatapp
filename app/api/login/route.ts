@@ -41,6 +41,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       });
     }
 
+    const isProfileSetup = checkUserLogin?.isProfileSetup;
     const tokenData = {
       id: checkUserLogin.id,
       email: checkUserLogin.email,
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const response = NextResponse.json({
       message: "User logged in",
       success: true,
+      profileSetup: isProfileSetup,
     });
     response.cookies.set("token", token, {
       httpOnly: true,
