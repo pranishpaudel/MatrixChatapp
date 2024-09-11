@@ -1,11 +1,15 @@
-// middlewareHelpers.ts
+// profileMiddleware.ts
 
 import regex from "@/constants/RegularExpressions";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function handleProfileRoutes(
   request: NextRequest,
-  jwtDetails: { success: boolean; email: string | undefined }
+  jwtDetails: {
+    success: boolean;
+    email: string | undefined;
+    isProfileSetup: boolean;
+  }
 ) {
   const { pathname } = request.nextUrl;
   const isJwtValid = jwtDetails.success;

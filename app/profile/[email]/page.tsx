@@ -67,7 +67,22 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
       });
       const data = await response.json();
       if (data.success) {
+        //update the token
+        const response = await fetch("/api/updateJWT", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: decodedEmail,
+          }),
+        });
+        const data = await response.json();
         setIsSubmitted(true);
+        if (data.success) {
+          setIsSubmitted(true);
+          window.location.href = "/";
+        }
       }
       console.log(data);
     } catch (error) {

@@ -12,8 +12,17 @@ export async function middleware(request: NextRequest) {
 
   const jwtDetails = await jwtValidationFunction(token);
   const isJwtValid = jwtDetails.success;
+  // Bypass the middleware for the /auth path
+  if (pathname === "/auth" && isJwtValid) {
+    return NextResponse.redirect(`${request.nextUrl.origin}`);
+  } else if (pathname === "/auth") {
+    return NextResponse.next();
+  }
 
-  if (pathname.startsWith("/profile") && !jwtDetails.isProfileSetup) {
+  if (!token || !isJwtValid) {
+    return NextResponse.redirect(REDIRECTION_FOR_UNAUTHENTICATED);
+  }
+  if (pathname.startsWith("/profile")) {
     const profileResponse = await handleProfileRoutes(
       request,
       jwtDetails as any
@@ -21,20 +30,7 @@ export async function middleware(request: NextRequest) {
     if (profileResponse !== NextResponse.next()) {
       return profileResponse;
     }
-  } else if (isJwtValid && !jwtDetails.isProfileSetup) {
-    return NextResponse.redirect(`${request.nextUrl.origin}/profile`);
   }
-
-  // Bypass the middleware for the /auth path
-  if (pathname === "/auth" && isJwtValid) {
-    return NextResponse.redirect(`${request.nextUrl.origin}`);
-  } else if (pathname === "/auth") {
-    return NextResponse.next();
-  }
-  if (!token || !isJwtValid) {
-    return NextResponse.redirect(REDIRECTION_FOR_UNAUTHENTICATED);
-  }
-
   return NextResponse.next();
 }
 
