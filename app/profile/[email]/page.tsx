@@ -28,6 +28,28 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
     { name: "blue", hex: "#3B82F6" },
   ];
 
+  //check if profile already exists
+  useEffect(() => {
+    const checkProfile = async () => {
+      const response = await fetch("/api/getUserDetails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          identifier: decodedEmail,
+          data: ["firstName", "lastName", "isProfileSetup", "image"],
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setFirstName(data.data.firstName);
+        setLastName(data.data.lastName);
+        setAvatarImage(data.data.image);
+      }
+    };
+    checkProfile();
+  }, [decodedEmail]);
   const handleFileChange = (event: any) => {
     const file = event.target.files[0];
     if (file) {
@@ -150,6 +172,7 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
             type="text"
             focusRingColor="blue-500"
             placeholder="First Name"
+            value={firstName}
             className="w-64 md:w-80 bg-gray-800 text-gray-300 border border-gray-700 focus:border-gray-500"
             onChange={(e) => {
               setFirstName(e.target.value);
@@ -159,6 +182,7 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
             type="text"
             focusRingColor="blue-500"
             placeholder="Last Name"
+            value={lastName}
             className="w-64 md:w-80 bg-gray-800 text-gray-300 border border-gray-700 focus:border-gray-500"
             onChange={(e) => setLastName(e.target.value)}
           />
