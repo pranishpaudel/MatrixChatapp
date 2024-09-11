@@ -30,6 +30,10 @@ export async function middleware(request: NextRequest) {
     if (profileResponse !== NextResponse.next()) {
       return profileResponse;
     }
+  } else if (!pathname.startsWith("/profile") && !jwtDetails.isProfileSetup) {
+    return NextResponse.redirect(
+      `${request.nextUrl.origin}/profile/${jwtDetails.email}`
+    );
   }
   return NextResponse.next();
 }
