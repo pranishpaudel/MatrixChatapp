@@ -6,6 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/modeToggle";
 import { FilePlus } from "lucide-react";
+import {
+  GET_USER_DETAILS_ROUTE,
+  SAVE_USER_PROFILE_ROUTE,
+  UPDATE_JWT_ROUTE,
+} from "@/constants/routes";
 
 interface ParamsType {
   email: string;
@@ -31,7 +36,7 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
   //check if profile already exists
   useEffect(() => {
     const checkProfile = async () => {
-      const response = await fetch("/api/getUserDetails", {
+      const response = await fetch(GET_USER_DETAILS_ROUTE, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +80,7 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
         return;
       }
       console.log("submitting");
-      const response = await fetch("/api/saveUserProfile", {
+      const response = await fetch(SAVE_USER_PROFILE_ROUTE, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -90,7 +95,7 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
       const data = await response.json();
       if (data.success) {
         //update the token
-        const response = await fetch("/api/updateJWT", {
+        const response = await fetch(UPDATE_JWT_ROUTE, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

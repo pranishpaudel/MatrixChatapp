@@ -15,7 +15,6 @@ interface iGetUserBody {
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const JWTData = await isJWTValidForApi(req);
-    console.log(JWTData);
     const reqBody = await req.json();
     getUserSchema.parse(reqBody);
     const { identifier, data } = reqBody as iGetUserBody;

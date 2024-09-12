@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
+import { LOGIN_ROUTE, SIGNUP_ROUTE } from "@/constants/routes";
 
 interface iFormProps {
   isLoginForm: boolean;
@@ -44,7 +45,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
 
   const onSubmit = async (data: LoginFormValues | SignupFormValues) => {
     setFormSubmissionError(null);
-    const APIROUTE = isLoginForm ? "/api/login" : "/api/signup";
+    const APIROUTE = isLoginForm ? LOGIN_ROUTE : SIGNUP_ROUTE;
     try {
       setIsSubmitting(true);
       const response = await axios.post(APIROUTE, data);
