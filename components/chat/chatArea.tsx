@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { Paperclip, Smile, SendHorizontal } from "lucide-react";
-import EmojiPicker from "emoji-picker-react";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 
 const ChatArea = () => {
   const [message, setMessage] = useState("");
@@ -36,7 +36,7 @@ const ChatArea = () => {
             </div>
             {showEmojiPicker && (
               <div className="absolute bottom-[4em] right-0">
-                <EmojiPicker onEmojiClick={onEmojiClick} />
+                <EmojiPicker onEmojiClick={onEmojiClick} theme={Theme.DARK} />
               </div>
             )}
           </div>
