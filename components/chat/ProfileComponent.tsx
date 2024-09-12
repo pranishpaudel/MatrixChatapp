@@ -1,6 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ProfileComponent = () => {
+  //get Userdata
+
   return (
     <div>
       <Avatar>
