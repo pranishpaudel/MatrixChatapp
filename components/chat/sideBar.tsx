@@ -10,7 +10,7 @@ const SideBar = () => {
         <div className="text-lg text-gray-300 relative left-[10%]">
           Channels
         </div>
-        <div className="absolute bottom-0 mb-3 ml-[25px]">
+        <div className="absolute bottom-0 mb-6 ml-[25px]">
           <ProfileComponent />
         </div>
       </div>
