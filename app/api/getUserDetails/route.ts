@@ -9,16 +9,15 @@ import { NextResponse, NextRequest } from "next/server";
 import { z } from "zod";
 
 interface iGetUserBody {
-  identifier: string;
   data: string;
 }
+
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const JWTData = await isJWTValidForApi(req);
     const reqBody = await req.json();
-    getUserSchema.parse(reqBody);
-    const { identifier, data } = reqBody as iGetUserBody;
-    //identify if email or id
+    getUserSchema.parse(reqBody); // You might need to adjust your getUserSchema
+    const { data } = reqBody as iGetUserBody;
 
     if (!JWTData.success) {
       return NextResponse.json(
@@ -29,26 +28,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
         { status: 401 }
       );
     }
-    const isEmail = regex.emailRegex.test(identifier) as boolean;
-    if (isEmail && JWTData.email !== identifier) {
-      return NextResponse.json(
-        {
-          message: "Unauthorized Email",
-          success: false,
-        },
-        { status: 401 }
-      );
-    } else if (identifier !== JWTData.userId && !isEmail) {
-      return NextResponse.json(
-        {
-          message: "Unauthorized Id",
-          success: false,
-        },
-        { status: 401 }
-      );
-    }
-    //get data
-    const dataFromPrisma = await getUserDataFromPrisma(identifier, data);
+
+    // Use JWTData.userId as the identifier
+    const dataFromPrisma = await getUserDataFromPrisma(
+      JWTData.userId as string,
+      data
+    );
+
     return NextResponse.json(
       {
         message: "User Data",

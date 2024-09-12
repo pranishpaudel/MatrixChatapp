@@ -1,3 +1,5 @@
+import ProfileComponent from "./ProfileComponent";
+
 const SideBar = () => {
   return (
     <div className="flex h-full">
@@ -7,6 +9,9 @@ const SideBar = () => {
         </div>
         <div className="text-lg text-gray-300 relative left-[10%]">
           Channels
+        </div>
+        <div className="absolute bottom-0 mb-3 ml-[25px]">
+          <ProfileComponent />
         </div>
       </div>
     </div>

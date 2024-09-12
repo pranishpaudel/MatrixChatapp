@@ -42,7 +42,6 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          identifier: decodedEmail,
           data: ["firstName", "lastName", "isProfileSetup", "image"],
         }),
       });
