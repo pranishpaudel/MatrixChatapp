@@ -1,6 +1,3 @@
-import Image from "next/image";
-import { Separator } from "../ui/separator";
-
 const LogoArea = () => {
   return (
     <div className="flex h-full items-center justify-between mt-0 ml-1">
@@ -33,10 +30,7 @@ const LogoArea = () => {
           <span className="text-3xl font-semibold">Matrix</span>
         </div>
       </div>
-
-      <Separator className="h-full" orientation="vertical" />
     </div>
   );
 };
-
 export default LogoArea;
