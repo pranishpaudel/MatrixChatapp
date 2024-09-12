@@ -41,7 +41,7 @@ const ChatArea = () => {
             )}
           </div>
 
-          <button className="h-[4em] ml-2 px-4 bg-blue-600 text-white text-lg rounded">
+          <button className="h-[4em] ml-2 px-4 bg-purple-600 text-white text-lg rounded">
             <SendHorizontal className="hover:text-slate-400 h-[100%]" />
           </button>
         </div>
