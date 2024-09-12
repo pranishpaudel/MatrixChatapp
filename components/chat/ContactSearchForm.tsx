@@ -13,7 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 
-function ContactSearchForm({ onClose }) {
+interface ContactSearchFormProps {
+  onClose: () => void;
+}
+
+function ContactSearchForm({ onClose }: ContactSearchFormProps) {
   return (
     <Card className="w-[350px] relative">
       <button
