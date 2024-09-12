@@ -18,6 +18,22 @@ interface ContactSearchFormProps {
 }
 
 function ContactSearchForm({ onClose }: ContactSearchFormProps) {
+  const [searchText, setSearchText] = React.useState("");
+  const [selectedName, setSelectedName] = React.useState("");
+
+  // Seed an array of names
+  const names = [
+    "John Doe",
+    "Jane Smith",
+    "Adsalice Johnson",
+    "Bodsab Williams",
+  ];
+
+  // Filter the names based on the search text
+  const filteredNames = names.filter((name) =>
+    name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   return (
     <Card className="w-[350px] relative bg-gray-800">
       <button
@@ -34,9 +50,23 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
           type="text"
           id="search"
           enableFocusRing={false}
+          onChange={(e) => setSearchText(e.target.value)}
           placeholder="Search for your friend"
           className="w-full h-[3em] text-slate-300 text-lg"
         />
+        <ul className="mt-4 max-h-40 overflow-y-auto">
+          {filteredNames.map((name) => (
+            <li
+              key={name}
+              className={`cursor-pointer p-2 hover:bg-gray-700 rounded-md ${
+                selectedName === name ? "bg-gray-700" : ""
+              }`}
+              onClick={() => setSelectedName(name)}
+            >
+              {name}
+            </li>
+          ))}
+        </ul>
       </CardContent>
     </Card>
   );
