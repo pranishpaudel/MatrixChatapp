@@ -1,7 +1,16 @@
+"use client";
+import { useState } from "react";
 import { Input } from "../ui/input";
 import { Paperclip, Smile, SendHorizontal } from "lucide-react";
+import EmojiPicker from "emoji-picker-react";
 
 const ChatArea = () => {
+  const [message, setMessage] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  const onEmojiClick = (emojiObject: any) => {
+    setMessage((prevMessage) => prevMessage + emojiObject.emoji);
+  };
   return (
     <div className="ml-2 h-full flex flex-col">
       <div className="flex-grow">
@@ -14,12 +23,22 @@ const ChatArea = () => {
               type="text"
               placeholder="Enter your message"
               className="w-full h-[4em] bg-gray-800 text-slate-300 text-lg pr-20"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
               enableFocusRing={false}
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2 text-slate-300">
               <Paperclip className="cursor-pointer" />
-              <Smile className="cursor-pointer" />
+              <Smile
+                className="cursor-pointer"
+                onClick={() => setShowEmojiPicker((prev) => !prev)}
+              />
             </div>
+            {showEmojiPicker && (
+              <div className="absolute bottom-[4em] right-0">
+                <EmojiPicker onEmojiClick={onEmojiClick} />
+              </div>
+            )}
           </div>
 
           <button className="h-[4em] ml-2 px-4 bg-blue-600 text-white text-lg rounded">
