@@ -19,7 +19,7 @@ interface ContactSearchFormProps {
 
 function ContactSearchForm({ onClose }: ContactSearchFormProps) {
   return (
-    <Card className="w-[350px] relative">
+    <Card className="w-[350px] relative bg-gray-800">
       <button
         className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
         onClick={onClose}
@@ -27,10 +27,17 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
         <X />
       </button>
       <CardHeader>
-        <CardTitle>Create project</CardTitle>
-        <CardDescription>Deploy your new project in one-click.</CardDescription>
+        <CardTitle className="text-md">Search your friend</CardTitle>
       </CardHeader>
-      {/* Rest of the code */}
+      <CardContent>
+        <Input
+          type="text"
+          id="search"
+          enableFocusRing={false}
+          placeholder="Search for your friend"
+          className="w-full h-[3em] text-slate-300 text-lg"
+        />
+      </CardContent>
     </Card>
   );
 }
