@@ -45,6 +45,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
               mode: "insensitive",
             },
           },
+          {
+            email: {
+              contains: searchText,
+              mode: "insensitive",
+            },
+          },
         ],
       },
     });
