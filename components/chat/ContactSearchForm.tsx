@@ -49,7 +49,7 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
     if (selectedFriendId) {
       addFriend();
     }
-  }, [selectedFriendId]);
+  });
 
   // Fetch the search results based on the search text
   React.useEffect(() => {
