@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
+import Lottie from "react-lottie";
 import {
   Card,
   CardContent,
@@ -55,17 +56,32 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
           className="w-full h-[3em] text-slate-300 text-lg"
         />
         <ul className="mt-4 max-h-40 overflow-y-auto">
-          {filteredNames.map((name) => (
-            <li
-              key={name}
-              className={`cursor-pointer p-2 hover:bg-gray-700 rounded-md ${
-                selectedName === name ? "bg-gray-700" : ""
-              }`}
-              onClick={() => setSelectedName(name)}
-            >
-              {name}
-            </li>
-          ))}
+          {searchText && filteredNames.length != 0 && (
+            <>
+              {filteredNames.map((name) => (
+                <li
+                  key={name}
+                  className={`cursor-pointer p-2 hover:bg-gray-700 rounded-md ${
+                    selectedName === name ? "bg-gray-700" : ""
+                  }`}
+                  onClick={() => setSelectedName(name)}
+                >
+                  {name}
+                </li>
+              ))}
+            </>
+          )}
+
+          <Lottie
+            isClickToPauseDisabled={true}
+            height={200}
+            width={200}
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: require("@/public/lottie-json.json"),
+            }}
+          />
         </ul>
       </CardContent>
     </Card>
