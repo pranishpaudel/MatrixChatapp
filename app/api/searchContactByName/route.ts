@@ -51,6 +51,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     //extract data firstName, lastName and email only from the dataFromPrisma
     const dataToShow = dataFromPrisma.map((user) => {
       return {
+        id: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,

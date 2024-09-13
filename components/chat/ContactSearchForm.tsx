@@ -15,6 +15,7 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
   const [selectedName, setSelectedName] = React.useState("");
   const [searchResults, setSearchResults] = React.useState<
     {
+      id: string;
       firstName: string | null;
       lastName: string;
       email: string;
@@ -68,8 +69,8 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
           {searchResults.length > 0 ? (
             searchResults.map((result, index) => (
               <li
-                key={index}
-                className={`cursor-pointer p-2 hover:bg-gray-700 rounded-md ${
+                key={result.id}
+                className={`cursor-pointer p-2 hover:bg-gray-900 rounded-md ${
                   selectedName === `${result.firstName} ${result.lastName}`
                     ? "bg-gray-700"
                     : ""
