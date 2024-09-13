@@ -44,6 +44,13 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
     console.log(data);
   };
 
+  // Trigger addFriend when selectedFriendId changes
+  React.useEffect(() => {
+    if (selectedFriendId) {
+      addFriend();
+    }
+  }, [selectedFriendId]);
+
   // Fetch the search results based on the search text
   React.useEffect(() => {
     const searchContact = async () => {
@@ -95,8 +102,7 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
                   selectedFriendId === result.id ? "bg-gray-700" : ""
                 }`}
                 onClick={() => {
-                  setSelectedFriendId(result.id); // Set selectedFriendId when clicked
-                  addFriend(); // Call addFriend
+                  setSelectedFriendId(result.id);
                 }}
               >
                 <div className="flex items-center space-x-4">
