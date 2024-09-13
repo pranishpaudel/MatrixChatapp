@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import { SEARCH_CONTACT_BY_NAME_ROUTE } from "@/constants/routes";
 import Lottie from "react-lottie";
-
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 interface ContactSearchFormProps {
   onClose: () => void;
 }
@@ -78,12 +78,28 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
                   setSelectedName(`${result.firstName} ${result.lastName}`)
                 }
               >
-                <div className="text-slate-300">
-                  <strong>
-                    {result.firstName ?? ""} {result.lastName}
-                  </strong>
+                <div className="flex items-center space-x-4">
+                  <Avatar>
+                    <AvatarImage
+                      src={
+                        result.image
+                          ? result.image
+                          : "https://avatars.dicebear.com/api/avataaars/shadcn.svg"
+                      }
+                      alt="@shadcn"
+                      height={40}
+                      width={40}
+                    />
+                  </Avatar>
+                  <div className="flex flex-col justify-center">
+                    <div className="text-slate-300">
+                      <strong>
+                        {result.firstName ?? ""} {result.lastName}
+                      </strong>
+                    </div>
+                    <div className="text-slate-400">{result.email}</div>
+                  </div>
                 </div>
-                <div className="text-slate-400">{result.email}</div>
               </li>
             ))
           ) : searchText ? (
