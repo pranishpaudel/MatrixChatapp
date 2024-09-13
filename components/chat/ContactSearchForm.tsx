@@ -28,28 +28,36 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
   const [selectedFriendId, setSelectedFriendId] = React.useState("");
 
   // Add friend function
-  const addFriend = async () => {
+  const addFriend = React.useCallback(async () => {
     if (!selectedFriendId) return;
 
-    const response = await fetch(ADD_FRIEND_ROUTE, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        friendId: selectedFriendId, // Use selectedFriendId
-      }),
-    });
-    const data = await response.json();
-    console.log(data);
-  };
+    try {
+      const response = await fetch(ADD_FRIEND_ROUTE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          friendId: selectedFriendId,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        onClose(); // Close the card after the friend is added successfully
+      }
+    } catch (error) {
+      console.error("Error adding friend:", error);
+    }
+  }, [selectedFriendId, onClose]);
 
   // Trigger addFriend when selectedFriendId changes
   React.useEffect(() => {
     if (selectedFriendId) {
       addFriend();
     }
-  });
+  }, [selectedFriendId, addFriend]);
 
   // Fetch the search results based on the search text
   React.useEffect(() => {
