@@ -1,17 +1,7 @@
 import * as React from "react";
-
 import { Button } from "@/components/ui/button";
-import Lottie from "react-lottie";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 import { SEARCH_CONTACT_BY_NAME_ROUTE } from "@/constants/routes";
 
@@ -22,33 +12,33 @@ interface ContactSearchFormProps {
 function ContactSearchForm({ onClose }: ContactSearchFormProps) {
   const [searchText, setSearchText] = React.useState("");
   const [selectedName, setSelectedName] = React.useState("");
+  const [searchResults, setSearchResults] = React.useState<
+    {
+      firstName: string | null;
+      lastName: string;
+      email: string;
+      image: string | null;
+    }[]
+  >([]);
 
-  // Seed an array of names
-  const names = [
-    "John Doe",
-    "Jane Smith",
-    "Adsalice Johnson",
-    "Bodsab Williams",
-  ];
-
-  // Filter the names based on the search text
-  const filteredNames = names.filter((name) =>
-    name.toLowerCase().includes(searchText.toLowerCase())
-  );
-
+  // Fetch the search results based on the search text
   React.useEffect(() => {
     const searchContact = async () => {
-      const response = await fetch(SEARCH_CONTACT_BY_NAME_ROUTE, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          searchText,
-        }),
-      });
-      const data = await response.json();
-      console.log(data);
+      if (searchText) {
+        const response = await fetch(SEARCH_CONTACT_BY_NAME_ROUTE, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            searchText,
+          }),
+        });
+        const data = await response.json();
+        setSearchResults(data.data || []);
+      } else {
+        setSearchResults([]);
+      }
     };
     searchContact();
   }, [searchText]);
@@ -74,32 +64,30 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
           className="w-full h-[3em] text-slate-300 text-lg"
         />
         <ul className="mt-4 max-h-40 overflow-y-auto">
-          {searchText && filteredNames.length != 0 && (
-            <>
-              {filteredNames.map((name) => (
+          {searchResults.length > 0
+            ? searchResults.map((result, index) => (
                 <li
-                  key={name}
+                  key={index}
                   className={`cursor-pointer p-2 hover:bg-gray-700 rounded-md ${
-                    selectedName === name ? "bg-gray-700" : ""
+                    selectedName === `${result.firstName} ${result.lastName}`
+                      ? "bg-gray-700"
+                      : ""
                   }`}
-                  onClick={() => setSelectedName(name)}
+                  onClick={() =>
+                    setSelectedName(`${result.firstName} ${result.lastName}`)
+                  }
                 >
-                  {name}
+                  <div className="text-slate-300">
+                    <strong>
+                      {result.firstName ?? ""} {result.lastName}
+                    </strong>
+                  </div>
+                  <div className="text-slate-400">{result.email}</div>
                 </li>
-              ))}
-            </>
-          )}
-
-          <Lottie
-            isClickToPauseDisabled={true}
-            height={200}
-            width={200}
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: require("@/public/lottie-json.json"),
-            }}
-          />
+              ))
+            : searchText && (
+                <li className="text-slate-400">No contacts found</li>
+              )}
         </ul>
       </CardContent>
     </Card>
