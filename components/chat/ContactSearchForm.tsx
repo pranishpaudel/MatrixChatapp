@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import { SEARCH_CONTACT_BY_NAME_ROUTE } from "@/constants/routes";
+import Lottie from "react-lottie";
 
 interface ContactSearchFormProps {
   onClose: () => void;
@@ -64,30 +65,46 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
           className="w-full h-[3em] text-slate-300 text-lg"
         />
         <ul className="mt-4 max-h-40 overflow-y-auto">
-          {searchResults.length > 0
-            ? searchResults.map((result, index) => (
-                <li
-                  key={index}
-                  className={`cursor-pointer p-2 hover:bg-gray-700 rounded-md ${
-                    selectedName === `${result.firstName} ${result.lastName}`
-                      ? "bg-gray-700"
-                      : ""
-                  }`}
-                  onClick={() =>
-                    setSelectedName(`${result.firstName} ${result.lastName}`)
-                  }
-                >
-                  <div className="text-slate-300">
-                    <strong>
-                      {result.firstName ?? ""} {result.lastName}
-                    </strong>
-                  </div>
-                  <div className="text-slate-400">{result.email}</div>
-                </li>
-              ))
-            : searchText && (
-                <li className="text-slate-400">No contacts found</li>
-              )}
+          {searchResults.length > 0 ? (
+            searchResults.map((result, index) => (
+              <li
+                key={index}
+                className={`cursor-pointer p-2 hover:bg-gray-700 rounded-md ${
+                  selectedName === `${result.firstName} ${result.lastName}`
+                    ? "bg-gray-700"
+                    : ""
+                }`}
+                onClick={() =>
+                  setSelectedName(`${result.firstName} ${result.lastName}`)
+                }
+              >
+                <div className="text-slate-300">
+                  <strong>
+                    {result.firstName ?? ""} {result.lastName}
+                  </strong>
+                </div>
+                <div className="text-slate-400">{result.email}</div>
+              </li>
+            ))
+          ) : searchText ? (
+            <>
+              <li className="text-slate-400">No contacts found</li>
+            </>
+          ) : null}
+          {searchText.length <= 0 && (
+            <>
+              <Lottie
+                isClickToPauseDisabled={true}
+                height={200}
+                width={200}
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: require("@/public/lottie-json.json"),
+                }}
+              />
+            </>
+          )}
         </ul>
       </CardContent>
     </Card>
