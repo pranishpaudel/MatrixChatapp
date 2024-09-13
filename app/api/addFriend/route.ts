@@ -28,13 +28,41 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const userId = JWTData.userId as string;
 
+    // Check if userId and friendId are the same
+    if (userId === friendId) {
+      return NextResponse.json(
+        {
+          message: "You cannot add yourself as a friend",
+          success: false,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check if the friend relationship already exists
+    const existingFriendship = await prisma.friend.findFirst({
+      where: {
+        userId,
+        friendId,
+      },
+    });
+
+    if (existingFriendship) {
+      return NextResponse.json(
+        {
+          message: "Friendship already exists",
+          success: false,
+        },
+        { status: 400 }
+      );
+    }
+
     const friend = await prisma.friend.create({
       data: {
         userId, // the ID of the user who is making the friend connection
         friendId, // the ID of the friend user
       },
     });
-    console.log(friend);
 
     return NextResponse.json(
       {
