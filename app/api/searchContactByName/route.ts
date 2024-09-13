@@ -36,11 +36,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
           {
             firstName: {
               contains: searchText,
+              mode: "insensitive",
             },
           },
           {
             lastName: {
               contains: searchText,
+              mode: "insensitive",
             },
           },
         ],

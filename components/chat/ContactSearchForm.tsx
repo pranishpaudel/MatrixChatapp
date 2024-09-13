@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
+import { SEARCH_CONTACT_BY_NAME_ROUTE } from "@/constants/routes";
 
 interface ContactSearchFormProps {
   onClose: () => void;
@@ -34,6 +35,23 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
   const filteredNames = names.filter((name) =>
     name.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  React.useEffect(() => {
+    const searchContact = async () => {
+      const response = await fetch(SEARCH_CONTACT_BY_NAME_ROUTE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          searchText,
+        }),
+      });
+      const data = await response.json();
+      console.log(data);
+    };
+    searchContact();
+  }, [searchText]);
 
   return (
     <Card className="w-[350px] relative bg-gray-800">
