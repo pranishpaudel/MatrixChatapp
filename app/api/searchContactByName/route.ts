@@ -4,7 +4,6 @@ import getUserDataFromPrisma from "@/helpers/prismaUserDetailsProvider";
 import handleZodError from "@/lib/Errors/handleZodError";
 import prisma from "@/prisma/prisma.config";
 import searchContactSchema from "@/zodSchemas/searchContactSchema";
-import saveUserProfileSchema from "@/zodSchemas/userProfileSchema";
 import { NextResponse, NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -31,12 +30,30 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const userId = JWTData.userId as string; // Extract userId from the JWT
 
+    // Fetch user's existing friends
+    const existingFriends = await prisma.friend.findMany({
+      where: {
+        OR: [{ userId }, { friendId: userId }],
+      },
+      select: {
+        friendId: true,
+        userId: true,
+      },
+    });
+
+    // Extract IDs of existing friends
+    const friendIds = existingFriends.map((friend) =>
+      friend.userId === userId ? friend.friendId : friend.userId
+    );
+
+    // Fetch users from Prisma excluding existing friends
     const dataFromPrisma = await prisma.user.findMany({
       where: {
         AND: [
           {
             id: {
-              not: userId, // Exclude your own user data
+              not: userId, // Exclude own user data
+              notIn: friendIds, // Exclude already added friends
             },
           },
           {
@@ -59,16 +76,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
       },
     });
 
-    // Extract data firstName, lastName, email, and image only from the dataFromPrisma
-    const dataToShow = dataFromPrisma.map((user) => {
-      return {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        image: user.image,
-      };
-    });
+    // Extract firstName, lastName, email, and image from the result
+    const dataToShow = dataFromPrisma.map((user) => ({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      image: user.image,
+    }));
 
     return NextResponse.json(
       {
