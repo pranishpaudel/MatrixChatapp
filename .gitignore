@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 /chatServer/node_modules
+/chatServer/dist
 /.pnp
 .pnp.js
 .yarn/install-state.gz

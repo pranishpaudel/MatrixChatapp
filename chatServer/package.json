@@ -5,11 +5,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc-watch --onSuccess \"node dist/index.js\""
+    "start": "node dist/index.js",
+    "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
+    "build": "tsc -p ."
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "express": "^4.21.0",
     "tsc-watch": "^6.2.0",
     "typescript": "^5.6.2"
   }
