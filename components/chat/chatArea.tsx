@@ -3,23 +3,30 @@ import { useState } from "react";
 import { Input } from "../ui/input";
 import { Paperclip, Smile, SendHorizontal } from "lucide-react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
-import ChatTypingSection from "./chatTypingSection";
+import { useAtom } from "jotai";
+import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
+import ChatMessageList from "./chatMessageList";
 
 const ChatArea = () => {
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [currentChatFriend] = useAtom(jotaiAtoms.currentChatFriend);
 
   const onEmojiClick = (emojiObject: any) => {
     setMessage((prevMessage) => prevMessage + emojiObject.emoji);
   };
+
   return (
     <div className="ml-2 h-full flex flex-col">
-      <div className="flex-grow">
-        {/* Chat messages can be displayed here */}
-        <ChatTypingSection />
+      <div className="flex-grow overflow-hidden">
+        {currentChatFriend.isSet && <ChatMessageList />}
       </div>
-      <div id="input" className="mb-4 ml">
+      <div id="input" className="mt-4 mb-4 flex justify-center">
+        {" "}
+        {/* Changed to justify-center */}
         <div className="flex items-center w-[70%] space-x-2">
+          {" "}
+          {/* You can adjust the width as needed */}
           <div className="relative flex-grow">
             <Input
               type="text"
@@ -42,7 +49,6 @@ const ChatArea = () => {
               </div>
             )}
           </div>
-
           <button className="h-[4em] ml-2 px-4 bg-purple-600 text-white text-lg rounded">
             <SendHorizontal className="hover:text-slate-400 h-[100%]" />
           </button>
