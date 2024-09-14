@@ -20,20 +20,24 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
     (msg) => {
-      console.log("Send message", msg);
       socket?.emit("event:message", { message: msg });
     },
     [socket]
   );
+  const onMessageRec = useCallback((msg: string) => {
+    console.log("Received message", msg);
+  }, []);
   useEffect(() => {
     console.log("SocketProvider useEffect");
     const _socket = io("http://localhost:8000");
+    _socket.on("message", onMessageRec);
     setSocket(_socket);
     return () => {
       _socket.disconnect();
+      _socket.off("message", onMessageRec);
       setSocket(null);
     };
-  }, []);
+  }, [onMessageRec]);
 
   return (
     <SocketContext.Provider value={{ sendMessage }}>

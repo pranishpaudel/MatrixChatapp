@@ -16,20 +16,9 @@ sub.on("error", (err) => {
 });
 
 // Subscribe to the "MESSAGES" channel
-sub.subscribe("MESSAGES", (err, count) => {
-  if (err) {
-    console.error("Failed to subscribe: ", err.message);
-  } else {
-    console.log(
-      `Subscribed successfully! This client is currently subscribed to ${count} channels.`
-    );
-  }
-});
+sub.subscribe("MESSAGES");
 
 // Listen for messages on the "MESSAGES" channel
-sub.on("message", (channel, message) => {
-  console.log(`Received message from ${channel}: ${message}`);
-});
 
 class SocketService {
   private _io: Server;
@@ -41,6 +30,9 @@ class SocketService {
         allowedHeaders: ["*"],
         origin: "*",
       },
+    });
+    sub.on("message", (channel, message) => {
+      this._io.emit("event:message", JSON.parse(message));
     });
   }
 
@@ -58,6 +50,12 @@ class SocketService {
           console.log("Message published to Redis", result);
         } catch (err) {
           console.error("Failed to publish message:", err);
+        }
+      });
+      sub.on("message", (channel, message) => {
+        if (channel === "MESSAGES") {
+          console.log(`Received message from ${channel}: ${message}`);
+          this._io.emit("message", JSON.parse(message));
         }
       });
       socket.on("disconnect", () => {
