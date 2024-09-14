@@ -2,6 +2,7 @@ import ChatArea from "@/components/chat/chatArea";
 import LogoArea from "@/components/chat/logoArea";
 import SideBar from "@/components/chat/sideBar";
 import { Separator } from "@/components/ui/separator";
+import ChatNavArea from "../../components/chat/chatNavArea";
 
 const Page = () => {
   return (
@@ -18,8 +19,10 @@ const Page = () => {
         <Separator className="h-full" orientation="vertical" />
       </div>
 
-      <div id="navArea" className="col-span-10 row-span-2"></div>
-      <div id="mainChatArea" className="col-span-10 row-span-10 ">
+      <div id="navArea" className="col-span-10 row-span-1">
+        <ChatNavArea />
+      </div>
+      <div id="mainChatArea" className="col-span-10 row-span-11 ">
         <ChatArea />
       </div>
     </div>

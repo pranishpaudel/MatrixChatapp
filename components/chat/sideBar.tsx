@@ -1,16 +1,24 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useAtom } from "jotai";
+import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Plus } from "lucide-react";
 import ProfileComponent from "./ProfileComponent";
 import ContactSearchForm from "./ContactSearchForm";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { useAtom } from "jotai";
-import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
+import { useEffect, useState } from "react";
+type Friend = {
+  firstName: string;
+  lastName: string;
+  image: string;
+};
 
 const SideBar = () => {
   const [isFormVisible, setFormVisible] = useState(false);
-  const [allFriendsInfo, setAllFriendsInfo] = useState([]);
+  const [allFriendsInfo, setAllFriendsInfo] = useState<Friend[]>([]);
   const [updateFriendStatus] = useAtom(jotaiAtoms.updateFriendStatus);
+  const [currentChatFriend, setCurrentChatFriend] = useAtom(
+    jotaiAtoms.currentChatFriend
+  );
   const [isFetching, setIsFetching] = useState(true);
   const [selectedFriendIndex, setSelectedFriendIndex] = useState<number | null>(
     null
@@ -32,6 +40,15 @@ const SideBar = () => {
 
   const handleFriendClick = (index: number) => {
     setSelectedFriendIndex(index); // Set selected friend index
+
+    // Update currentChatFriend atom with the selected friend's details
+    const selectedFriend = allFriendsInfo[index];
+    setCurrentChatFriend({
+      firstName: selectedFriend.firstName,
+      lastName: selectedFriend.lastName,
+      image: selectedFriend.image,
+      isSet: true,
+    });
   };
 
   return (
@@ -74,7 +91,6 @@ const SideBar = () => {
             ))
           ) : (
             <p className="text-gray-400 px-[10%]">
-              {" "}
               {isFetching ? "Searching For Friends" : "No friends added yet."}
             </p>
           )}
