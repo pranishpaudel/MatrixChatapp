@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -26,4 +23,16 @@ model User {
   isProfileSetup    Boolean  @default(false)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  friends           Friend[] @relation("UserFriends") // Add back-reference to `user` in `Friend` model
+  friendConnections Friend[] @relation("UserFriendConnections") // Add back-reference to `friend` in `Friend` model
+}
+
+model Friend {
+  id        String   @id @default(cuid())
+  user      User     @relation("UserFriends", fields: [userId], references: [id])
+  userId    String // The user who is adding the friend
+  friend    User     @relation("UserFriendConnections", fields: [friendId], references: [id])
+  friendId  String // The friend being added
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -3,16 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
-import { SEARCH_CONTACT_BY_NAME_ROUTE } from "@/constants/routes";
+import {
+  ADD_FRIEND_ROUTE,
+  SEARCH_CONTACT_BY_NAME_ROUTE,
+} from "@/constants/routes";
 import Lottie from "react-lottie";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useAtom } from "jotai";
+import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
+
 interface ContactSearchFormProps {
   onClose: () => void;
 }
 
 function ContactSearchForm({ onClose }: ContactSearchFormProps) {
   const [searchText, setSearchText] = React.useState("");
-  const [selectedName, setSelectedName] = React.useState("");
+  const [updateFriendStatus, setUpdateFriendStatus] = useAtom(
+    jotaiAtoms.updateFriendStatus
+  );
   const [searchResults, setSearchResults] = React.useState<
     {
       id: string;
@@ -22,6 +30,39 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
       image: string | null;
     }[]
   >([]);
+  const [selectedFriendId, setSelectedFriendId] = React.useState("");
+
+  // Add friend function
+  const addFriend = React.useCallback(async () => {
+    if (!selectedFriendId) return;
+
+    try {
+      const response = await fetch(ADD_FRIEND_ROUTE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          friendId: selectedFriendId,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUpdateFriendStatus(!updateFriendStatus);
+        onClose(); // Close the card after the friend is added successfully
+      }
+    } catch (error) {
+      console.error("Error adding friend:", error);
+    }
+  }, [selectedFriendId, onClose, setUpdateFriendStatus, updateFriendStatus]);
+
+  // Trigger addFriend when selectedFriendId changes
+  React.useEffect(() => {
+    if (selectedFriendId) {
+      addFriend();
+    }
+  }, [selectedFriendId, addFriend]);
 
   // Fetch the search results based on the search text
   React.useEffect(() => {
@@ -67,17 +108,15 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
         />
         <ul className="mt-4 max-h-40 overflow-y-auto">
           {searchResults.length > 0 ? (
-            searchResults.map((result, index) => (
+            searchResults.map((result) => (
               <li
                 key={result.id}
                 className={`cursor-pointer p-2 hover:bg-gray-900 rounded-md ${
-                  selectedName === `${result.firstName} ${result.lastName}`
-                    ? "bg-gray-700"
-                    : ""
+                  selectedFriendId === result.id ? "bg-gray-700" : ""
                 }`}
-                onClick={() =>
-                  setSelectedName(`${result.firstName} ${result.lastName}`)
-                }
+                onClick={() => {
+                  setSelectedFriendId(result.id);
+                }}
               >
                 <div className="flex items-center space-x-4">
                   <Avatar>
@@ -104,23 +143,19 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
               </li>
             ))
           ) : searchText ? (
-            <>
-              <li className="text-slate-400">No contacts found</li>
-            </>
+            <li className="text-slate-400">No contacts found</li>
           ) : null}
           {searchText.length <= 0 && (
-            <>
-              <Lottie
-                isClickToPauseDisabled={true}
-                height={200}
-                width={200}
-                options={{
-                  loop: true,
-                  autoplay: true,
-                  animationData: require("@/public/lottie-json.json"),
-                }}
-              />
-            </>
+            <Lottie
+              isClickToPauseDisabled={true}
+              height={200}
+              width={200}
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: require("@/public/lottie-json.json"),
+              }}
+            />
           )}
         </ul>
       </CardContent>
