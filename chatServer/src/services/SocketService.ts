@@ -4,20 +4,8 @@ import Redis from "ioredis";
 // Connect to Redis
 const serviceUri =
   "rediss://default:AVNS_bZyrZ7T9-2PsZX49E8H@caching-972a5c3-sindsa26-d146.l.aivencloud.com:10664";
-const pub = new Redis({
-  host: "caching-972a5c3-sindsa26-d146.l.aivencloud.com",
-  port: 10664,
-  username: "default",
-  password: "AVNS_bZyrZ7T9-2PsZX49E8H",
-});
-
-const sub = new Redis({
-  host: "caching-972a5c3-sindsa26-d146.l.aivencloud.com",
-  port: 10664,
-  username: "default",
-  password: "AVNS_bZyrZ7T9-2PsZX49E8H",
-});
-
+const pub = new Redis(serviceUri);
+const sub = new Redis(serviceUri);
 // Error handling for Redis connections
 pub.on("error", (err) => {
   console.error("Redis pub error:", err);
