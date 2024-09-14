@@ -9,6 +9,8 @@ import {
 } from "@/constants/routes";
 import Lottie from "react-lottie";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useAtom } from "jotai";
+import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 
 interface ContactSearchFormProps {
   onClose: () => void;
@@ -16,6 +18,9 @@ interface ContactSearchFormProps {
 
 function ContactSearchForm({ onClose }: ContactSearchFormProps) {
   const [searchText, setSearchText] = React.useState("");
+  const [updateFriendStatus, setUpdateFriendStatus] = useAtom(
+    jotaiAtoms.updateFriendStatus
+  );
   const [searchResults, setSearchResults] = React.useState<
     {
       id: string;
@@ -44,13 +49,13 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
+        setUpdateFriendStatus(!updateFriendStatus);
         onClose(); // Close the card after the friend is added successfully
       }
     } catch (error) {
       console.error("Error adding friend:", error);
     }
-  }, [selectedFriendId, onClose]);
+  }, [selectedFriendId, onClose, setUpdateFriendStatus, updateFriendStatus]);
 
   // Trigger addFriend when selectedFriendId changes
   React.useEffect(() => {

@@ -5,3 +5,4 @@ export const SAVE_USER_PROFILE_ROUTE = "/api/saveUserProfile";
 export const UPDATE_JWT_ROUTE = "/api/updateJWT";
 export const SEARCH_CONTACT_BY_NAME_ROUTE = "/api/searchContactByName";
 export const ADD_FRIEND_ROUTE = "/api/addFriend";
+export const GET_FRIENDS_LIST_ROUTE = "/api/getFriendsList";
