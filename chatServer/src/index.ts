@@ -1,16 +1,12 @@
-import express from "express";
-
-const app = express();
-const PORT = 3001;
-
-app.get("/", (req, res) => {
-  res.send("Hello World");
-});
-
-app
-  .listen(PORT, () => {
+import SocketService from "./services/SocketService.js";
+import http from "http";
+async function init() {
+  const socketService = new SocketService();
+  const httpServer = http.createServer();
+  const PORT = 8000;
+  socketService.io.attach(httpServer);
+  httpServer.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-  })
-  .on("error", (err) => {
-    console.error("Failed to start server:", err);
   });
+}
+init();
