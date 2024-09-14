@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Input } from "../ui/input";
 import { Paperclip, Smile, SendHorizontal } from "lucide-react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
+import ChatTypingSection from "./chatTypingSection";
 
 const ChatArea = () => {
   const [message, setMessage] = useState("");
@@ -15,8 +16,9 @@ const ChatArea = () => {
     <div className="ml-2 h-full flex flex-col">
       <div className="flex-grow">
         {/* Chat messages can be displayed here */}
+        <ChatTypingSection />
       </div>
-      <div id="input" className="mb-4 ml-5">
+      <div id="input" className="mb-4 ml">
         <div className="flex items-center w-[70%] space-x-2">
           <div className="relative flex-grow">
             <Input
