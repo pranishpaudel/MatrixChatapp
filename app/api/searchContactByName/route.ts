@@ -29,26 +29,37 @@ export async function POST(req: NextRequest, res: NextResponse) {
       );
     }
 
-    //search all contacts with the given search text if includes in first name or last name
+    const userId = JWTData.userId as string; // Extract userId from the JWT
+
     const dataFromPrisma = await prisma.user.findMany({
       where: {
-        OR: [
+        AND: [
           {
-            firstName: {
-              contains: searchText,
-              mode: "insensitive",
+            id: {
+              not: userId, // Exclude your own user data
             },
           },
           {
-            lastName: {
-              contains: searchText,
-              mode: "insensitive",
-            },
+            OR: [
+              {
+                firstName: {
+                  contains: searchText,
+                  mode: "insensitive",
+                },
+              },
+              {
+                lastName: {
+                  contains: searchText,
+                  mode: "insensitive",
+                },
+              },
+            ],
           },
         ],
       },
     });
-    //extract data firstName, lastName and email only from the dataFromPrisma
+
+    // Extract data firstName, lastName, email, and image only from the dataFromPrisma
     const dataToShow = dataFromPrisma.map((user) => {
       return {
         id: user.id,
@@ -58,6 +69,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         image: user.image,
       };
     });
+
     return NextResponse.json(
       {
         message: "User Data",

@@ -75,7 +75,7 @@ const SideBar = () => {
           ) : (
             <p className="text-gray-400 px-[10%]">
               {" "}
-              {isFetching ? "Fetching Data" : "No friends added yet."}
+              {isFetching ? "Searching For Friends" : "No friends added yet."}
             </p>
           )}
         </div>
