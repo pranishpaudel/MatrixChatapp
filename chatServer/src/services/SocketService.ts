@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import Redis from "ioredis";
+import { produceMessage } from "./kafka.js";
 
 const serviceUri =
   "rediss://default:AVNS_bZyrZ7T9-2PsZX49E8H@caching-972a5c3-sindsa26-d146.l.aivencloud.com:10664";
@@ -29,10 +30,11 @@ class SocketService {
     });
 
     // Single listener for Redis messages
-    sub.on("message", (channel, message) => {
+    sub.on("message", async (channel, message) => {
       if (channel === "MESSAGES") {
-        console.log(`Received message from ${channel}: ${message}`);
         this._io.emit("message", JSON.parse(message));
+        await produceMessage(message);
+        console.log("Message Produced to Kafka Broker");
       }
     });
   }
@@ -43,7 +45,7 @@ class SocketService {
       console.log("New client connected", socket.id);
 
       socket.on("event:message", async ({ message }: { message: string }) => {
-        console.log("New message received", message);
+        console.log("New message received from client socketio", message);
         try {
           const result = await pub.publish(
             "MESSAGES",
