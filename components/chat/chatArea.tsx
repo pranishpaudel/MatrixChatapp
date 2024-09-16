@@ -13,6 +13,9 @@ const ChatArea = () => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [currentChatFriend] = useAtom(jotaiAtoms.currentChatFriend);
   const { sendMessage } = useSocket();
+  const [localChatHistory, setLocalChatHistory] = useAtom(
+    jotaiAtoms.localChatHistory
+  );
 
   const onEmojiClick = (emojiObject: any) => {
     setMessage((prevMessage) => prevMessage + emojiObject.emoji);
@@ -21,6 +24,18 @@ const ChatArea = () => {
   const handleSendMessage = () => {
     if (message.trim()) {
       sendMessage(message);
+      setLocalChatHistory((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          sender: "user",
+          message,
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
       setMessage("");
     }
   };
