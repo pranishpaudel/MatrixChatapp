@@ -1,6 +1,11 @@
 import { Server } from "socket.io";
 import Redis from "ioredis";
 
+interface iMessageFromFrontend {
+  message: string;
+  senderId: string;
+  receiverId: string;
+}
 const serviceUri =
   "rediss://default:AVNS_bZyrZ7T9-2PsZX49E8H@caching-972a5c3-sindsa26-d146.l.aivencloud.com:10664";
 const pub = new Redis(serviceUri);
@@ -42,18 +47,29 @@ class SocketService {
     this._io.on("connection", (socket) => {
       console.log("New client connected", socket.id);
 
-      socket.on("event:message", async ({ message }: { message: string }) => {
-        console.log("New message received", message);
-        try {
-          const result = await pub.publish(
-            "MESSAGES",
-            JSON.stringify({ message })
+      socket.on(
+        "event:message",
+        async ({ message, senderId, receiverId }: iMessageFromFrontend) => {
+          console.log(
+            "New message received",
+            message,
+            "from",
+            senderId,
+            "to",
+            receiverId
           );
-          console.log("Message published to Redis", result);
-        } catch (err) {
-          console.error("Failed to publish message:", err);
+
+          try {
+            const result = await pub.publish(
+              "MESSAGES",
+              JSON.stringify({ message })
+            );
+            console.log("Message published to Redis", result);
+          } catch (err) {
+            console.error("Failed to publish message:", err);
+          }
         }
-      });
+      );
 
       socket.on("disconnect", () => {
         console.log("Client disconnected");

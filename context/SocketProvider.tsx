@@ -1,14 +1,17 @@
 "use client";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { useAtom } from "jotai";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
+
 interface SocketProviderProp {
   children?: React.ReactNode;
 }
+
 interface ISocketContext {
   sendMessage: (msg: string) => void;
 }
+
 const SocketContext = React.createContext<ISocketContext | null>(null);
 
 export const useSocket = () => {
@@ -18,33 +21,43 @@ export const useSocket = () => {
   }
   return context;
 };
+
 export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
-  const [socket, setSocket] = React.useState<Socket | null>(null);
+  const socketRef = useRef<Socket | null>(null);
   const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
   const [senderUserId] = useAtom(jotaiAtoms.currentSenderId);
-  const receivedUserId = receiverData.id;
+  const receivedUserId = receiverData?.id;
+
   console.log("receivedUserId", receivedUserId);
   console.log("senderUserId", senderUserId);
+
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
     (msg) => {
-      socket?.emit("event:message", {
-        message: msg,
-      });
+      if (socketRef.current) {
+        socketRef.current.emit("event:message", {
+          message: msg,
+          senderId: senderUserId,
+          receiverId: receivedUserId,
+        });
+      }
     },
-    [socket]
+    [senderUserId, receivedUserId]
   );
+
   const onMessageRec = useCallback((msg: string) => {
     console.log("Received message", msg);
   }, []);
+
   useEffect(() => {
     console.log("SocketProvider useEffect");
     const _socket = io("http://localhost:8000");
     _socket.on("message", onMessageRec);
-    setSocket(_socket);
+    socketRef.current = _socket;
+
     return () => {
       _socket.disconnect();
       _socket.off("message", onMessageRec);
-      setSocket(null);
+      socketRef.current = null;
     };
   }, [onMessageRec]);
 
