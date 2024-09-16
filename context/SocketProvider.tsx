@@ -44,14 +44,33 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
     [senderUserId, receivedUserId]
   );
 
-  const onMessageRec = useCallback((msg: string) => {
-    console.log("Received message", msg);
-  }, []);
+  const onMessageRec = useCallback(
+    (msg: { senderId: string; message: string }) => {
+      console.log("Received message from", msg.senderId, ":", msg.message);
+    },
+    []
+  );
 
   useEffect(() => {
     console.log("SocketProvider useEffect");
     const _socket = io("http://localhost:8000");
+
+    // Register the user ID with the server
+    if (senderUserId) {
+      _socket.emit("register", senderUserId);
+    }
+
     _socket.on("message", onMessageRec);
+
+    // Error handling
+    _socket.on("connect_error", (err) => {
+      console.error("Connection error:", err);
+    });
+
+    _socket.on("disconnect", (reason) => {
+      console.warn("Disconnected:", reason);
+    });
+
     socketRef.current = _socket;
 
     return () => {
@@ -59,7 +78,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
       _socket.off("message", onMessageRec);
       socketRef.current = null;
     };
-  }, [onMessageRec]);
+  }, [onMessageRec, senderUserId]);
 
   return (
     <SocketContext.Provider value={{ sendMessage }}>
