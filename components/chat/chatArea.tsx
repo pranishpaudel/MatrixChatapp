@@ -27,7 +27,7 @@ const ChatArea = () => {
       setLocalChatHistory((prev) => [
         ...prev,
         {
-          id: prev.length + 1,
+          id: prev.length + 1, // Ensure unique id generation
           sender: "user",
           message,
           timestamp: new Date().toLocaleTimeString([], {
