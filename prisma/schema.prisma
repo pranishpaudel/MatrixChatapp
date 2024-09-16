@@ -10,29 +10,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Message {
+  id          String   @id @default(cuid())
+  content     String
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id])
+  senderId    String
+  recipient   User     @relation("ReceivedMessages", fields: [recipientId], references: [id])
+  recipientId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model User {
-  id                String   @id @default(cuid())
-  email             String   @unique
+  id                String    @id @default(cuid())
+  email             String    @unique
   password          String
   firstName         String?
   lastName          String?
-  awsProfileCreated Boolean  @default(false)
+  awsProfileCreated Boolean   @default(false)
   role              String?
   image             String?
   color             Int?
-  isProfileSetup    Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  friends           Friend[] @relation("UserFriends") // Add back-reference to `user` in `Friend` model
-  friendConnections Friend[] @relation("UserFriendConnections") // Add back-reference to `friend` in `Friend` model
+  isProfileSetup    Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  friends           Friend[]  @relation("UserFriends")
+  friendConnections Friend[]  @relation("UserFriendConnections")
+  sentMessages      Message[] @relation("SentMessages")
+  receivedMessages  Message[] @relation("ReceivedMessages")
 }
 
 model Friend {
   id        String   @id @default(cuid())
   user      User     @relation("UserFriends", fields: [userId], references: [id])
-  userId    String // The user who is adding the friend
+  userId    String
   friend    User     @relation("UserFriendConnections", fields: [friendId], references: [id])
-  friendId  String // The friend being added
+  friendId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
