@@ -14,8 +14,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
         { status: 401 }
       );
     }
-    //search firstName,lastName, email and image of the friends of user
-    const friendsList = await prisma.friend.findMany({
+
+    // Search firstName, lastName, email, and image of the friends of user
+    const friendsList1 = await prisma.friend.findMany({
       where: {
         userId: JWTData.userId as string,
       },
@@ -30,14 +31,32 @@ export async function GET(req: NextRequest, res: NextResponse) {
       },
     });
 
-    // Extract friend details from the result
-    const friends = friendsList.map((friend) => friend.friend);
+    const friendsList2 = await prisma.friend.findMany({
+      where: {
+        friendId: JWTData.userId as string,
+      },
+      select: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    // Combine the results from both queries
+    const combinedFriendsList = [
+      ...friendsList1.map((friend) => friend.friend),
+      ...friendsList2.map((friend) => friend.user),
+    ];
 
     return NextResponse.json(
       {
         message: "Friends List",
         success: true,
-        data: friends,
+        data: combinedFriendsList,
       },
       { status: 200 }
     );
