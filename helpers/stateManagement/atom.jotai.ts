@@ -1,5 +1,17 @@
 import { atom } from "jotai";
 
+// Define the Chat type
+type Chat = {
+  id: number;
+  sender: "user" | "other";
+  message: string;
+  timestamp: string;
+};
+
+// Create the localChatHistory atom
+const localChatHistory = atom<Chat[]>([]);
+
+// Define the complete jotaiAtoms object
 const jotaiAtoms = {
   isLoginForm: atom(true),
   currentLoginEmail: atom(""),
@@ -12,6 +24,7 @@ const jotaiAtoms = {
     image: "",
     isSet: false,
   }),
+  localChatHistory,
 };
 
 export default jotaiAtoms;
