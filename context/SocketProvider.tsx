@@ -1,4 +1,6 @@
 "use client";
+import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
+import { useAtom } from "jotai";
 import React, { useCallback, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 interface SocketProviderProp {
@@ -18,9 +20,16 @@ export const useSocket = () => {
 };
 export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const [socket, setSocket] = React.useState<Socket | null>(null);
+  const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
+  const [senderUserId] = useAtom(jotaiAtoms.currentSenderId);
+  const receivedUserId = receiverData.id;
+  console.log("receivedUserId", receivedUserId);
+  console.log("senderUserId", senderUserId);
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
     (msg) => {
-      socket?.emit("event:message", { message: msg });
+      socket?.emit("event:message", {
+        message: msg,
+      });
     },
     [socket]
   );

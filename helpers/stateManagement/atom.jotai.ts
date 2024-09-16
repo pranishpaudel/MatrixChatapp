@@ -4,7 +4,9 @@ const jotaiAtoms = {
   isLoginForm: atom(true),
   currentLoginEmail: atom(""),
   updateFriendStatus: atom(false),
+  currentSenderId: atom(""),
   currentChatFriend: atom({
+    id: "",
     firstName: "",
     lastName: "",
     image: "",

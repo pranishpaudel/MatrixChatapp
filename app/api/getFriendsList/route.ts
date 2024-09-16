@@ -23,6 +23,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
       select: {
         friend: {
           select: {
+            id: true,
             firstName: true,
             lastName: true,
             image: true,
@@ -38,6 +39,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
       select: {
         user: {
           select: {
+            id: true,
             firstName: true,
             lastName: true,
             image: true,

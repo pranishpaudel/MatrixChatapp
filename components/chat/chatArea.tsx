@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Paperclip, Smile, SendHorizontal } from "lucide-react";
 import EmojiPicker, { Theme } from "emoji-picker-react";

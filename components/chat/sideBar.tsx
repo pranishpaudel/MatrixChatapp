@@ -6,7 +6,9 @@ import { Plus } from "lucide-react";
 import ProfileComponent from "./ProfileComponent";
 import ContactSearchForm from "./ContactSearchForm";
 import { useEffect, useState } from "react";
+
 type Friend = {
+  id: string;
   firstName: string;
   lastName: string;
   image: string;
@@ -44,6 +46,7 @@ const SideBar = () => {
     // Update currentChatFriend atom with the selected friend's details
     const selectedFriend = allFriendsInfo[index];
     setCurrentChatFriend({
+      id: selectedFriend.id,
       firstName: selectedFriend.firstName,
       lastName: selectedFriend.lastName,
       image: selectedFriend.image,
@@ -65,7 +68,7 @@ const SideBar = () => {
 
           {/* Loop through friends and display */}
           {allFriendsInfo && allFriendsInfo.length > 0 ? (
-            allFriendsInfo.map((friend: any, index: number) => (
+            allFriendsInfo.map((friend: Friend, index: number) => (
               <div
                 key={index}
                 onClick={() => handleFriendClick(index)}

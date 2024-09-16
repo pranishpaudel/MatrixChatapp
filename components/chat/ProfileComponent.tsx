@@ -3,13 +3,17 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { GET_USER_DETAILS_ROUTE } from "@/constants/routes";
 import { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
+import { useAtom } from "jotai";
+import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 
 const ProfileComponent = () => {
   const [imageData, setImageData] = useState("https://github.com/shadcn.png");
   const [firstName, setFirstName] = useState("User");
   const [lastName, setLastName] = useState("");
   const [fullName, setFullName] = useState("");
-
+  const [currentSenderId, setCurrentSenderId] = useAtom(
+    jotaiAtoms.currentSenderId
+  );
   useEffect(() => {
     firstName.length + lastName.length > 15
       ? setFullName(firstName.substring(0, 10) + "...")
@@ -25,7 +29,7 @@ const ProfileComponent = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          data: ["firstName", "lastName", "image"],
+          data: ["firstName", "lastName", "image", "id"],
         }),
       });
       const data = await response.json();
@@ -34,10 +38,11 @@ const ProfileComponent = () => {
         setFirstName(data.data.firstName);
         setLastName(data.data.lastName);
         setImageData(data.data.image);
+        setCurrentSenderId(data.data.id);
       }
     };
     checkProfile();
-  }, []);
+  }, [setCurrentSenderId]);
 
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
