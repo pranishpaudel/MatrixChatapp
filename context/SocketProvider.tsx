@@ -26,6 +26,9 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const socketRef = useRef<Socket | null>(null);
   const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
   const [senderUserId] = useAtom(jotaiAtoms.currentSenderId);
+  const [localChatHistory, setLocalChatHistory] = useAtom(
+    jotaiAtoms.localChatHistory
+  );
   const receivedUserId = receiverData?.id;
 
   console.log("receivedUserId", receivedUserId);
@@ -47,8 +50,20 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const onMessageRec = useCallback(
     (msg: { senderId: string; message: string }) => {
       console.log("Received message from", msg.senderId, ":", msg.message);
+      setLocalChatHistory((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          sender: "other",
+          message: msg.message,
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
     },
-    []
+    [setLocalChatHistory]
   );
 
   useEffect(() => {

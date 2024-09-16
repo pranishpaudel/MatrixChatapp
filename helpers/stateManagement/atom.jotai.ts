@@ -1,12 +1,12 @@
 import { atom } from "jotai";
 
 // Define the Chat type
-type Chat = {
+interface Chat {
   id: number;
   sender: "user" | "other";
   message: string;
   timestamp: string;
-};
+}
 
 // Create the localChatHistory atom
 const localChatHistory = atom<Chat[]>([]);

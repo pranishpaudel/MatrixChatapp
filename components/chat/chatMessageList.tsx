@@ -1,3 +1,5 @@
+import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
+import { useAtom } from "jotai";
 import React, { useState, useEffect, useRef } from "react";
 
 interface Chat {
@@ -10,62 +12,11 @@ interface Chat {
 const ChatMessageList: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const [localChatHistoryState] = useAtom(jotaiAtoms.localChatHistory);
 
   useEffect(() => {
-    const dummyChats: Chat[] = [
-      {
-        id: 1,
-        sender: "user",
-        message: "Hey there! How are you?",
-        timestamp: "10:15 AM",
-      },
-      {
-        id: 2,
-        sender: "other",
-        message: "I am good, thanks! What about you?",
-        timestamp: "10:16 AM",
-      },
-      {
-        id: 3,
-        sender: "user",
-        message: "I'm doing well too, thanks for asking!",
-        timestamp: "10:17 AM",
-      },
-      {
-        id: 4,
-        sender: "other",
-        message: "I am good, thanks! What about you?",
-        timestamp: "10:16 AM",
-      },
-      {
-        id: 5,
-        sender: "user",
-        message: "I'm doing well too, thanks for asking!",
-        timestamp: "10:17 AM",
-      },
-      {
-        id: 6,
-        sender: "user",
-        message: "I'm doing well too, thanks for asking!",
-        timestamp: "10:17 AM",
-      },
-      {
-        id: 7,
-        sender: "other",
-        message: "I am good, thanks! What about you?",
-        timestamp: "10:16 AM",
-      },
-      {
-        id: 8,
-        sender: "user",
-        message: "I'm doing well too, thanks for asking!",
-        timestamp: "10:17 AM",
-      },
-      // ... other dummy chats ...
-    ];
-
-    setChats(dummyChats);
-  }, []);
+    setChats(localChatHistoryState);
+  }, [localChatHistoryState]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
