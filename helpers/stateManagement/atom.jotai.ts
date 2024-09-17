@@ -1,13 +1,4 @@
-import { time } from "console";
 import { atom } from "jotai";
-
-// Define the Chat type
-interface Chat {
-  id: number;
-  sender: "user" | "other";
-  message: string;
-  timestamp: string;
-}
 
 // Define the complete jotaiAtoms object
 const jotaiAtoms = {
@@ -30,6 +21,8 @@ const jotaiAtoms = {
       hour: "2-digit",
       minute: "2-digit",
     }),
+    senderId: "", // Optional property
+    receiverId: "", // Optional property
   }),
 };
 

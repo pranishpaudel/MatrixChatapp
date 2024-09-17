@@ -13,7 +13,9 @@ const ChatMessageList: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [updateMessageStatus] = useAtom(jotaiAtoms.updateMessageStatus);
-  const [lastMessageReceived] = useAtom(jotaiAtoms.lastMessageReceived);
+  const [lastMessageReceived, setLastMessageReceived] = useAtom(
+    jotaiAtoms.lastMessageReceived
+  );
   const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
 
   useEffect(() => {
@@ -45,8 +47,9 @@ const ChatMessageList: React.FC = () => {
         timestamp: lastMessageReceived.timestamp,
       },
     ]);
+
     console.log("New message received", lastMessageReceived);
-  }, [updateMessageStatus, lastMessageReceived]);
+  }, [updateMessageStatus, lastMessageReceived, setLastMessageReceived]);
 
   useEffect(() => {
     if (chatContainerRef.current) {

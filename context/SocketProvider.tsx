@@ -50,13 +50,14 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const onMessageRec = useCallback(
     (msg: { senderId: string; message: string }) => {
       setUpdateMessageStatus(!updateMessageStatus);
-      console.log("Received message from", msg.senderId, ":", msg.message);
       setLastMessageReceived(
         Object.assign(lastMessageReceived, {
           userType: "other",
           message: msg.message,
+          senderId: msg.senderId,
         })
       );
+      console.log("Last message received", lastMessageReceived);
     },
     [
       setLastMessageReceived,

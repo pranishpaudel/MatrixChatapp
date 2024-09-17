@@ -31,6 +31,8 @@ const ChatArea = () => {
           hour: "2-digit",
           minute: "2-digit",
         }),
+        senderId: "",
+        receiverId: currentChatFriend.id as string,
       });
       setUpdateMessageStatus(!updateMessageStatus);
       setMessage("");
