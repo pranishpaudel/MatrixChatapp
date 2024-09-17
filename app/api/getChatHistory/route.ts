@@ -7,11 +7,11 @@ import { z } from "zod";
 
 interface iGetChatFriendUidBody {
   chatFriendUid: string;
-  numberOfMessages: number;
+  numberOfMessages?: number; // Made optional
 }
 
 interface Chat {
-  id: number;
+  id: string;
   sender: "user" | "other";
   message: string;
   timestamp: string;
@@ -52,11 +52,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
         createdAt: true,
         senderId: true,
       },
-      take: numberOfMessages,
+      ...(numberOfMessages && { take: numberOfMessages }),
     });
 
     const formattedChatHistory: Chat[] = chatHistory.map((message) => ({
-      id: Number(message.id), // Convert id to number
+      id: message.id,
       sender: message.senderId === userId ? "user" : "other",
       message: message.content,
       timestamp: message.createdAt.toISOString(),

@@ -1,3 +1,4 @@
+import { time } from "console";
 import { atom } from "jotai";
 
 // Define the Chat type
@@ -7,9 +8,6 @@ interface Chat {
   message: string;
   timestamp: string;
 }
-
-// Create the localChatHistory atom
-const localChatHistory = atom<Chat[]>([]);
 
 // Define the complete jotaiAtoms object
 const jotaiAtoms = {
@@ -24,7 +22,15 @@ const jotaiAtoms = {
     image: "",
     isSet: false,
   }),
-  localChatHistory,
+  updateMessageStatus: atom(false),
+  lastMessageReceived: atom({
+    userType: "",
+    message: "",
+    timestamp: new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  }),
 };
 
 export default jotaiAtoms;

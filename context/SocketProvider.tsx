@@ -26,8 +26,11 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const socketRef = useRef<Socket | null>(null);
   const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
   const [senderUserId] = useAtom(jotaiAtoms.currentSenderId);
-  const [localChatHistory, setLocalChatHistory] = useAtom(
-    jotaiAtoms.localChatHistory
+  const [updateMessageStatus, setUpdateMessageStatus] = useAtom(
+    jotaiAtoms.updateMessageStatus
+  );
+  const [lastMessageReceived, setLastMessageReceived] = useAtom(
+    jotaiAtoms.lastMessageReceived
   );
   const receivedUserId = receiverData?.id;
 
@@ -46,21 +49,21 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
 
   const onMessageRec = useCallback(
     (msg: { senderId: string; message: string }) => {
+      setUpdateMessageStatus(!updateMessageStatus);
       console.log("Received message from", msg.senderId, ":", msg.message);
-      setLocalChatHistory((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          sender: "other",
+      setLastMessageReceived(
+        Object.assign(lastMessageReceived, {
+          userType: "other",
           message: msg.message,
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        },
-      ]);
+        })
+      );
     },
-    [setLocalChatHistory]
+    [
+      setLastMessageReceived,
+      updateMessageStatus,
+      setUpdateMessageStatus,
+      lastMessageReceived,
+    ]
   );
 
   useEffect(() => {

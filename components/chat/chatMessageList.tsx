@@ -1,6 +1,6 @@
-import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { useAtom } from "jotai";
 import React, { useState, useEffect, useRef } from "react";
+import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 
 interface Chat {
   id: number;
@@ -12,9 +12,8 @@ interface Chat {
 const ChatMessageList: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
-  const [localChatHistoryState, setlocalChatHistoryState] = useAtom(
-    jotaiAtoms.localChatHistory
-  );
+  const [updateMessageStatus] = useAtom(jotaiAtoms.updateMessageStatus);
+  const [lastMessageReceived] = useAtom(jotaiAtoms.lastMessageReceived);
   const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
 
   useEffect(() => {
@@ -26,20 +25,28 @@ const ChatMessageList: React.FC = () => {
         },
         body: JSON.stringify({
           chatFriendUid: receiverData.id,
-          numberOfMessages: 10,
         }),
       });
       const data = await response.json();
       if (data.success) {
-        setlocalChatHistoryState(data.chatHistory);
+        setChats(data.chatHistory);
       }
     };
     fetchChatHistory();
-  }, [receiverData, setlocalChatHistoryState]);
+  }, [receiverData]);
 
   useEffect(() => {
-    setChats(localChatHistoryState);
-  }, [localChatHistoryState]);
+    setChats((prevChats) => [
+      ...prevChats,
+      {
+        id: prevChats.length + 1,
+        sender: lastMessageReceived.userType as "user" | "other",
+        message: lastMessageReceived.message,
+        timestamp: lastMessageReceived.timestamp,
+      },
+    ]);
+    console.log("New message received", lastMessageReceived);
+  }, [updateMessageStatus, lastMessageReceived]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
