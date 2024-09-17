@@ -47,6 +47,7 @@ const ChatMessageList: React.FC = () => {
           id: chat.id,
           sender: chat.sender,
           senderUid: chat.senderUid,
+          offlineMessage: false,
           receiverUid: chat.receiverUid,
           message: chat.message,
           timestamp: chat.timestamp,
