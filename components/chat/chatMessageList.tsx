@@ -11,6 +11,7 @@ interface Chat {
 
 interface OfflineChat extends Chat {
   senderUid?: string;
+  receiverUid?: string;
   offlineMessage?: boolean;
 }
 

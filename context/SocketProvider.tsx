@@ -40,7 +40,6 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
         socketRef.current.emit("event:message", {
           message: msg,
           senderId: senderUserId,
-          offlineMessage: true,
           receiverId: receivedUserId,
         });
       }
@@ -58,6 +57,8 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
           id: prevChats.length + 1,
           senderUid: msg.senderId,
           sender: "other",
+          offlineMessage: true,
+          receiverUid: receivedUserId,
           message: msg.message,
           timestamp: new Date().toLocaleTimeString([], {
             hour: "2-digit",
@@ -66,7 +67,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
         },
       ]);
     },
-    [setUpdateMessageStatus, setOfflineChats]
+    [setUpdateMessageStatus, setOfflineChats, receivedUserId]
   );
   useEffect(() => {
     const _socket = io("http://localhost:8000");
