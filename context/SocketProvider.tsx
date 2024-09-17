@@ -55,7 +55,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
         ...prevChats,
         {
           id: prevChats.length + 1,
-          senderUid: msg.senderId,
+          senderUid: senderUserId,
           sender: "other",
           offlineMessage: true,
           receiverUid: receivedUserId,
@@ -66,8 +66,9 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
           }),
         },
       ]);
+      console.log("Offline chat history updated");
     },
-    [setUpdateMessageStatus, setOfflineChats, receivedUserId]
+    [setUpdateMessageStatus, setOfflineChats, receivedUserId, senderUserId]
   );
   useEffect(() => {
     const _socket = io("http://localhost:8000");

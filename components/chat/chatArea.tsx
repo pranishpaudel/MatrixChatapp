@@ -19,6 +19,9 @@ const ChatArea = () => {
   const [updateMessageStatus, setUpdateMessageStatus] = useAtom(
     jotaiAtoms.updateMessageStatus
   );
+  const [currentSenderId, setCurrentSenderId] = useAtom(
+    jotaiAtoms.currentSenderId
+  );
   const onEmojiClick = (emojiObject: any) => {
     setMessage((prevMessage) => prevMessage + emojiObject.emoji);
   };
@@ -31,6 +34,8 @@ const ChatArea = () => {
         {
           id: prev.length + 1,
           sender: "user",
+          senderUid: currentSenderId,
+          offlineMessage: false,
           receiverUid: currentChatFriend.id,
           message,
           timestamp: new Date().toLocaleTimeString([], {
