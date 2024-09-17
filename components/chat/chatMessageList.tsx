@@ -92,7 +92,11 @@ const ChatMessageList: React.FC = () => {
       })),
     ];
 
-    setChats(newChatHistory);
+    const uniqueChatHistory = newChatHistory.filter(
+      (chat, index, self) => index === self.findIndex((c) => c.id === chat.id)
+    );
+
+    setChats(uniqueChatHistory);
   }, [offlineChatHistory, onlineChatHistory, updateMessageStatus]);
   const renderChat = (chat: Chat) => {
     const isUser = chat.sender === "user";
