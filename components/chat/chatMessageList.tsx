@@ -9,6 +9,14 @@ interface Chat {
   timestamp: string;
 }
 
+interface OfflineChat {
+  id: number;
+  sender: "user" | "other";
+  senderUid: string;
+  message: string;
+  timestamp: string;
+}
+
 const ChatMessageList: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
@@ -41,16 +49,17 @@ const ChatMessageList: React.FC = () => {
           timestamp: chat.timestamp,
         }));
 
-        // Check if offlineChatHistory has any messages
-        if (offlineChatHistory.length > 0) {
-          const offlineChats: Chat[] = offlineChatHistory.map((chat: any) => ({
+        // Filter offlineChatHistory based on senderUid
+        const filteredOfflineChats: Chat[] = offlineChatHistory
+          .filter((chat: OfflineChat) => chat.senderUid === receiverData.id)
+          .map((chat: OfflineChat) => ({
             id: chat.id,
             sender: chat.sender,
             message: chat.message,
             timestamp: chat.timestamp,
           }));
-          combinedChatHistory = [...combinedChatHistory, ...offlineChats];
-        }
+
+        combinedChatHistory = [...combinedChatHistory, ...filteredOfflineChats];
 
         setChats(combinedChatHistory);
       }
