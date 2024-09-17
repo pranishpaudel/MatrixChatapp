@@ -1,8 +1,6 @@
 import { useAtom } from "jotai";
 import React, { useState, useEffect, useRef } from "react";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
-import { on } from "events";
-import { set } from "zod";
 
 interface Chat {
   id: number;
@@ -26,7 +24,7 @@ const ChatMessageList: React.FC = () => {
   const [offlineChatHistory, setOfflineChatHistory] = useAtom(
     jotaiAtoms.offlineChatHistory
   );
-  const [onlineChatHistory, setOnlineChatHistory] = useState([]);
+  const [onlineChatHistory, setOnlineChatHistory] = useState<Chat[]>([]);
   const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
   const [updateMessageStatus, setUpdateMessageStatus] = useAtom(
     jotaiAtoms.updateMessageStatus
@@ -66,7 +64,12 @@ const ChatMessageList: React.FC = () => {
 
         combinedChatHistory = [...combinedChatHistory, ...filteredOfflineChats];
 
-        setChats(combinedChatHistory);
+        // Filter out duplicates
+        const uniqueChatHistory = Array.from(
+          new Set(combinedChatHistory.map((chat) => chat.id))
+        ).map((id) => combinedChatHistory.find((chat) => chat.id === id)!);
+
+        setChats(uniqueChatHistory);
         setFirstPaint(true);
       }
     };
@@ -79,6 +82,7 @@ const ChatMessageList: React.FC = () => {
         chatContainerRef.current.scrollHeight;
     }
   }, [chats]);
+
   useEffect(() => {
     const newChatHistory: Chat[] = [
       ...onlineChatHistory.map((chat: any) => ({
@@ -95,12 +99,14 @@ const ChatMessageList: React.FC = () => {
       })),
     ];
 
-    const uniqueChatHistory = newChatHistory.filter(
-      (chat, index, self) => index === self.findIndex((c) => c.id === chat.id)
-    );
+    // Filter out duplicates
+    const uniqueChatHistory = Array.from(
+      new Set(newChatHistory.map((chat) => chat.id))
+    ).map((id) => newChatHistory.find((chat) => chat.id === id)!);
 
     setChats(uniqueChatHistory);
   }, [offlineChatHistory, onlineChatHistory, updateMessageStatus]);
+
   const renderChat = (chat: Chat) => {
     const isUser = chat.sender === "user";
     return (
