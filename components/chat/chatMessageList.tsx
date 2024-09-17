@@ -22,6 +22,7 @@ interface OfflineChat {
 const ChatMessageList: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const [firstPaint, setFirstPaint] = useState(false);
   const [offlineChatHistory, setOfflineChatHistory] = useAtom(
     jotaiAtoms.offlineChatHistory
   );
@@ -33,6 +34,7 @@ const ChatMessageList: React.FC = () => {
 
   useEffect(() => {
     const fetchChatHistory = async () => {
+      if (firstPaint) return;
       const response = await fetch("/api/getChatHistory", {
         method: "POST",
         headers: {
@@ -65,12 +67,14 @@ const ChatMessageList: React.FC = () => {
         combinedChatHistory = [...combinedChatHistory, ...filteredOfflineChats];
 
         setChats(combinedChatHistory);
+        setFirstPaint(true);
       }
     };
     fetchChatHistory();
-  }, [receiverData, offlineChatHistory]);
+  }, [receiverData, offlineChatHistory, firstPaint]);
 
   useEffect(() => {
+    firstPaint;
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop =
         chatContainerRef.current.scrollHeight;
