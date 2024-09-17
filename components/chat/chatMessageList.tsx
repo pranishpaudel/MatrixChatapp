@@ -33,7 +33,7 @@ const ChatMessageList: React.FC = () => {
 
   useEffect(() => {
     const fetchChatHistory = async () => {
-      if (firstPaint) return;
+      if (firstPaint && !receiverData) return;
       const response = await fetch("/api/getChatHistory", {
         method: "POST",
         headers: {
