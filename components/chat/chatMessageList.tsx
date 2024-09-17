@@ -16,6 +16,9 @@ const ChatMessageList: React.FC = () => {
   const [lastMessageReceived, setLastMessageReceived] = useAtom(
     jotaiAtoms.lastMessageReceived
   );
+  const [offlineChatHistory, setOfflineChatHistory] = useAtom(
+    jotaiAtoms.offlineChatHistory
+  );
   const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
 
   useEffect(() => {
@@ -31,11 +34,29 @@ const ChatMessageList: React.FC = () => {
       });
       const data = await response.json();
       if (data.success) {
-        setChats(data.chatHistory);
+        let combinedChatHistory: Chat[] = data.chatHistory.map((chat: any) => ({
+          id: chat.id,
+          sender: chat.sender,
+          message: chat.message,
+          timestamp: chat.timestamp,
+        }));
+
+        // Check if offlineChatHistory has any messages
+        if (offlineChatHistory.length > 0) {
+          const offlineChats: Chat[] = offlineChatHistory.map((chat: any) => ({
+            id: chat.id,
+            sender: chat.sender,
+            message: chat.message,
+            timestamp: chat.timestamp,
+          }));
+          combinedChatHistory = [...combinedChatHistory, ...offlineChats];
+        }
+
+        setChats(combinedChatHistory);
       }
     };
     fetchChatHistory();
-  }, [receiverData]);
+  }, [receiverData, offlineChatHistory]);
 
   useEffect(() => {
     setChats((prevChats) => [

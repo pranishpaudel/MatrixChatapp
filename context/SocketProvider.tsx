@@ -33,6 +33,9 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
     jotaiAtoms.lastMessageReceived
   );
   const receivedUserId = receiverData?.id;
+  const [offlineChats, setOfflineChats] = useAtom(
+    jotaiAtoms.offlineChatHistory
+  ); // To store chats when receiving user is offline or not connected
 
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
     (msg) => {
@@ -58,6 +61,21 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
           senderId: msg.senderId,
         })
       );
+      if (!receiverData.isSet) {
+        setOfflineChats((prevChats) => [
+          ...prevChats,
+          {
+            id: prevChats.length + 1,
+            senderUid: msg.senderId,
+            sender: "other",
+            message: msg.message,
+            timestamp: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          },
+        ]);
+      }
       console.log("Last message received", lastMessageReceived);
     },
     [
@@ -65,6 +83,8 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
       updateMessageStatus,
       setUpdateMessageStatus,
       lastMessageReceived,
+      receiverData,
+      setOfflineChats,
     ]
   );
 
