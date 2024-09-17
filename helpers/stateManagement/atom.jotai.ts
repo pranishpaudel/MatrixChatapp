@@ -1,5 +1,15 @@
 import { atom } from "jotai";
 
+interface offlineChat {
+  id: number;
+  sender: "user" | "other";
+  senderUid?: string;
+  receiverUid?: string;
+  offlineMessage?: boolean;
+  message: string;
+  timestamp: string;
+}
+
 // Define the complete jotaiAtoms object
 const jotaiAtoms = {
   isLoginForm: atom(true),
@@ -25,6 +35,8 @@ const jotaiAtoms = {
     senderId: "", // Optional property
     receiverId: "", // Optional property
   }),
+  // New chatHistory atom
+  offlineChatHistory: atom<offlineChat[]>([]),
 };
 
 export default jotaiAtoms;

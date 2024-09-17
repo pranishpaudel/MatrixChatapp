@@ -29,10 +29,10 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const [updateMessageStatus, setUpdateMessageStatus] = useAtom(
     jotaiAtoms.updateMessageStatus
   );
-  const [lastMessageReceived, setLastMessageReceived] = useAtom(
-    jotaiAtoms.lastMessageReceived
-  );
   const receivedUserId = receiverData?.id;
+  const [offlineChats, setOfflineChats] = useAtom(
+    jotaiAtoms.offlineChatHistory
+  ); // To store chats when receiving user is offline or not connected
 
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
     (msg) => {
@@ -48,24 +48,27 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   );
 
   const onMessageRec = useCallback(
-    (msg: { senderId: string; message: string }) => {
-      setUpdateMessageStatus(!updateMessageStatus);
-      setLastMessageReceived(
-        Object.assign(lastMessageReceived, {
-          isSet: true,
-          userType: "other",
+    (msg: { senderId: string; receiverId: string; message: string }) => {
+      setUpdateMessageStatus((prevStatus) => !prevStatus);
+
+      setOfflineChats((prevChats) => [
+        ...prevChats,
+        {
+          id: prevChats.length + 1,
+          senderUid: msg.senderId,
+          sender: "other",
+          offlineMessage: true,
+          receiverUid: msg.receiverId,
           message: msg.message,
-          senderId: msg.senderId,
-        })
-      );
-      console.log("Last message received", lastMessageReceived);
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
+      console.log("Offline chat history updated");
     },
-    [
-      setLastMessageReceived,
-      updateMessageStatus,
-      setUpdateMessageStatus,
-      lastMessageReceived,
-    ]
+    [setUpdateMessageStatus, setOfflineChats]
   );
 
   useEffect(() => {

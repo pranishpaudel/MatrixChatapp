@@ -58,6 +58,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const formattedChatHistory: Chat[] = chatHistory.map((message) => ({
       id: message.id,
       sender: message.senderId === userId ? "user" : "other",
+      senderUid: JWTData.userId,
+      receiverUid: chatFriendUid,
       message: message.content,
       timestamp: message.createdAt.toISOString(),
     }));
