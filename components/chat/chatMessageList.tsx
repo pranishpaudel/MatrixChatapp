@@ -90,7 +90,14 @@ const ChatMessageList: React.FC = () => {
         timestamp: chat.timestamp,
       })),
       ...offlineChatHistory
-        .filter((chat: OfflineChat) => chat.receiverUid === receiverData.id)
+        .filter((chat: OfflineChat) => {
+          console.log(`aba herum k hunxa
+            {
+            ReceiverData: ${receiverData.id}
+            Offline kandaL ${chat.receiverUid}
+            }`);
+          return chat.receiverUid === receiverData.id;
+        })
         .map((chat: OfflineChat) => ({
           id: chat.id,
           sender: chat.sender,

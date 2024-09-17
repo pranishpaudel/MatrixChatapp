@@ -48,7 +48,7 @@ class SocketService {
         if (receiverSocketId) {
           this._io
             .to(receiverSocketId)
-            .emit("message", { senderId, message: msg });
+            .emit("message", { senderId, receiverId, message: msg });
         }
       }
     });

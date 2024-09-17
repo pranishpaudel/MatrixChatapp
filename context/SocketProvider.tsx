@@ -48,17 +48,17 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   );
 
   const onMessageRec = useCallback(
-    (msg: { senderId: string; message: string }) => {
+    (msg: { senderId: string; receiverId: string; message: string }) => {
       setUpdateMessageStatus((prevStatus) => !prevStatus);
 
       setOfflineChats((prevChats) => [
         ...prevChats,
         {
           id: prevChats.length + 1,
-          senderUid: senderUserId,
+          senderUid: msg.senderId,
           sender: "other",
           offlineMessage: true,
-          receiverUid: receivedUserId,
+          receiverUid: msg.receiverId,
           message: msg.message,
           timestamp: new Date().toLocaleTimeString([], {
             hour: "2-digit",
@@ -68,8 +68,9 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
       ]);
       console.log("Offline chat history updated");
     },
-    [setUpdateMessageStatus, setOfflineChats, receivedUserId, senderUserId]
+    [setUpdateMessageStatus, setOfflineChats]
   );
+
   useEffect(() => {
     const _socket = io("http://localhost:8000");
 
