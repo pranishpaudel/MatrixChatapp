@@ -99,10 +99,7 @@ const ChatMessageList: React.FC = () => {
           offlineMessage: chat.offlineMessage,
         })),
     ];
-    ////console log all offline chat too
-    offlineChatHistory.forEach((element) => {
-      console.log(element);
-    });
+
     setChats(newChatHistory);
   }, [
     offlineChatHistory,
