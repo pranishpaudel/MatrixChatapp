@@ -9,13 +9,14 @@ interface Chat {
   timestamp: string;
 }
 
-interface OfflineChat {
-  id: number;
-  sender: "user" | "other";
+interface OfflineChat extends Chat {
   senderUid?: string;
-  message: string;
-  timestamp: string;
+  offlineMessage?: boolean;
 }
+
+const isOfflineChat = (chat: Chat | OfflineChat): chat is OfflineChat => {
+  return (chat as OfflineChat).offlineMessage !== undefined;
+};
 
 const ChatMessageList: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -84,7 +85,7 @@ const ChatMessageList: React.FC = () => {
   }, [chats]);
 
   useEffect(() => {
-    const newChatHistory: Chat[] = [
+    const newChatHistory: (Chat | OfflineChat)[] = [
       ...onlineChatHistory.map((chat: any) => ({
         id: chat.id,
         sender: chat.sender,
@@ -96,13 +97,22 @@ const ChatMessageList: React.FC = () => {
         sender: chat.sender,
         message: chat.message,
         timestamp: chat.timestamp,
+        offlineMessage: chat.offlineMessage,
       })),
     ];
 
     // Filter out duplicates
-    const uniqueChatHistory = Array.from(
-      new Set(newChatHistory.map((chat) => chat.id))
-    ).map((id) => newChatHistory.find((chat) => chat.id === id)!);
+    const uniqueChatHistory = newChatHistory.filter(
+      (chat, index, self) =>
+        index ===
+        self.findIndex(
+          (c) =>
+            c.id === chat.id ||
+            (isOfflineChat(c) &&
+              isOfflineChat(chat) &&
+              c.message === chat.message)
+        )
+    );
 
     setChats(uniqueChatHistory);
   }, [offlineChatHistory, onlineChatHistory, updateMessageStatus]);

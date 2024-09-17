@@ -5,6 +5,7 @@ interface offlineChat {
   sender: "user" | "other";
   senderUid?: string;
   receiverUid?: string;
+  offlineMessage?: boolean;
   message: string;
   timestamp: string;
 }

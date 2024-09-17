@@ -40,6 +40,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
         socketRef.current.emit("event:message", {
           message: msg,
           senderId: senderUserId,
+          offlineMessage: true,
           receiverId: receivedUserId,
         });
       }
