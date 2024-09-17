@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import Redis from "ioredis";
-
+import { produceMessage } from "./kafka.js";
 interface iMessageFromFrontend {
   message: string;
   senderId: string;
@@ -36,12 +36,13 @@ class SocketService {
     });
 
     // Single listener for Redis messages
-    sub.on("message", (channel, message) => {
+    sub.on("message", async (channel, message) => {
       if (channel === "MESSAGES") {
         const parsedMessage = JSON.parse(message);
         const { senderId, receiverId, message: msg } = parsedMessage;
-        console.log(`Received message from ${channel}: ${message}`);
 
+        await produceMessage(parsedMessage);
+        console.log("Message Produced to Kafka Broker");
         // Emit the message to the specific receiver
         const receiverSocketId = this.users[receiverId];
         if (receiverSocketId) {
@@ -67,15 +68,6 @@ class SocketService {
       socket.on(
         "event:message",
         async ({ message, senderId, receiverId }: iMessageFromFrontend) => {
-          console.log(
-            "New message received",
-            message,
-            "from",
-            senderId,
-            "to",
-            receiverId
-          );
-
           try {
             const result = await pub.publish(
               "MESSAGES",

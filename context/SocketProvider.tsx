@@ -26,13 +26,13 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const socketRef = useRef<Socket | null>(null);
   const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
   const [senderUserId] = useAtom(jotaiAtoms.currentSenderId);
-  const [localChatHistory, setLocalChatHistory] = useAtom(
-    jotaiAtoms.localChatHistory
+  const [updateMessageStatus, setUpdateMessageStatus] = useAtom(
+    jotaiAtoms.updateMessageStatus
+  );
+  const [lastMessageReceived, setLastMessageReceived] = useAtom(
+    jotaiAtoms.lastMessageReceived
   );
   const receivedUserId = receiverData?.id;
-
-  console.log("receivedUserId", receivedUserId);
-  console.log("senderUserId", senderUserId);
 
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
     (msg) => {
@@ -49,25 +49,26 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
 
   const onMessageRec = useCallback(
     (msg: { senderId: string; message: string }) => {
-      console.log("Received message from", msg.senderId, ":", msg.message);
-      setLocalChatHistory((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          sender: "other",
+      setUpdateMessageStatus(!updateMessageStatus);
+      setLastMessageReceived(
+        Object.assign(lastMessageReceived, {
+          isSet: true,
+          userType: "other",
           message: msg.message,
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        },
-      ]);
+          senderId: msg.senderId,
+        })
+      );
+      console.log("Last message received", lastMessageReceived);
     },
-    [setLocalChatHistory]
+    [
+      setLastMessageReceived,
+      updateMessageStatus,
+      setUpdateMessageStatus,
+      lastMessageReceived,
+    ]
   );
 
   useEffect(() => {
-    console.log("SocketProvider useEffect");
     const _socket = io("http://localhost:8000");
 
     // Register the user ID with the server
