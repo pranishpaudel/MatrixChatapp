@@ -10,6 +10,13 @@ interface iGetChatFriendUidBody {
   numberOfMessages: number;
 }
 
+interface Chat {
+  id: number;
+  sender: "user" | "other";
+  message: string;
+  timestamp: string;
+}
+
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const JWTData = await isJWTValidForApi(req);
@@ -27,12 +34,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
     getChatHistorySchema.parse(reqBody);
     const { chatFriendUid, numberOfMessages } =
       reqBody as iGetChatFriendUidBody;
-    const senderId = JWTData.userId as string;
+    const userId = JWTData.userId as string;
 
     const chatHistory = await prisma.message.findMany({
       where: {
-        senderId,
-        recipientId: chatFriendUid,
+        OR: [
+          { senderId: userId, recipientId: chatFriendUid },
+          { senderId: chatFriendUid, recipientId: userId },
+        ],
       },
       orderBy: {
         createdAt: "asc",
@@ -41,13 +50,21 @@ export async function POST(req: NextRequest, res: NextResponse) {
         id: true,
         content: true,
         createdAt: true,
+        senderId: true,
       },
       take: numberOfMessages,
     });
 
+    const formattedChatHistory: Chat[] = chatHistory.map((message) => ({
+      id: Number(message.id), // Convert id to number
+      sender: message.senderId === userId ? "user" : "other",
+      message: message.content,
+      timestamp: message.createdAt.toISOString(),
+    }));
+
     return NextResponse.json(
       {
-        chatHistory,
+        chatHistory: formattedChatHistory,
         success: true,
       },
       { status: 200 }

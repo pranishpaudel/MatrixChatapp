@@ -41,7 +41,7 @@ export async function produceMessage(message: object) {
 
 let messageBuffer: any[] = [];
 const BATCH_SIZE = 10;
-const BATCH_INTERVAL = 5000; // 5 seconds
+const BATCH_INTERVAL = 1500; // 5 seconds
 
 async function saveMessagesToDB(messages: any[]) {
   try {

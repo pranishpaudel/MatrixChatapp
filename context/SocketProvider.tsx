@@ -31,9 +31,6 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   );
   const receivedUserId = receiverData?.id;
 
-  console.log("receivedUserId", receivedUserId);
-  console.log("senderUserId", senderUserId);
-
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
     (msg) => {
       if (socketRef.current) {
@@ -67,7 +64,6 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   );
 
   useEffect(() => {
-    console.log("SocketProvider useEffect");
     const _socket = io("http://localhost:8000");
 
     // Register the user ID with the server

@@ -12,7 +12,30 @@ interface Chat {
 const ChatMessageList: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
-  const [localChatHistoryState] = useAtom(jotaiAtoms.localChatHistory);
+  const [localChatHistoryState, setlocalChatHistoryState] = useAtom(
+    jotaiAtoms.localChatHistory
+  );
+  const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
+
+  useEffect(() => {
+    const fetchChatHistory = async () => {
+      const response = await fetch("/api/getChatHistory", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          chatFriendUid: receiverData.id,
+          numberOfMessages: 10,
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setlocalChatHistoryState(data.chatHistory);
+      }
+    };
+    fetchChatHistory();
+  }, [receiverData, setlocalChatHistoryState]);
 
   useEffect(() => {
     setChats(localChatHistoryState);
