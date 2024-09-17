@@ -1,5 +1,6 @@
 import { Kafka, Producer } from "kafkajs";
 import fs from "fs";
+import prismaClientForChat from "../prisma/client.js";
 
 const caCert = fs.readFileSync(
   "/Users/air/chatapp/chatServer/src/authCert/ca.pem",
@@ -44,10 +45,26 @@ export async function startMessageConsumer() {
   await consumer.subscribe({ topic: "MESSAGES", fromBeginning: true });
   await consumer.run({
     autoCommit: true,
-    eachMessage: async ({ message, pause }) => {
+    eachMessage: async ({ message, pause }: any) => {
       if (!message.value) return;
       console.log(`Received message ${message.value}`);
-      pause();
+      const parsedMessage = JSON.parse(message.value.toString());
+      const { senderId, receiverId, message: msg } = parsedMessage;
+      try {
+        const messageDb = await prismaClientForChat.message.create({
+          data: {
+            content: msg,
+            senderId: senderId,
+            recipientId: receiverId,
+          },
+        });
+        console.log("Message saved to DB", messageDb);
+      } catch (error) {
+        pause();
+        setTimeout(() => {
+          consumer.resume([{ topic: "MESSAGES" }]);
+        }, 60 * 1000);
+      }
     },
   });
 }
