@@ -15,10 +15,6 @@ interface OfflineChat extends Chat {
   offlineMessage?: boolean;
 }
 
-const isOfflineChat = (chat: Chat | OfflineChat): chat is OfflineChat => {
-  return (chat as OfflineChat).offlineMessage !== undefined;
-};
-
 const ChatMessageList: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
@@ -93,30 +89,24 @@ const ChatMessageList: React.FC = () => {
         message: chat.message,
         timestamp: chat.timestamp,
       })),
-      ...offlineChatHistory.map((chat: OfflineChat) => ({
-        id: chat.id,
-        sender: chat.sender,
-        message: chat.message,
-        timestamp: chat.timestamp,
-        offlineMessage: chat.offlineMessage,
-      })),
+      ...offlineChatHistory
+        .filter((chat: OfflineChat) => chat.receiverUid === receiverData.id)
+        .map((chat: OfflineChat) => ({
+          id: chat.id,
+          sender: chat.sender,
+          message: chat.message,
+          timestamp: chat.timestamp,
+          offlineMessage: chat.offlineMessage,
+        })),
     ];
 
-    // Filter out duplicates
-    const uniqueChatHistory = newChatHistory.filter(
-      (chat, index, self) =>
-        index ===
-        self.findIndex(
-          (c) =>
-            c.id === chat.id ||
-            (isOfflineChat(c) &&
-              isOfflineChat(chat) &&
-              c.message === chat.message)
-        )
-    );
-
-    setChats(uniqueChatHistory);
-  }, [offlineChatHistory, onlineChatHistory, updateMessageStatus]);
+    setChats(newChatHistory);
+  }, [
+    offlineChatHistory,
+    onlineChatHistory,
+    updateMessageStatus,
+    receiverData,
+  ]);
 
   const renderChat = (chat: Chat) => {
     const isUser = chat.sender === "user";
