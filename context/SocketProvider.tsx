@@ -65,7 +65,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
         },
       ]);
     },
-    [setUpdateMessageStatus, receiverData, setOfflineChats]
+    [setUpdateMessageStatus, setOfflineChats]
   );
   useEffect(() => {
     const _socket = io("http://localhost:8000");
