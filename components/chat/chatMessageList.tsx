@@ -5,13 +5,13 @@ import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 interface Chat {
   id: number;
   sender: "user" | "other";
+  senderUid?: string;
+  receiverUid?: string;
   message: string;
   timestamp: string;
 }
 
 interface OfflineChat extends Chat {
-  senderUid?: string;
-  receiverUid?: string;
   offlineMessage?: boolean;
 }
 
@@ -46,16 +46,24 @@ const ChatMessageList: React.FC = () => {
         let combinedChatHistory: Chat[] = data.chatHistory.map((chat: any) => ({
           id: chat.id,
           sender: chat.sender,
+          senderUid: chat.senderUid,
+          receiverUid: chat.receiverUid,
           message: chat.message,
           timestamp: chat.timestamp,
         }));
 
-        // Filter offlineChatHistory based on senderUid
+        // Include both sent and received offline messages
         const filteredOfflineChats: Chat[] = offlineChatHistory
-          .filter((chat: OfflineChat) => chat.senderUid === receiverData.id)
+          .filter(
+            (chat: OfflineChat) =>
+              chat.senderUid === receiverData.id ||
+              chat.receiverUid === receiverData.id
+          )
           .map((chat: OfflineChat) => ({
             id: chat.id,
             sender: chat.sender as "user" | "other",
+            senderUid: chat.senderUid,
+            receiverUid: chat.receiverUid,
             message: chat.message,
             timestamp: chat.timestamp,
           }));
@@ -90,6 +98,11 @@ const ChatMessageList: React.FC = () => {
         timestamp: chat.timestamp,
       })),
       ...offlineChatHistory
+        .filter(
+          (chat: OfflineChat) =>
+            chat.senderUid === receiverData.id ||
+            chat.receiverUid === receiverData.id
+        )
         .map((chat: OfflineChat) => ({
           id: chat.id,
           sender: chat.sender,
