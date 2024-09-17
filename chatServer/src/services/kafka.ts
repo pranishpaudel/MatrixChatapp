@@ -1,4 +1,4 @@
-import { Kafka, Producer } from "kafkajs";
+import { Kafka, Producer, Consumer } from "kafkajs";
 import fs from "fs";
 import prismaClientForChat from "../prisma/client.js";
 
@@ -39,31 +39,50 @@ export async function produceMessage(message: object) {
   return true;
 }
 
+let messageBuffer: any[] = [];
+const BATCH_SIZE = 10;
+const BATCH_INTERVAL = 5000; // 5 seconds
+
+async function saveMessagesToDB(messages: any[]) {
+  try {
+    const messageDb = await prismaClientForChat.message.createMany({
+      data: messages.map(({ senderId, receiverId, message: msg }) => ({
+        content: msg,
+        senderId: senderId,
+        recipientId: receiverId,
+      })),
+    });
+    console.log("Messages saved to DB", messageDb);
+  } catch (error) {
+    console.error("Error saving messages to DB", error);
+  }
+}
+
 export async function startMessageConsumer() {
   const consumer = kafka.consumer({ groupId: "default" });
   await consumer.connect();
   await consumer.subscribe({ topic: "MESSAGES", fromBeginning: true });
+
+  setInterval(async () => {
+    if (messageBuffer.length > 0) {
+      const messagesToSave = [...messageBuffer];
+      messageBuffer = [];
+      await saveMessagesToDB(messagesToSave);
+    }
+  }, BATCH_INTERVAL);
+
   await consumer.run({
     autoCommit: true,
-    eachMessage: async ({ message, pause }: any) => {
+    eachMessage: async ({ message }: any) => {
       if (!message.value) return;
       console.log(`Received message ${message.value}`);
       const parsedMessage = JSON.parse(message.value.toString());
-      const { senderId, receiverId, message: msg } = parsedMessage;
-      try {
-        const messageDb = await prismaClientForChat.message.create({
-          data: {
-            content: msg,
-            senderId: senderId,
-            recipientId: receiverId,
-          },
-        });
-        console.log("Message saved to DB", messageDb);
-      } catch (error) {
-        pause();
-        setTimeout(() => {
-          consumer.resume([{ topic: "MESSAGES" }]);
-        }, 60 * 1000);
+      messageBuffer.push(parsedMessage);
+
+      if (messageBuffer.length >= BATCH_SIZE) {
+        const messagesToSave = [...messageBuffer];
+        messageBuffer = [];
+        await saveMessagesToDB(messagesToSave);
       }
     },
   });
