@@ -3,7 +3,8 @@ import { atom } from "jotai";
 interface offlineChat {
   id: number;
   sender: "user" | "other";
-  senderUid: string;
+  senderUid?: string;
+  receiverUid?: string;
   message: string;
   timestamp: string;
 }

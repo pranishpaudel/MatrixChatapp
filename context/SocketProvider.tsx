@@ -29,9 +29,6 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const [updateMessageStatus, setUpdateMessageStatus] = useAtom(
     jotaiAtoms.updateMessageStatus
   );
-  const [lastMessageReceived, setLastMessageReceived] = useAtom(
-    jotaiAtoms.lastMessageReceived
-  );
   const receivedUserId = receiverData?.id;
   const [offlineChats, setOfflineChats] = useAtom(
     jotaiAtoms.offlineChatHistory
@@ -52,42 +49,24 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
 
   const onMessageRec = useCallback(
     (msg: { senderId: string; message: string }) => {
-      setUpdateMessageStatus(!updateMessageStatus);
-      setLastMessageReceived(
-        Object.assign(lastMessageReceived, {
-          isSet: true,
-          userType: "other",
-          message: msg.message,
-          senderId: msg.senderId,
-        })
-      );
-      if (!receiverData.isSet) {
-        setOfflineChats((prevChats) => [
-          ...prevChats,
-          {
-            id: prevChats.length + 1,
-            senderUid: msg.senderId,
-            sender: "other",
-            message: msg.message,
-            timestamp: new Date().toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-          },
-        ]);
-      }
-      console.log("Last message received", lastMessageReceived);
-    },
-    [
-      setLastMessageReceived,
-      updateMessageStatus,
-      setUpdateMessageStatus,
-      lastMessageReceived,
-      receiverData,
-      setOfflineChats,
-    ]
-  );
+      setUpdateMessageStatus((prevStatus) => !prevStatus);
 
+      setOfflineChats((prevChats) => [
+        ...prevChats,
+        {
+          id: prevChats.length + 1,
+          senderUid: msg.senderId,
+          sender: "other",
+          message: msg.message,
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
+    },
+    [setUpdateMessageStatus, receiverData, setOfflineChats]
+  );
   useEffect(() => {
     const _socket = io("http://localhost:8000");
 

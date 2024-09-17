@@ -1,6 +1,8 @@
 import { useAtom } from "jotai";
 import React, { useState, useEffect, useRef } from "react";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
+import { on } from "events";
+import { set } from "zod";
 
 interface Chat {
   id: number;
@@ -12,7 +14,7 @@ interface Chat {
 interface OfflineChat {
   id: number;
   sender: "user" | "other";
-  senderUid: string;
+  senderUid?: string;
   message: string;
   timestamp: string;
 }
@@ -20,14 +22,14 @@ interface OfflineChat {
 const ChatMessageList: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
-  const [updateMessageStatus] = useAtom(jotaiAtoms.updateMessageStatus);
-  const [lastMessageReceived, setLastMessageReceived] = useAtom(
-    jotaiAtoms.lastMessageReceived
-  );
   const [offlineChatHistory, setOfflineChatHistory] = useAtom(
     jotaiAtoms.offlineChatHistory
   );
+  const [onlineChatHistory, setOnlineChatHistory] = useState([]);
   const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
+  const [updateMessageStatus, setUpdateMessageStatus] = useAtom(
+    jotaiAtoms.updateMessageStatus
+  );
 
   useEffect(() => {
     const fetchChatHistory = async () => {
@@ -42,6 +44,7 @@ const ChatMessageList: React.FC = () => {
       });
       const data = await response.json();
       if (data.success) {
+        setOnlineChatHistory(data.chatHistory);
         let combinedChatHistory: Chat[] = data.chatHistory.map((chat: any) => ({
           id: chat.id,
           sender: chat.sender,
@@ -54,7 +57,7 @@ const ChatMessageList: React.FC = () => {
           .filter((chat: OfflineChat) => chat.senderUid === receiverData.id)
           .map((chat: OfflineChat) => ({
             id: chat.id,
-            sender: chat.sender,
+            sender: chat.sender as "user" | "other",
             message: chat.message,
             timestamp: chat.timestamp,
           }));
@@ -68,26 +71,29 @@ const ChatMessageList: React.FC = () => {
   }, [receiverData, offlineChatHistory]);
 
   useEffect(() => {
-    setChats((prevChats) => [
-      ...prevChats,
-      {
-        id: prevChats.length + 1,
-        sender: lastMessageReceived.userType as "user" | "other",
-        message: lastMessageReceived.message,
-        timestamp: lastMessageReceived.timestamp,
-      },
-    ]);
-
-    console.log("New message received", lastMessageReceived);
-  }, [updateMessageStatus, lastMessageReceived, setLastMessageReceived]);
-
-  useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop =
         chatContainerRef.current.scrollHeight;
     }
   }, [chats]);
+  useEffect(() => {
+    const newChatHistory: Chat[] = [
+      ...onlineChatHistory.map((chat: any) => ({
+        id: chat.id,
+        sender: chat.sender,
+        message: chat.message,
+        timestamp: chat.timestamp,
+      })),
+      ...offlineChatHistory.map((chat: OfflineChat) => ({
+        id: chat.id,
+        sender: chat.sender,
+        message: chat.message,
+        timestamp: chat.timestamp,
+      })),
+    ];
 
+    setChats(newChatHistory);
+  }, [offlineChatHistory, onlineChatHistory, updateMessageStatus]);
   const renderChat = (chat: Chat) => {
     const isUser = chat.sender === "user";
     return (
