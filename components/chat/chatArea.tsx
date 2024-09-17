@@ -25,6 +25,7 @@ const ChatArea = () => {
     if (message.trim()) {
       sendMessage(message);
       setLastMessageSent({
+        isSet: true,
         userType: "user",
         message,
         timestamp: new Date().toLocaleTimeString([], {

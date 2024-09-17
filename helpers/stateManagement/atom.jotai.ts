@@ -15,6 +15,7 @@ const jotaiAtoms = {
   }),
   updateMessageStatus: atom(false),
   lastMessageReceived: atom({
+    isSet: false,
     userType: "",
     message: "",
     timestamp: new Date().toLocaleTimeString([], {

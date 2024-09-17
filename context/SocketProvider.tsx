@@ -52,6 +52,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
       setUpdateMessageStatus(!updateMessageStatus);
       setLastMessageReceived(
         Object.assign(lastMessageReceived, {
+          isSet: true,
           userType: "other",
           message: msg.message,
           senderId: msg.senderId,
