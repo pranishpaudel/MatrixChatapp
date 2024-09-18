@@ -24,6 +24,11 @@ const jotaiAtoms = {
     image: "",
     isSet: false,
   }),
+  currentGroup: atom({
+    id: "",
+    name: "",
+    isSet: false,
+  }),
   updateMessageStatus: atom(false),
   lastMessageReceived: atom({
     isSet: false,

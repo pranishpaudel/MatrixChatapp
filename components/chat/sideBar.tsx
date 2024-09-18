@@ -38,8 +38,12 @@ const SideBar = () => {
   const [currentChatFriend, setCurrentChatFriend] = useAtom(
     jotaiAtoms.currentChatFriend
   );
+  const [currentGroup, setCurrentGroup] = useAtom(jotaiAtoms.currentGroup);
   const [isFetching, setIsFetching] = useState(true);
   const [selectedFriendIndex, setSelectedFriendIndex] = useState<number | null>(
+    null
+  );
+  const [selectedGroupIndex, setSelectedGroupIndex] = useState<number | null>(
     null
   );
   const [offlineChatHistory, setOfflineChatHistory] = useAtom<OfflineChat[]>(
@@ -82,6 +86,7 @@ const SideBar = () => {
 
   const handleFriendClick = (index: number) => {
     setSelectedFriendIndex(index);
+    setSelectedGroupIndex(null); // Deselect group when a friend is selected
 
     const selectedFriend = allFriendsInfo[index];
     setCurrentChatFriend({
@@ -104,6 +109,18 @@ const SideBar = () => {
       return chat;
     });
     setOfflineChatHistory(updatedOfflineChatHistory);
+  };
+
+  const handleGroupClick = (index: number) => {
+    setSelectedGroupIndex(index);
+    setSelectedFriendIndex(null); // Deselect friend when a group is selected
+
+    const selectedGroup = groupList[index];
+    setCurrentGroup({
+      id: selectedGroup.groupName,
+      name: selectedGroup.groupName,
+      isSet: true,
+    });
   };
 
   const hasUnreadMessages = (friendId: string) => {
@@ -183,8 +200,11 @@ const SideBar = () => {
           groupList.map((group: Group, index: number) => (
             <div
               key={index}
+              onClick={() => handleGroupClick(index)}
               className={`flex items-center space-x-3 text-slate-300 text-lg w-full py-2 px-[10%] cursor-pointer 
-              transition-colors duration-200 hover:bg-slate-600`}
+              transition-colors duration-200 hover:bg-slate-600 ${
+                selectedGroupIndex === index ? "bg-purple-700" : ""
+              }`}
             >
               <Avatar className="h-10 w-10">
                 <AvatarImage
