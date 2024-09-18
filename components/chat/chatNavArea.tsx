@@ -3,6 +3,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
+import { EllipsisVertical } from "lucide-react";
+
 const ChatNavArea = () => {
   const [currentChatFriend] = useAtom(jotaiAtoms.currentChatFriend);
   return (
@@ -10,10 +12,8 @@ const ChatNavArea = () => {
       {currentChatFriend.isSet ? (
         <>
           <div className="h-full flex flex-col">
-            <div className="flex-grow flex items-center">
-              <div className="flex items-center space-x-3 ml-7">
-                {" "}
-                {/* Added ml-4 for left margin */}
+            <div className="flex-grow flex items-center justify-between px-7">
+              <div className="flex items-center space-x-3">
                 <Avatar>
                   <AvatarImage
                     src={
@@ -28,6 +28,7 @@ const ChatNavArea = () => {
                   {currentChatFriend.firstName} {currentChatFriend.lastName}
                 </span>
               </div>
+              <EllipsisVertical className="ml-auto" />
             </div>
             <Separator className="w-full" />
           </div>
