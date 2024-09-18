@@ -25,7 +25,9 @@ const ChatMessageList: React.FC = () => {
   const [offlineChatHistory, setOfflineChatHistory] = useAtom(
     jotaiAtoms.offlineChatHistory
   );
-  const [onlineChatHistory, setOnlineChatHistory] = useState<Chat[]>([]);
+  const [onlineChatHistory, setOnlineChatHistory] = useState<{
+    [key: string]: Chat[];
+  }>({});
   const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
   const [updateMessageStatus, setUpdateMessageStatus] = useAtom(
     jotaiAtoms.updateMessageStatus
@@ -36,6 +38,11 @@ const ChatMessageList: React.FC = () => {
 
   useEffect(() => {
     const fetchChatHistory = async () => {
+      // Check if the chat history is already fetched
+      if (chatFriendsUidCacheHistory.includes(receiverData.id)) {
+        setChats(onlineChatHistory[receiverData.id] || []);
+        return;
+      }
       try {
         setIsLoadingOnlineChat(true);
         const response = await fetch("/api/getChatHistory", {
@@ -60,7 +67,10 @@ const ChatMessageList: React.FC = () => {
             timestamp: chat.timestamp,
           }));
 
-          setOnlineChatHistory(onlineChats);
+          setOnlineChatHistory((prev) => ({
+            ...prev,
+            [receiverData.id]: onlineChats,
+          }));
           setChats(onlineChats);
         }
       } catch (error) {
@@ -76,22 +86,12 @@ const ChatMessageList: React.FC = () => {
       }
     };
 
-    if (!chatFriendsUidCacheHistory.includes(receiverData.id)) {
-      fetchChatHistory();
-    } else {
-      setOnlineChatHistory(
-        chats.filter(
-          (chat) =>
-            chat.senderUid === receiverData.id ||
-            chat.receiverUid === receiverData.id
-        )
-      );
-    }
+    fetchChatHistory();
   }, [
     receiverData,
     setChatFriendsUidCacheHistory,
+    onlineChatHistory,
     chatFriendsUidCacheHistory,
-    chats,
   ]);
 
   useEffect(() => {
@@ -106,7 +106,7 @@ const ChatMessageList: React.FC = () => {
       return;
     }
     const newChatHistory: (Chat | OfflineChat)[] = [
-      ...onlineChatHistory.map((chat: any) => ({
+      ...(onlineChatHistory[receiverData.id] || []).map((chat: any) => ({
         id: chat.id,
         sender: chat.sender,
         message: chat.message,
@@ -183,6 +183,12 @@ const ChatMessageList: React.FC = () => {
             ></div>
           </div>
         </div>
+        {isUser && (
+          <Avatar className="ml-2">
+            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+        )}
       </div>
     );
   };
