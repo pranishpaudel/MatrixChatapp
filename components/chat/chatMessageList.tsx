@@ -1,6 +1,7 @@
 import { useAtom } from "jotai";
 import React, { useState, useEffect, useRef } from "react";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Chat {
   id: number;
@@ -18,7 +19,7 @@ interface OfflineChat extends Chat {
 const ChatMessageList: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
-  const [firstPaint, setFirstPaint] = useState(false);
+  const [isLoadingOnlineChat, setIsLoadingOnlineChat] = useState(false);
   const [offlineChatHistory, setOfflineChatHistory] = useAtom(
     jotaiAtoms.offlineChatHistory
   );
@@ -30,57 +31,42 @@ const ChatMessageList: React.FC = () => {
 
   useEffect(() => {
     const fetchChatHistory = async () => {
-      if (firstPaint && !receiverData) return;
-      const response = await fetch("/api/getChatHistory", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          chatFriendUid: receiverData.id,
-        }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        setOnlineChatHistory(data.chatHistory);
-        let combinedChatHistory: Chat[] = data.chatHistory.map((chat: any) => ({
-          id: chat.id,
-          sender: chat.sender,
-          senderUid: chat.senderUid,
-          receiverUid: chat.receiverUid,
-          message: chat.message,
-          timestamp: chat.timestamp,
-        }));
+      try {
+        setIsLoadingOnlineChat(true);
+        const response = await fetch("/api/getChatHistory", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            chatFriendUid: receiverData.id,
+          }),
+        });
 
-        // Include both sent and received offline messages
-        const filteredOfflineChats: Chat[] = offlineChatHistory
-          .filter(
-            (chat: OfflineChat) =>
-              chat.senderUid === receiverData.id ||
-              chat.receiverUid === receiverData.id
-          )
-          .map((chat: OfflineChat) => ({
+        const data = await response.json();
+        if (data.success) {
+          const onlineChats = data.chatHistory.map((chat: Chat) => ({
             id: chat.id,
-            sender: chat.sender as "user" | "other",
+            sender: chat.sender,
             senderUid: chat.senderUid,
+            offlineMessage: false,
             receiverUid: chat.receiverUid,
             message: chat.message,
             timestamp: chat.timestamp,
           }));
 
-        combinedChatHistory = [...combinedChatHistory, ...filteredOfflineChats];
-
-        // Filter out duplicates
-        const uniqueChatHistory = Array.from(
-          new Set(combinedChatHistory.map((chat) => chat.id))
-        ).map((id) => combinedChatHistory.find((chat) => chat.id === id)!);
-
-        setChats(uniqueChatHistory);
-        setFirstPaint(true);
+          setOnlineChatHistory(onlineChats);
+          setChats(onlineChats);
+        }
+      } catch (error) {
+        console.error("Failed to fetch chat history:", error);
+      } finally {
+        setIsLoadingOnlineChat(false);
       }
     };
+
     fetchChatHistory();
-  }, [receiverData, offlineChatHistory, firstPaint]);
+  }, [receiverData]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -90,6 +76,9 @@ const ChatMessageList: React.FC = () => {
   }, [chats]);
 
   useEffect(() => {
+    if (isLoadingOnlineChat) {
+      return;
+    }
     const newChatHistory: (Chat | OfflineChat)[] = [
       ...onlineChatHistory.map((chat: any) => ({
         id: chat.id,
@@ -116,6 +105,7 @@ const ChatMessageList: React.FC = () => {
   }, [
     offlineChatHistory,
     onlineChatHistory,
+    isLoadingOnlineChat,
     updateMessageStatus,
     receiverData,
   ]);
@@ -150,7 +140,22 @@ const ChatMessageList: React.FC = () => {
         className="flex-1 overflow-y-auto mb-4 space-y-4 p-2"
         style={{ maxHeight: "calc(100% - 20px)" }}
       >
-        {chats.map(renderChat)}
+        {isLoadingOnlineChat ? (
+          <div className="space-y-4">
+            {[...Array(5)].map((_, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  index % 2 === 0 ? "justify-start" : "justify-end"
+                }`}
+              >
+                <Skeleton className="h-16 w-3/4 max-w-md" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          chats.map(renderChat)
+        )}
       </div>
     </div>
   );
