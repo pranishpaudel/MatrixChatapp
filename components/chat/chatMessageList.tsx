@@ -141,11 +141,15 @@ const ChatMessageList: React.FC = () => {
   useEffect(() => {
     if (offlineChatHistory.length > 0) {
       const lastMessage = offlineChatHistory[offlineChatHistory.length - 1];
-      setIsTyping(lastMessage.message === "!TYPING...!");
+      setIsTyping(
+        lastMessage.message === "!TYPING...!" &&
+          (lastMessage.senderUid === receiverData.id ||
+            lastMessage.receiverUid === receiverData.id)
+      );
     } else {
       setIsTyping(false);
     }
-  }, [offlineChatHistory]);
+  }, [offlineChatHistory, receiverData]);
 
   const renderChat = (chat: Chat) => {
     const isUser = chat.sender === "user";
