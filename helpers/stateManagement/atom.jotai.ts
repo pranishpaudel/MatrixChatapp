@@ -37,6 +37,7 @@ const jotaiAtoms = {
   }),
   // New chatHistory atom
   offlineChatHistory: atom<offlineChat[]>([]),
+  chatFriendsUidCacheHistory: atom<string[]>([]),
 };
 
 export default jotaiAtoms;

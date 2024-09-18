@@ -28,9 +28,16 @@ const ChatMessageList: React.FC = () => {
   const [updateMessageStatus, setUpdateMessageStatus] = useAtom(
     jotaiAtoms.updateMessageStatus
   );
+  const [chatFriendsUidCacheHistory, setChatFriendsUidCacheHistory] = useAtom(
+    jotaiAtoms.chatFriendsUidCacheHistory
+  );
 
   useEffect(() => {
     const fetchChatHistory = async () => {
+      //check if the chat history is already fetched
+      if (chatFriendsUidCacheHistory.includes(receiverData.id)) {
+        return;
+      }
       try {
         setIsLoadingOnlineChat(true);
         const response = await fetch("/api/getChatHistory", {
@@ -62,11 +69,17 @@ const ChatMessageList: React.FC = () => {
         console.error("Failed to fetch chat history:", error);
       } finally {
         setIsLoadingOnlineChat(false);
+        setChatFriendsUidCacheHistory((prev) => {
+          if (!prev.includes(receiverData.id)) {
+            return [...prev, receiverData.id];
+          }
+          return prev;
+        });
       }
     };
 
     fetchChatHistory();
-  }, [receiverData]);
+  }, [receiverData, setChatFriendsUidCacheHistory, chatFriendsUidCacheHistory]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
