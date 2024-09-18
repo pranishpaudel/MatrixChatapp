@@ -2,6 +2,7 @@ import { useAtom } from "jotai";
 import React, { useState, useEffect, useRef } from "react";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Skeleton } from "@/components/ui/skeleton";
+import formatTimestamp from "@/lib/formatTimestamp";
 
 interface Chat {
   id: number;
@@ -34,7 +35,7 @@ const ChatMessageList: React.FC = () => {
 
   useEffect(() => {
     const fetchChatHistory = async () => {
-      //check if the chat history is already fetched
+      // Check if the chat history is already fetched
       if (chatFriendsUidCacheHistory.includes(receiverData.id)) {
         return;
       }
@@ -140,7 +141,9 @@ const ChatMessageList: React.FC = () => {
           >
             <p>{chat.message}</p>
           </div>
-          <div className="text-gray-400 text-sm mt-1">{chat.timestamp}</div>
+          <div className="text-gray-400 text-sm mt-1">
+            {formatTimestamp(chat.timestamp)}
+          </div>
         </div>
       </div>
     );

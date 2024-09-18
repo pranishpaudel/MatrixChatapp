@@ -38,10 +38,7 @@ const ChatArea = () => {
           offlineMessage: false,
           receiverUid: currentChatFriend.id,
           message,
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+          timestamp: new Date().toISOString(),
         },
       ]);
       setUpdateMessageStatus((prevStatus) => !prevStatus);

@@ -60,10 +60,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
           offlineMessage: true,
           receiverUid: msg.receiverId,
           message: msg.message,
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+          timestamp: new Date().toISOString(),
         },
       ]);
       console.log("Offline chat history updated");
