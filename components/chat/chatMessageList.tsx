@@ -25,7 +25,9 @@ const ChatMessageList: React.FC = () => {
   const [offlineChatHistory, setOfflineChatHistory] = useAtom(
     jotaiAtoms.offlineChatHistory
   );
-  const [onlineChatHistory, setOnlineChatHistory] = useState<Chat[]>([]);
+  const [onlineChatHistory, setOnlineChatHistory] = useState<{
+    [key: string]: Chat[];
+  }>({});
   const [receiverData] = useAtom(jotaiAtoms.currentChatFriend);
   const [updateMessageStatus, setUpdateMessageStatus] = useAtom(
     jotaiAtoms.updateMessageStatus
@@ -38,6 +40,7 @@ const ChatMessageList: React.FC = () => {
     const fetchChatHistory = async () => {
       // Check if the chat history is already fetched
       if (chatFriendsUidCacheHistory.includes(receiverData.id)) {
+        setChats(onlineChatHistory[receiverData.id] || []);
         return;
       }
       try {
@@ -64,7 +67,10 @@ const ChatMessageList: React.FC = () => {
             timestamp: chat.timestamp,
           }));
 
-          setOnlineChatHistory(onlineChats);
+          setOnlineChatHistory((prev) => ({
+            ...prev,
+            [receiverData.id]: onlineChats,
+          }));
           setChats(onlineChats);
         }
       } catch (error) {
@@ -81,7 +87,12 @@ const ChatMessageList: React.FC = () => {
     };
 
     fetchChatHistory();
-  }, [receiverData, setChatFriendsUidCacheHistory, chatFriendsUidCacheHistory]);
+  }, [
+    receiverData,
+    setChatFriendsUidCacheHistory,
+    onlineChatHistory,
+    chatFriendsUidCacheHistory,
+  ]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -95,7 +106,7 @@ const ChatMessageList: React.FC = () => {
       return;
     }
     const newChatHistory: (Chat | OfflineChat)[] = [
-      ...onlineChatHistory.map((chat: any) => ({
+      ...(onlineChatHistory[receiverData.id] || []).map((chat: any) => ({
         id: chat.id,
         sender: chat.sender,
         message: chat.message,
