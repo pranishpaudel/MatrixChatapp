@@ -2,6 +2,7 @@ import { useAtom } from "jotai";
 import React, { useState, useEffect, useRef } from "react";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Skeleton } from "@/components/ui/skeleton";
+import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
 
 interface Chat {
   id: number;
@@ -34,7 +35,7 @@ const ChatMessageList: React.FC = () => {
 
   useEffect(() => {
     const fetchChatHistory = async () => {
-      //check if the chat history is already fetched
+      // Check if the chat history is already fetched
       if (chatFriendsUidCacheHistory.includes(receiverData.id)) {
         return;
       }
@@ -123,6 +124,23 @@ const ChatMessageList: React.FC = () => {
     receiverData,
   ]);
 
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInSeconds = (now.getTime() - date.getTime()) / 1000;
+
+    if (diffInSeconds < 60) {
+      return "a few seconds ago";
+    } else if (diffInSeconds < 3600) {
+      return formatDistanceToNow(date, { addSuffix: true });
+    } else if (isToday(date)) {
+      return format(date, "p");
+    } else if (isYesterday(date)) {
+      return "Yesterday";
+    } else {
+      return format(date, "MMM d, yyyy");
+    }
+  };
   const renderChat = (chat: Chat) => {
     const isUser = chat.sender === "user";
     return (
@@ -140,7 +158,9 @@ const ChatMessageList: React.FC = () => {
           >
             <p>{chat.message}</p>
           </div>
-          <div className="text-gray-400 text-sm mt-1">{chat.timestamp}</div>
+          <div className="text-gray-400 text-sm mt-1">
+            {formatTimestamp(chat.timestamp)}
+          </div>
         </div>
       </div>
     );
