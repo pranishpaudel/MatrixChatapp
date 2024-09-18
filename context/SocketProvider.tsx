@@ -51,18 +51,29 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
     (msg: { senderId: string; receiverId: string; message: string }) => {
       setUpdateMessageStatus((prevStatus) => !prevStatus);
 
-      setOfflineChats((prevChats) => [
-        ...prevChats,
-        {
-          id: prevChats.length + 1,
-          senderUid: msg.senderId,
-          sender: "other",
-          offlineMessage: true,
-          receiverUid: msg.receiverId,
-          message: msg.message,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
+      setOfflineChats((prevChats) => {
+        // Check if the last message is "!TYPING...!"
+        const lastMessage = prevChats[prevChats.length - 1];
+        if (
+          msg.message === "!TYPING...!" &&
+          lastMessage?.message === "!TYPING...!"
+        ) {
+          return prevChats; // Do not add the typing message again
+        }
+
+        return [
+          ...prevChats,
+          {
+            id: prevChats.length + 1,
+            senderUid: msg.senderId,
+            sender: "other",
+            offlineMessage: true,
+            receiverUid: msg.receiverId,
+            message: msg.message,
+            timestamp: new Date().toISOString(),
+          },
+        ];
+      });
       console.log("Offline chat history updated");
     },
     [setUpdateMessageStatus, setOfflineChats]
