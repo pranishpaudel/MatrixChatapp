@@ -4,8 +4,8 @@ import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Plus } from "lucide-react";
 import ProfileComponent from "./ProfileComponent";
-import ContactSearchForm from "./ContactSearchForm";
 import { useEffect, useState } from "react";
+import DCInputForm from "./DCInputForm";
 
 type Friend = {
   id: string;
@@ -14,9 +14,26 @@ type Friend = {
   image: string;
 };
 
+type Group = {
+  groupName: string;
+};
+
+interface OfflineChat {
+  id: number;
+  sender: "user" | "other";
+  senderUid?: string;
+  receiverUid?: string;
+  offlineMessage?: boolean;
+  isRead: boolean;
+  message: string;
+  timestamp: string;
+}
+
 const SideBar = () => {
-  const [isFormVisible, setFormVisible] = useState(false);
+  const [isFriendFormVisible, setFriendFormVisible] = useState(false);
+  const [isChannelFormVisible, setChannelFormVisible] = useState(false);
   const [allFriendsInfo, setAllFriendsInfo] = useState<Friend[]>([]);
+  const [groupList, setGroupList] = useState<Group[]>([]);
   const [updateFriendStatus] = useAtom(jotaiAtoms.updateFriendStatus);
   const [currentChatFriend, setCurrentChatFriend] = useAtom(
     jotaiAtoms.currentChatFriend
@@ -25,9 +42,16 @@ const SideBar = () => {
   const [selectedFriendIndex, setSelectedFriendIndex] = useState<number | null>(
     null
   );
+  const [offlineChatHistory, setOfflineChatHistory] = useAtom<OfflineChat[]>(
+    jotaiAtoms.offlineChatHistory
+  );
 
-  const toggleFormVisibility = () => {
-    setFormVisible(!isFormVisible);
+  const toggleFriendFormVisibility = () => {
+    setFriendFormVisible(!isFriendFormVisible);
+  };
+
+  const toggleChannelFormVisibility = () => {
+    setChannelFormVisible(!isChannelFormVisible);
   };
 
   useEffect(() => {
@@ -38,12 +62,27 @@ const SideBar = () => {
         setAllFriendsInfo(data.data); // Set entire array of friends
         setIsFetching(false);
       });
+
+    // Fetch group list
+    fetch("/api/getGroupList")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Fetched group data:", data); // Log fetched data
+        const groupList = data.groups.map((group: any) => ({
+          groupName: group.groupName,
+        }));
+        console.log("Processed group list:", groupList); // Log processed group list
+        setGroupList(groupList);
+      })
+      .catch((error) => {
+        console.error("Error fetching group list:", error);
+        setGroupList([]);
+      });
   }, [setAllFriendsInfo, updateFriendStatus]);
 
   const handleFriendClick = (index: number) => {
-    setSelectedFriendIndex(index); // Set selected friend index
+    setSelectedFriendIndex(index);
 
-    // Update currentChatFriend atom with the selected friend's details
     const selectedFriend = allFriendsInfo[index];
     setCurrentChatFriend({
       id: selectedFriend.id,
@@ -52,6 +91,33 @@ const SideBar = () => {
       image: selectedFriend.image,
       isSet: true,
     });
+
+    // Mark the latest message as read for the selected friend
+    const updatedOfflineChatHistory = offlineChatHistory.map((chat) => {
+      if (
+        chat.senderUid === selectedFriend.id &&
+        chat.isRead === false &&
+        chat.message !== "!TYPING...!"
+      ) {
+        return { ...chat, isRead: true };
+      }
+      return chat;
+    });
+    setOfflineChatHistory(updatedOfflineChatHistory);
+  };
+
+  const hasUnreadMessages = (friendId: string) => {
+    // Check if the current chat friend is the same as the friendId
+    if (currentChatFriend?.id === friendId) {
+      return false;
+    }
+
+    return offlineChatHistory.some(
+      (chat) =>
+        chat.senderUid === friendId &&
+        chat.isRead === false &&
+        chat.message !== "!TYPING...!"
+    );
   };
 
   return (
@@ -62,7 +128,7 @@ const SideBar = () => {
             <span>Direct Messages</span>
             <Plus
               className="ml-4 cursor-pointer hover:scale-150 transition-transform duration-200"
-              onClick={toggleFormVisibility}
+              onClick={toggleFriendFormVisibility}
             />
           </div>
 
@@ -84,12 +150,17 @@ const SideBar = () => {
                         ? friend.image
                         : "https://github.com/shadcn.png"
                     }
-                    alt={`@${friend.firstName}`}
+                    alt={`${friend.firstName}`}
                   />
                 </Avatar>
                 <span>
                   {friend.firstName} {friend.lastName}
                 </span>
+                {hasUnreadMessages(friend.id) && (
+                  <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                    New
+                  </span>
+                )}
               </div>
             ))
           ) : (
@@ -99,16 +170,59 @@ const SideBar = () => {
           )}
         </div>
 
-        <div className="text-lg text-gray-300 mt-4 px-[10%]">Channels</div>
+        <div className="flex items-center text-lg text-gray-300 mt-4 px-[10%]">
+          <span>Channels</span>
+          <Plus
+            className="ml-4 cursor-pointer hover:scale-150 transition-transform duration-200"
+            onClick={toggleChannelFormVisibility}
+          />
+        </div>
+
+        {/* Loop through groups and display */}
+        {groupList && groupList.length > 0 ? (
+          groupList.map((group: Group, index: number) => (
+            <div
+              key={index}
+              className={`flex items-center space-x-3 text-slate-300 text-lg w-full py-2 px-[10%] cursor-pointer 
+              transition-colors duration-200 hover:bg-slate-600`}
+            >
+              <Avatar className="h-10 w-10">
+                <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  alt={`${group.groupName}`}
+                />
+              </Avatar>
+              <span>{group.groupName}</span>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-400 px-[10%]">
+            {isFetching ? "Fetching Groups" : "No groups available."}
+          </p>
+        )}
+
         <div className="absolute bottom-0 mb-6 ml-[25px]">
           <ProfileComponent />
         </div>
       </div>
 
-      {isFormVisible && (
+      {isFriendFormVisible && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="absolute inset-0 bg-black opacity-50"></div>
-          <ContactSearchForm onClose={toggleFormVisibility} />
+          <DCInputForm
+            onClose={toggleFriendFormVisibility}
+            compType="searchFriend"
+          />
+        </div>
+      )}
+
+      {isChannelFormVisible && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black opacity-50"></div>
+          <DCInputForm
+            onClose={toggleChannelFormVisibility}
+            compType="createGroup"
+          />
         </div>
       )}
     </div>
