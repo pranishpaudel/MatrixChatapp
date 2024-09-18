@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Skeleton } from "@/components/ui/skeleton";
 import formatTimestamp from "@/lib/formatTimestamp";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Chat {
   id: number;
@@ -35,10 +36,6 @@ const ChatMessageList: React.FC = () => {
 
   useEffect(() => {
     const fetchChatHistory = async () => {
-      // Check if the chat history is already fetched
-      if (chatFriendsUidCacheHistory.includes(receiverData.id)) {
-        return;
-      }
       try {
         setIsLoadingOnlineChat(true);
         const response = await fetch("/api/getChatHistory", {
@@ -79,8 +76,23 @@ const ChatMessageList: React.FC = () => {
       }
     };
 
-    fetchChatHistory();
-  }, [receiverData, setChatFriendsUidCacheHistory, chatFriendsUidCacheHistory]);
+    if (!chatFriendsUidCacheHistory.includes(receiverData.id)) {
+      fetchChatHistory();
+    } else {
+      setOnlineChatHistory(
+        chats.filter(
+          (chat) =>
+            chat.senderUid === receiverData.id ||
+            chat.receiverUid === receiverData.id
+        )
+      );
+    }
+  }, [
+    receiverData,
+    setChatFriendsUidCacheHistory,
+    chatFriendsUidCacheHistory,
+    chats,
+  ]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -131,7 +143,20 @@ const ChatMessageList: React.FC = () => {
         key={chat.id}
         className={`flex ${isUser ? "justify-end" : "justify-start"}`}
       >
-        <div className="bg-gray-800 p-4 rounded-lg shadow-lg max-w-md">
+        {!isUser && (
+          <Avatar className="mr-2">
+            <AvatarImage
+              src={
+                receiverData.image
+                  ? receiverData.image
+                  : "https://github.com/shadcn.png"
+              }
+              alt="@shadcn"
+            />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+        )}
+        <div className="relative bg-gray-800 p-4 rounded-lg shadow-lg max-w-md">
           <div
             className={`${
               isUser ? "bg-purple-600" : "bg-[#1E201E]"
@@ -143,6 +168,19 @@ const ChatMessageList: React.FC = () => {
           </div>
           <div className="text-gray-400 text-sm mt-1">
             {formatTimestamp(chat.timestamp)}
+          </div>
+          <div
+            className={`absolute top-1/2 transform -translate-y-1/2 ${
+              isUser ? "right-full mr-2" : "left-full ml-2"
+            }`}
+          >
+            <div
+              className={`w-0 h-0 border-t-8 border-b-8 ${
+                isUser
+                  ? "border-l-8 border-l-purple-600"
+                  : "border-r-8 border-r-[#1E201E]"
+              } border-transparent`}
+            ></div>
           </div>
         </div>
       </div>

@@ -73,7 +73,7 @@ const SideBar = () => {
                 key={index}
                 onClick={() => handleFriendClick(index)}
                 className={`flex items-center space-x-3 text-slate-300 text-lg w-full py-2 px-[10%] cursor-pointer 
-                transition-colors duration-200 hover:bg-purple-600 ${
+                transition-colors duration-200 hover:bg-slate-600 ${
                   selectedFriendIndex === index ? "bg-purple-700" : ""
                 }`}
               >
