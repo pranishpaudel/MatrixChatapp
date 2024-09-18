@@ -36,6 +36,10 @@ const ChatMessageList: React.FC = () => {
 
   useEffect(() => {
     const fetchChatHistory = async () => {
+      // Check if the chat history is already fetched
+      if (chatFriendsUidCacheHistory.includes(receiverData.id)) {
+        return;
+      }
       try {
         setIsLoadingOnlineChat(true);
         const response = await fetch("/api/getChatHistory", {
@@ -76,23 +80,8 @@ const ChatMessageList: React.FC = () => {
       }
     };
 
-    if (!chatFriendsUidCacheHistory.includes(receiverData.id)) {
-      fetchChatHistory();
-    } else {
-      setOnlineChatHistory(
-        chats.filter(
-          (chat) =>
-            chat.senderUid === receiverData.id ||
-            chat.receiverUid === receiverData.id
-        )
-      );
-    }
-  }, [
-    receiverData,
-    setChatFriendsUidCacheHistory,
-    chatFriendsUidCacheHistory,
-    chats,
-  ]);
+    fetchChatHistory();
+  }, [receiverData, setChatFriendsUidCacheHistory, chatFriendsUidCacheHistory]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -183,6 +172,12 @@ const ChatMessageList: React.FC = () => {
             ></div>
           </div>
         </div>
+        {isUser && (
+          <Avatar className="ml-2">
+            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+        )}
       </div>
     );
   };
