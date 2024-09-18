@@ -24,6 +24,7 @@ interface OfflineChat {
   senderUid?: string;
   receiverUid?: string;
   offlineMessage?: boolean;
+  isGroup?: boolean;
   isRead: boolean;
   message: string;
   timestamp: string;
@@ -109,6 +110,9 @@ const SideBar = () => {
       return chat;
     });
     setOfflineChatHistory(updatedOfflineChatHistory);
+
+    // Ensure group message is set to false
+    setCurrentGroup({ id: "", name: "", isSet: false });
   };
 
   const handleGroupClick = (index: number) => {
@@ -120,6 +124,15 @@ const SideBar = () => {
       id: selectedGroup.groupName,
       name: selectedGroup.groupName,
       isSet: true,
+    });
+
+    // Ensure chat friend is set to false
+    setCurrentChatFriend({
+      id: "",
+      firstName: "",
+      lastName: "",
+      image: "",
+      isSet: false,
     });
   };
 
@@ -167,7 +180,7 @@ const SideBar = () => {
                         ? friend.image
                         : "https://github.com/shadcn.png"
                     }
-                    alt={`${friend.firstName}`}
+                    alt={friend.firstName}
                   />
                 </Avatar>
                 <span>
@@ -209,7 +222,7 @@ const SideBar = () => {
               <Avatar className="h-10 w-10">
                 <AvatarImage
                   src="https://github.com/shadcn.png"
-                  alt={`${group.groupName}`}
+                  alt={group.groupName}
                 />
               </Avatar>
               <span>{group.groupName}</span>
