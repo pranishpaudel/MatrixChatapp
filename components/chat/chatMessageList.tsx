@@ -4,6 +4,7 @@ import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Skeleton } from "@/components/ui/skeleton";
 import formatTimestamp from "@/lib/formatTimestamp";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import TypingEffect from "./TypingEffect";
 
 interface Chat {
   id: number;
@@ -241,7 +242,9 @@ const ChatMessageList: React.FC = () => {
                 </Avatar>
                 <div className="relative bg-gray-800 p-4 rounded-lg shadow-lg max-w-md">
                   <div className="bg-[#1E201E] p-3 rounded-lg text-white text-lg">
-                    <p>Typing...</p>
+                    <p>
+                      <TypingEffect />
+                    </p>
                   </div>
                 </div>
               </div>
