@@ -2,7 +2,7 @@ import { useAtom } from "jotai";
 import React, { useState, useEffect, useRef } from "react";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Skeleton } from "@/components/ui/skeleton";
-import { format, formatDistanceToNow, isToday, isYesterday } from "date-fns";
+import formatTimestamp from "@/lib/formatTimestamp";
 
 interface Chat {
   id: number;
@@ -124,23 +124,6 @@ const ChatMessageList: React.FC = () => {
     receiverData,
   ]);
 
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInSeconds = (now.getTime() - date.getTime()) / 1000;
-
-    if (diffInSeconds < 60) {
-      return "a few seconds ago";
-    } else if (diffInSeconds < 3600) {
-      return formatDistanceToNow(date, { addSuffix: true });
-    } else if (isToday(date)) {
-      return format(date, "p");
-    } else if (isYesterday(date)) {
-      return "Yesterday";
-    } else {
-      return format(date, "MMM d, yyyy");
-    }
-  };
   const renderChat = (chat: Chat) => {
     const isUser = chat.sender === "user";
     return (
