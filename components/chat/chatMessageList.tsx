@@ -143,7 +143,7 @@ const ChatMessageList: React.FC = () => {
         key={chat.id}
         className={`flex ${isUser ? "justify-end" : "justify-start"}`}
       >
-        {/* {!isUser && (
+        {!isUser && (
           <Avatar className="mr-2">
             <AvatarImage
               src={
@@ -155,7 +155,7 @@ const ChatMessageList: React.FC = () => {
             />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-        )} */}
+        )}
         <div className="relative bg-gray-800 p-4 rounded-lg shadow-lg max-w-md">
           <div
             className={`${
