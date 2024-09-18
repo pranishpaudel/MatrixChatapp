@@ -1,6 +1,7 @@
 import { useAtom } from "jotai";
 import React, { useState, useEffect, useRef } from "react";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Chat {
   id: number;
@@ -76,7 +77,6 @@ const ChatMessageList: React.FC = () => {
 
   useEffect(() => {
     if (isLoadingOnlineChat) {
-      alert("Loading online chats");
       return;
     }
     const newChatHistory: (Chat | OfflineChat)[] = [
@@ -140,7 +140,22 @@ const ChatMessageList: React.FC = () => {
         className="flex-1 overflow-y-auto mb-4 space-y-4 p-2"
         style={{ maxHeight: "calc(100% - 20px)" }}
       >
-        {chats.map(renderChat)}
+        {isLoadingOnlineChat ? (
+          <div className="space-y-4">
+            {[...Array(5)].map((_, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  index % 2 === 0 ? "justify-start" : "justify-end"
+                }`}
+              >
+                <Skeleton className="h-16 w-3/4 max-w-md" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          chats.map(renderChat)
+        )}
       </div>
     </div>
   );
