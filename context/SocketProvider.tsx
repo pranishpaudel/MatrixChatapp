@@ -68,6 +68,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
             senderUid: msg.senderId,
             sender: "other",
             offlineMessage: true,
+            isRead: false,
             receiverUid: msg.receiverId,
             message: msg.message,
             timestamp: new Date().toISOString(),

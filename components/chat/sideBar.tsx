@@ -14,6 +14,17 @@ type Friend = {
   image: string;
 };
 
+interface OfflineChat {
+  id: number;
+  sender: "user" | "other";
+  senderUid?: string;
+  receiverUid?: string;
+  offlineMessage?: boolean;
+  isRead: boolean;
+  message: string;
+  timestamp: string;
+}
+
 const SideBar = () => {
   const [isFormVisible, setFormVisible] = useState(false);
   const [allFriendsInfo, setAllFriendsInfo] = useState<Friend[]>([]);
@@ -24,6 +35,9 @@ const SideBar = () => {
   const [isFetching, setIsFetching] = useState(true);
   const [selectedFriendIndex, setSelectedFriendIndex] = useState<number | null>(
     null
+  );
+  const [offlineChatHistory, setOfflineChatHistory] = useAtom<OfflineChat[]>(
+    jotaiAtoms.offlineChatHistory
   );
 
   const toggleFormVisibility = () => {
@@ -41,9 +55,8 @@ const SideBar = () => {
   }, [setAllFriendsInfo, updateFriendStatus]);
 
   const handleFriendClick = (index: number) => {
-    setSelectedFriendIndex(index); // Set selected friend index
+    setSelectedFriendIndex(index);
 
-    // Update currentChatFriend atom with the selected friend's details
     const selectedFriend = allFriendsInfo[index];
     setCurrentChatFriend({
       id: selectedFriend.id,
@@ -52,6 +65,33 @@ const SideBar = () => {
       image: selectedFriend.image,
       isSet: true,
     });
+
+    // Mark the latest message as read for the selected friend
+    const updatedOfflineChatHistory = offlineChatHistory.map((chat) => {
+      if (
+        chat.senderUid === selectedFriend.id &&
+        chat.isRead === false &&
+        chat.message !== "!TYPING...!"
+      ) {
+        return { ...chat, isRead: true };
+      }
+      return chat;
+    });
+    setOfflineChatHistory(updatedOfflineChatHistory);
+  };
+
+  const hasUnreadMessages = (friendId: string) => {
+    // Check if the current chat friend is the same as the friendId
+    if (currentChatFriend?.id === friendId) {
+      return false;
+    }
+
+    return offlineChatHistory.some(
+      (chat) =>
+        chat.senderUid === friendId &&
+        chat.isRead === false &&
+        chat.message !== "!TYPING...!"
+    );
   };
 
   return (
@@ -84,12 +124,17 @@ const SideBar = () => {
                         ? friend.image
                         : "https://github.com/shadcn.png"
                     }
-                    alt={`@${friend.firstName}`}
+                    alt={`${friend.firstName}`}
                   />
                 </Avatar>
                 <span>
                   {friend.firstName} {friend.lastName}
                 </span>
+                {hasUnreadMessages(friend.id) && (
+                  <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                    New
+                  </span>
+                )}
               </div>
             ))
           ) : (
