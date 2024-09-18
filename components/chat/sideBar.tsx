@@ -14,6 +14,10 @@ type Friend = {
   image: string;
 };
 
+type Group = {
+  groupName: string;
+};
+
 interface OfflineChat {
   id: number;
   sender: "user" | "other";
@@ -29,6 +33,7 @@ const SideBar = () => {
   const [isFriendFormVisible, setFriendFormVisible] = useState(false);
   const [isChannelFormVisible, setChannelFormVisible] = useState(false);
   const [allFriendsInfo, setAllFriendsInfo] = useState<Friend[]>([]);
+  const [groupList, setGroupList] = useState<Group[]>([]);
   const [updateFriendStatus] = useAtom(jotaiAtoms.updateFriendStatus);
   const [currentChatFriend, setCurrentChatFriend] = useAtom(
     jotaiAtoms.currentChatFriend
@@ -56,6 +61,22 @@ const SideBar = () => {
       .then((data) => {
         setAllFriendsInfo(data.data); // Set entire array of friends
         setIsFetching(false);
+      });
+
+    // Fetch group list
+    fetch("/api/getGroupList")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Fetched group data:", data); // Log fetched data
+        const groupList = data.groups.map((group: any) => ({
+          groupName: group.groupName,
+        }));
+        console.log("Processed group list:", groupList); // Log processed group list
+        setGroupList(groupList);
+      })
+      .catch((error) => {
+        console.error("Error fetching group list:", error);
+        setGroupList([]);
       });
   }, [setAllFriendsInfo, updateFriendStatus]);
 
@@ -156,6 +177,29 @@ const SideBar = () => {
             onClick={toggleChannelFormVisibility}
           />
         </div>
+
+        {/* Loop through groups and display */}
+        {groupList && groupList.length > 0 ? (
+          groupList.map((group: Group, index: number) => (
+            <div
+              key={index}
+              className={`flex items-center space-x-3 text-slate-300 text-lg w-full py-2 px-[10%] cursor-pointer 
+              transition-colors duration-200 hover:bg-slate-600`}
+            >
+              <Avatar className="h-10 w-10">
+                <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  alt={`${group.groupName}`}
+                />
+              </Avatar>
+              <span>{group.groupName}</span>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-400 px-[10%]">
+            {isFetching ? "Fetching Groups" : "No groups available."}
+          </p>
+        )}
 
         <div className="absolute bottom-0 mb-6 ml-[25px]">
           <ProfileComponent />

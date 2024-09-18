@@ -36,7 +36,7 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
     []
   );
   const [groupName, setGroupName] = React.useState("");
-
+  const isGroup = compType === "createGroup" ? true : false;
   // Add friend function
   const addFriend = React.useCallback(async () => {
     if (selectedFriendIds.length === 0) return;
@@ -105,7 +105,7 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
           },
           body: JSON.stringify({
             searchText,
-            isGroup: true,
+            isGroup,
           }),
         });
         const data = await response.json();

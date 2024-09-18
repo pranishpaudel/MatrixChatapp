@@ -8,3 +8,4 @@ export const ADD_FRIEND_ROUTE = "/api/addFriend";
 export const GET_FRIENDS_LIST_ROUTE = "/api/getFriendsList";
 export const GET_CHAT_HISTORY_ROUTE = "/api/getChatHistory";
 export const CREATE_CHAT_GROUP_ROUTE = "/api/createChatGroup";
+export const GET_GROUP_LIST_ROUTE = "/api/getGroupList";
