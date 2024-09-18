@@ -6,17 +6,19 @@ import { X } from "lucide-react";
 import {
   ADD_FRIEND_ROUTE,
   SEARCH_CONTACT_BY_NAME_ROUTE,
+  CREATE_CHAT_GROUP_ROUTE,
 } from "@/constants/routes";
 import Lottie from "react-lottie";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 
-interface ContactSearchFormProps {
+interface DCInputFormProps {
   onClose: () => void;
+  compType: "searchFriend" | "createGroup";
 }
 
-function ContactSearchForm({ onClose }: ContactSearchFormProps) {
+function DCInputForm({ onClose, compType }: DCInputFormProps) {
   const [searchText, setSearchText] = React.useState("");
   const [updateFriendStatus, setUpdateFriendStatus] = useAtom(
     jotaiAtoms.updateFriendStatus
@@ -30,11 +32,14 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
       image: string | null;
     }[]
   >([]);
-  const [selectedFriendId, setSelectedFriendId] = React.useState("");
+  const [selectedFriendIds, setSelectedFriendIds] = React.useState<string[]>(
+    []
+  );
+  const [groupName, setGroupName] = React.useState("");
 
   // Add friend function
   const addFriend = React.useCallback(async () => {
-    if (!selectedFriendId) return;
+    if (selectedFriendIds.length === 0) return;
 
     try {
       const response = await fetch(ADD_FRIEND_ROUTE, {
@@ -43,7 +48,7 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          friendId: selectedFriendId,
+          friendId: selectedFriendIds[0], // Assuming single friend selection for add friend
         }),
       });
 
@@ -55,14 +60,39 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
     } catch (error) {
       console.error("Error adding friend:", error);
     }
-  }, [selectedFriendId, onClose, setUpdateFriendStatus, updateFriendStatus]);
+  }, [selectedFriendIds, onClose, setUpdateFriendStatus, updateFriendStatus]);
 
-  // Trigger addFriend when selectedFriendId changes
+  // Create group function
+  const createGroup = React.useCallback(async () => {
+    if (!groupName || selectedFriendIds.length === 0) return;
+
+    try {
+      const response = await fetch(CREATE_CHAT_GROUP_ROUTE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          groupName,
+          groupMembers: selectedFriendIds,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        onClose(); // Close the card after the group is created successfully
+      }
+    } catch (error) {
+      console.error("Error creating group:", error);
+    }
+  }, [groupName, selectedFriendIds, onClose]);
+
+  // Trigger addFriend when selectedFriendIds changes for searchFriend
   React.useEffect(() => {
-    if (selectedFriendId) {
+    if (compType === "searchFriend" && selectedFriendIds.length > 0) {
       addFriend();
     }
-  }, [selectedFriendId, addFriend]);
+  }, [selectedFriendIds, addFriend, compType]);
 
   // Fetch the search results based on the search text
   React.useEffect(() => {
@@ -75,6 +105,7 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
           },
           body: JSON.stringify({
             searchText,
+            isGroup: true,
           }),
         });
         const data = await response.json();
@@ -95,9 +126,23 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
         <X />
       </button>
       <CardHeader>
-        <CardTitle className="text-md">Search your friend</CardTitle>
+        <CardTitle className="text-md">
+          {compType === "searchFriend"
+            ? "Search your friend"
+            : "Create a group"}
+        </CardTitle>
       </CardHeader>
       <CardContent>
+        {compType === "createGroup" && (
+          <Input
+            type="text"
+            id="groupName"
+            enableFocusRing={false}
+            onChange={(e) => setGroupName(e.target.value)}
+            placeholder="Enter group name"
+            className="w-full h-[3em] text-slate-300 text-lg mb-4"
+          />
+        )}
         <Input
           type="text"
           id="search"
@@ -112,10 +157,14 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
               <li
                 key={result.id}
                 className={`cursor-pointer p-2 hover:bg-gray-900 rounded-md ${
-                  selectedFriendId === result.id ? "bg-gray-700" : ""
+                  selectedFriendIds.includes(result.id) ? "bg-gray-700" : ""
                 }`}
                 onClick={() => {
-                  setSelectedFriendId(result.id);
+                  setSelectedFriendIds((prev) =>
+                    prev.includes(result.id)
+                      ? prev.filter((id) => id !== result.id)
+                      : [...prev, result.id]
+                  );
                 }}
               >
                 <div className="flex items-center space-x-4">
@@ -158,9 +207,18 @@ function ContactSearchForm({ onClose }: ContactSearchFormProps) {
             />
           )}
         </ul>
+        {compType === "createGroup" && (
+          <Button
+            className="mt-4 w-full"
+            onClick={createGroup}
+            disabled={!groupName || selectedFriendIds.length === 0}
+          >
+            Create Group
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
 }
 
-export default ContactSearchForm;
+export default DCInputForm;

@@ -4,8 +4,8 @@ import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Plus } from "lucide-react";
 import ProfileComponent from "./ProfileComponent";
-import ContactSearchForm from "./ContactSearchForm";
 import { useEffect, useState } from "react";
+import DCInputForm from "./DCInputForm";
 
 type Friend = {
   id: string;
@@ -26,7 +26,8 @@ interface OfflineChat {
 }
 
 const SideBar = () => {
-  const [isFormVisible, setFormVisible] = useState(false);
+  const [isFriendFormVisible, setFriendFormVisible] = useState(false);
+  const [isChannelFormVisible, setChannelFormVisible] = useState(false);
   const [allFriendsInfo, setAllFriendsInfo] = useState<Friend[]>([]);
   const [updateFriendStatus] = useAtom(jotaiAtoms.updateFriendStatus);
   const [currentChatFriend, setCurrentChatFriend] = useAtom(
@@ -40,8 +41,12 @@ const SideBar = () => {
     jotaiAtoms.offlineChatHistory
   );
 
-  const toggleFormVisibility = () => {
-    setFormVisible(!isFormVisible);
+  const toggleFriendFormVisibility = () => {
+    setFriendFormVisible(!isFriendFormVisible);
+  };
+
+  const toggleChannelFormVisibility = () => {
+    setChannelFormVisible(!isChannelFormVisible);
   };
 
   useEffect(() => {
@@ -102,7 +107,7 @@ const SideBar = () => {
             <span>Direct Messages</span>
             <Plus
               className="ml-4 cursor-pointer hover:scale-150 transition-transform duration-200"
-              onClick={toggleFormVisibility}
+              onClick={toggleFriendFormVisibility}
             />
           </div>
 
@@ -148,7 +153,7 @@ const SideBar = () => {
           <span>Channels</span>
           <Plus
             className="ml-4 cursor-pointer hover:scale-150 transition-transform duration-200"
-            onClick={toggleFormVisibility}
+            onClick={toggleChannelFormVisibility}
           />
         </div>
 
@@ -157,10 +162,23 @@ const SideBar = () => {
         </div>
       </div>
 
-      {isFormVisible && (
+      {isFriendFormVisible && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="absolute inset-0 bg-black opacity-50"></div>
-          <ContactSearchForm onClose={toggleFormVisibility} />
+          <DCInputForm
+            onClose={toggleFriendFormVisibility}
+            compType="searchFriend"
+          />
+        </div>
+      )}
+
+      {isChannelFormVisible && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black opacity-50"></div>
+          <DCInputForm
+            onClose={toggleChannelFormVisibility}
+            compType="createGroup"
+          />
         </div>
       )}
     </div>

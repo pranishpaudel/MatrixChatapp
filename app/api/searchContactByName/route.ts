@@ -9,6 +9,7 @@ import { z } from "zod";
 
 interface iSeachContactBody {
   searchText: string;
+  isGroup?: boolean;
 }
 
 export async function POST(req: NextRequest, res: NextResponse) {
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const JWTData = await isJWTValidForApi(req);
     const reqBody = await req.json();
     searchContactSchema.parse(reqBody);
-    const { searchText } = reqBody as iSeachContactBody;
+    const { searchText, isGroup = false } = reqBody as iSeachContactBody;
 
     if (!JWTData.success) {
       return NextResponse.json(
@@ -30,30 +31,34 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const userId = JWTData.userId as string; // Extract userId from the JWT
 
-    // Fetch user's existing friends
-    const existingFriends = await prisma.friend.findMany({
-      where: {
-        OR: [{ userId }, { friendId: userId }],
-      },
-      select: {
-        friendId: true,
-        userId: true,
-      },
-    });
+    let friendIds: string[] = [];
 
-    // Extract IDs of existing friends
-    const friendIds = existingFriends.map((friend) =>
-      friend.userId === userId ? friend.friendId : friend.userId
-    );
+    if (!isGroup) {
+      // Fetch user's existing friends
+      const existingFriends = await prisma.friend.findMany({
+        where: {
+          OR: [{ userId }, { friendId: userId }],
+        },
+        select: {
+          friendId: true,
+          userId: true,
+        },
+      });
 
-    // Fetch users from Prisma excluding existing friends
+      // Extract IDs of existing friends
+      friendIds = existingFriends.map((friend) =>
+        friend.userId === userId ? friend.friendId : friend.userId
+      );
+    }
+
+    // Fetch users from Prisma excluding existing friends if isGroup is false
     const dataFromPrisma = await prisma.user.findMany({
       where: {
         AND: [
           {
             id: {
               not: userId, // Exclude own user data
-              notIn: friendIds, // Exclude already added friends
+              ...(isGroup ? {} : { notIn: friendIds }), // Exclude already added friends if not a group
             },
           },
           {
