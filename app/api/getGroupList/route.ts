@@ -17,9 +17,12 @@ interface GroupMember {
   image: string | null;
 }
 
-// Define the structure of a group
-interface Group {
+// Define the structure of a group including members
+interface GroupWithMembers {
+  id: string;
   name: string;
+  createdAt: Date;
+  updatedAt: Date;
   members: GroupMember[];
 }
 
@@ -39,7 +42,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const userId = JWTData.userId;
 
     // Fetch groups where the user is a member
-    const groups: Group[] = await prisma.group.findMany({
+    const groups: GroupWithMembers[] = (await prisma.group.findMany({
       where: {
         members: {
           some: {
@@ -50,17 +53,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       include: {
         members: true,
       },
-    });
+    })) as GroupWithMembers[];
 
     // Format the response
-    const groupList = groups.map((group) => ({
+    const groupList = groups.map((group: GroupWithMembers) => ({
       groupName: group.name,
-      groupMembers: group.members.map((member) => ({
+      groupId: group.id,
+      members: group.members.map((member: GroupMember) => ({
         id: member.id,
-        email: member.email,
         firstName: member.firstName,
         lastName: member.lastName,
-        image: member.image,
       })),
     }));
 
