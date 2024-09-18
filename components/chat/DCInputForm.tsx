@@ -115,7 +115,7 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
       }
     };
     searchContact();
-  }, [searchText]);
+  }, [searchText, isGroup]);
 
   return (
     <Card className="w-[350px] relative bg-gray-800">
