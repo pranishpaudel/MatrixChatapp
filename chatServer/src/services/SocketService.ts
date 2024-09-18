@@ -41,7 +41,9 @@ class SocketService {
         const parsedMessage = JSON.parse(message);
         const { senderId, receiverId, message: msg } = parsedMessage;
 
-        await produceMessage(parsedMessage);
+        if (msg === "!TYPING...!" ) {
+          await produceMessage(parsedMessage);
+        }
         console.log("Message Produced to Kafka Broker");
         // Emit the message to the specific receiver
         const receiverSocketId = this.users[receiverId];

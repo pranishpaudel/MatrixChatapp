@@ -4,6 +4,7 @@ import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Skeleton } from "@/components/ui/skeleton";
 import formatTimestamp from "@/lib/formatTimestamp";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import TypingEffect from "./TypingEffect";
 
 interface Chat {
   id: number;
@@ -20,6 +21,7 @@ interface OfflineChat extends Chat {
 
 const ChatMessageList: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [isLoadingOnlineChat, setIsLoadingOnlineChat] = useState(false);
   const [offlineChatHistory, setOfflineChatHistory] = useAtom(
@@ -125,7 +127,7 @@ const ChatMessageList: React.FC = () => {
           timestamp: chat.timestamp,
           offlineMessage: chat.offlineMessage,
         })),
-    ];
+    ].filter((chat) => chat.message !== "!TYPING...!");
 
     setChats(newChatHistory);
   }, [
@@ -135,6 +137,15 @@ const ChatMessageList: React.FC = () => {
     updateMessageStatus,
     receiverData,
   ]);
+
+  useEffect(() => {
+    if (offlineChatHistory.length > 0) {
+      const lastMessage = offlineChatHistory[offlineChatHistory.length - 1];
+      setIsTyping(lastMessage.message === "!TYPING...!");
+    } else {
+      setIsTyping(false);
+    }
+  }, [offlineChatHistory]);
 
   const renderChat = (chat: Chat) => {
     const isUser = chat.sender === "user";
@@ -214,7 +225,31 @@ const ChatMessageList: React.FC = () => {
             ))}
           </div>
         ) : (
-          chats.map(renderChat)
+          <>
+            {chats.map(renderChat)}
+            {isTyping && (
+              <div className="flex justify-start">
+                <Avatar className="mr-2">
+                  <AvatarImage
+                    src={
+                      receiverData.image
+                        ? receiverData.image
+                        : "https://github.com/shadcn.png"
+                    }
+                    alt="@shadcn"
+                  />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                <div className="relative bg-gray-800 p-4 rounded-lg shadow-lg max-w-md">
+                  <div className="bg-[#1E201E] p-3 rounded-lg text-white text-lg">
+                    <p>
+                      <TypingEffect />
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

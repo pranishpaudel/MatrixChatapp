@@ -22,6 +22,8 @@ const ChatArea = () => {
   const [currentSenderId, setCurrentSenderId] = useAtom(
     jotaiAtoms.currentSenderId
   );
+  const [isTyping, setIsTyping] = useState(false);
+
   const onEmojiClick = (emojiObject: any) => {
     setMessage((prevMessage) => prevMessage + emojiObject.emoji);
   };
@@ -43,6 +45,7 @@ const ChatArea = () => {
       ]);
       setUpdateMessageStatus((prevStatus) => !prevStatus);
       setMessage("");
+      setIsTyping(false); // Reset typing status after sending message
     }
   };
 
@@ -52,6 +55,24 @@ const ChatArea = () => {
       handleSendMessage();
     }
   };
+
+  const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value);
+    if (!isTyping) {
+      setIsTyping(true);
+      sendMessage("!TYPING...!");
+    }
+  };
+
+  useEffect(() => {
+    if (isTyping) {
+      const typingTimeout = setTimeout(() => {
+        setIsTyping(false);
+      }, 3000); // Reset typing status after 3 seconds of inactivity
+
+      return () => clearTimeout(typingTimeout);
+    }
+  }, [isTyping]);
 
   return (
     <>
@@ -68,7 +89,7 @@ const ChatArea = () => {
                   placeholder="Enter your message"
                   className="w-full h-[4em] bg-gray-800 text-slate-300 text-lg pr-20"
                   value={message}
-                  onChange={(e) => setMessage(e.target.value)}
+                  onChange={handleTyping} // Handles typing status
                   onKeyDown={handleKeyDown} // Handles Enter key
                   enableFocusRing={false}
                 />
