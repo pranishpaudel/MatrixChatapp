@@ -173,7 +173,7 @@ const ChatMessageList: React.FC = () => {
               isUser ? "bg-purple-600" : "bg-[#1E201E]"
             } p-3 rounded-lg ${
               isUser ? "text-gray-200" : "text-white"
-            } text-lg`}
+            } text-lg break-words`}
           >
             <p>{chat.message}</p>
           </div>
@@ -194,12 +194,6 @@ const ChatMessageList: React.FC = () => {
             ></div>
           </div>
         </div>
-        {isUser && (
-          <Avatar className="ml-2">
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-        )}
       </div>
     );
   };
