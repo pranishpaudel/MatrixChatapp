@@ -29,6 +29,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     // Debugging: Log the groupMembers array
     console.log("groupMembers:", groupMembers);
+    const updatedGroupMembers = [...groupMembers, JWTData.userId] as string[];
 
     // Check if the group name already exists
     const existingGroup = await prisma.group.findFirst({
@@ -49,12 +50,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const membersExist = await prisma.user.findMany({
       where: {
         id: {
-          in: groupMembers,
+          in: updatedGroupMembers,
         },
       },
     });
 
-    if (membersExist.length !== groupMembers.length) {
+    if (membersExist.length !== updatedGroupMembers.length) {
       return NextResponse.json(
         {
           message: "One or more group members do not exist",
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       data: {
         name: groupName,
         members: {
-          connect: groupMembers.map((memberId) => ({ id: memberId })),
+          connect: updatedGroupMembers.map((memberId) => ({ id: memberId })),
         },
       },
     });
