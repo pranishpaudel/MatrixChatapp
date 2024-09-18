@@ -36,10 +36,6 @@ const ChatMessageList: React.FC = () => {
 
   useEffect(() => {
     const fetchChatHistory = async () => {
-      // Check if the chat history is already fetched
-      if (chatFriendsUidCacheHistory.includes(receiverData.id)) {
-        return;
-      }
       try {
         setIsLoadingOnlineChat(true);
         const response = await fetch("/api/getChatHistory", {
@@ -80,8 +76,23 @@ const ChatMessageList: React.FC = () => {
       }
     };
 
-    fetchChatHistory();
-  }, [receiverData, setChatFriendsUidCacheHistory, chatFriendsUidCacheHistory]);
+    if (!chatFriendsUidCacheHistory.includes(receiverData.id)) {
+      fetchChatHistory();
+    } else {
+      setOnlineChatHistory(
+        chats.filter(
+          (chat) =>
+            chat.senderUid === receiverData.id ||
+            chat.receiverUid === receiverData.id
+        )
+      );
+    }
+  }, [
+    receiverData,
+    setChatFriendsUidCacheHistory,
+    chatFriendsUidCacheHistory,
+    chats,
+  ]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -132,7 +143,7 @@ const ChatMessageList: React.FC = () => {
         key={chat.id}
         className={`flex ${isUser ? "justify-end" : "justify-start"}`}
       >
-        {!isUser && (
+        {/* {!isUser && (
           <Avatar className="mr-2">
             <AvatarImage
               src={
@@ -144,7 +155,7 @@ const ChatMessageList: React.FC = () => {
             />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-        )}
+        )} */}
         <div className="relative bg-gray-800 p-4 rounded-lg shadow-lg max-w-md">
           <div
             className={`${
