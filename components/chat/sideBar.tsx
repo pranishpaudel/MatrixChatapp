@@ -144,7 +144,14 @@ const SideBar = () => {
           )}
         </div>
 
-        <div className="text-lg text-gray-300 mt-4 px-[10%]">Channels</div>
+        <div className="flex items-center text-lg text-gray-300 mt-4 px-[10%]">
+          <span>Channels</span>
+          <Plus
+            className="ml-4 cursor-pointer hover:scale-150 transition-transform duration-200"
+            onClick={toggleFormVisibility}
+          />
+        </div>
+
         <div className="absolute bottom-0 mb-6 ml-[25px]">
           <ProfileComponent />
         </div>
