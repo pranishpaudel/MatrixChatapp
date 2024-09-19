@@ -54,6 +54,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
     (msg: { senderId: string; receiverId: string; message: string }) => {
       setUpdateMessageStatus((prevStatus) => !prevStatus);
 
+      console.log("Message received from server:", msg);
       setOfflineChats((prevChats) => {
         // Check if the last message is "!TYPING...!"
         const lastMessage = prevChats[prevChats.length - 1];

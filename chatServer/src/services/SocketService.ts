@@ -51,18 +51,22 @@ class SocketService {
         console.log("Message Produced to Kafka Broker");
 
         if (isGroup) {
-          console.log("Group id", receiverId);
+          console.log("Group id vaneko", receiverId.id);
           // Emit the message to all members of the group
-          const groupMembers = await getGroupMembers(receiverId);
-          console.log("Group members", groupMembers);
-          groupMembers.forEach((memberId: string) => {
-            const memberSocketId = this.users[memberId];
-            if (memberSocketId) {
-              this._io
-                .to(memberSocketId)
-                .emit("message", { senderId, receiverId, message: msg });
-            }
-          });
+          try {
+            const groupMembers = await getGroupMembers(receiverId.id);
+            console.log("Group members", groupMembers);
+            groupMembers.forEach((memberId: string) => {
+              const memberSocketId = this.users[memberId];
+              if (memberSocketId) {
+                this._io
+                  .to(memberSocketId)
+                  .emit("message", { senderId, receiverId, message: msg });
+              }
+            });
+          } catch (error) {
+            console.error("Error fetching group members:", error);
+          }
         } else {
           // Emit the message to the specific receiver
           const receiverSocketId = this.users[receiverId];
