@@ -18,6 +18,9 @@ const ChatArea = () => {
   const [offlineChatHistory, setOfflineChatHistory] = useAtom(
     jotaiAtoms.offlineChatHistory
   );
+  const [, setOfflineGroupChatLatest] = useAtom(
+    jotaiAtoms.offlineGroupChatLatestMessage
+  );
   const [updateMessageStatus, setUpdateMessageStatus] = useAtom(
     jotaiAtoms.updateMessageStatus
   );
@@ -40,20 +43,36 @@ const ChatArea = () => {
     );
     if (message.trim()) {
       sendMessage(message);
-      setOfflineChatHistory((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
+      if (isGroup) {
+        setOfflineGroupChatLatest({
+          id: new Date().getTime(), // Unique ID based on timestamp
           sender: "user",
-          senderUid: currentSenderId,
-          offlineMessage: false,
-          isRead: false,
-          isGroup,
-          receiverUid: currentChatFriend.id,
           message,
           timestamp: new Date().toISOString(),
-        },
-      ]);
+          fromSocket: false,
+          groupId: currentGroup.id,
+          senderId: currentSenderId,
+          senderFirstName: "You",
+          senderLastName: "",
+          senderImage: "",
+        });
+      } else {
+        setOfflineChatHistory((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            sender: "user",
+            senderUid: currentSenderId,
+            offlineMessage: false,
+            isRead: false,
+            isGroup,
+            receiverUid: currentChatFriend.id,
+            message,
+            timestamp: new Date().toISOString(),
+          },
+        ]);
+      }
+
       setUpdateMessageStatus((prevStatus) => !prevStatus);
       setMessage("");
       setIsTyping(false); // Reset typing status after sending message

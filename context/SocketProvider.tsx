@@ -34,7 +34,9 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
     jotaiAtoms.offlineChatHistory
   ); // To store chats when receiving user is offline or not connected
   const [currentGroup] = useAtom(jotaiAtoms.currentGroup);
-
+  const [, setOfflineGroupChatLatest] = useAtom(
+    jotaiAtoms.offlineGroupChatLatestMessage
+  );
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
     (msg) => {
       if (socketRef.current) {
@@ -59,41 +61,61 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
     }) => {
       setUpdateMessageStatus((prevStatus) => !prevStatus);
 
-      setOfflineChats((prevChats) => {
-        // Check if the last message is "!TYPING...!"
-        const lastMessage = prevChats[prevChats.length - 1];
-        if (
-          msg.message === "!TYPING...!" &&
-          lastMessage?.message === "!TYPING...!"
-        ) {
-          return prevChats; // Do not add the typing message again
-        }
-        console.log(
-          "Message received from server:",
-          msg.message,
-          "receiver",
-          msg.receiverId,
-          "isGroup",
-          msg.isGroup
-        );
-        return [
-          ...prevChats,
-          {
-            id: prevChats.length + 1,
-            senderUid: msg.senderId,
-            sender: "other",
-            offlineMessage: true,
-            isRead: false,
-            isGroup: msg.isGroup,
-            receiverUid: msg.receiverId,
-            message: msg.message,
-            timestamp: new Date().toISOString(),
-          },
-        ];
-      });
+      if (msg.isGroup) {
+        setOfflineGroupChatLatest({
+          id: new Date().getTime(), // Unique ID based on timestamp
+          sender: "other",
+          message: msg.message,
+          timestamp: new Date().toISOString(),
+          fromSocket: true,
+          groupId: currentGroup.id,
+          senderId: msg.senderId,
+          senderFirstName: "FirstName", // Replace with actual data
+          senderLastName: "LastName", // Replace with actual data
+          senderImage: "ImageURL", // Replace with actual data
+        });
+      } else {
+        setOfflineChats((prevChats) => {
+          // Check if the last message is "!TYPING...!"
+          const lastMessage = prevChats[prevChats.length - 1];
+          if (
+            msg.message === "!TYPING...!" &&
+            lastMessage?.message === "!TYPING...!"
+          ) {
+            return prevChats; // Do not add the typing message again
+          }
+          console.log(
+            "Message received from server:",
+            msg.message,
+            "receiver",
+            msg.receiverId,
+            "isGroup",
+            msg.isGroup
+          );
+          return [
+            ...prevChats,
+            {
+              id: prevChats.length + 1,
+              senderUid: msg.senderId,
+              sender: "other",
+              offlineMessage: true,
+              isRead: false,
+              isGroup: msg.isGroup,
+              receiverUid: msg.receiverId,
+              message: msg.message,
+              timestamp: new Date().toISOString(),
+            },
+          ];
+        });
+      }
       console.log("Offline chat history updated");
     },
-    [setUpdateMessageStatus, setOfflineChats]
+    [
+      setUpdateMessageStatus,
+      setOfflineChats,
+      setOfflineGroupChatLatest,
+      currentGroup,
+    ]
   );
 
   useEffect(() => {

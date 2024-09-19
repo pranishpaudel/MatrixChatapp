@@ -12,6 +12,19 @@ interface offlineChat {
   timestamp: string;
 }
 
+interface OfflineGroupChat {
+  id: string | number;
+  sender: "user" | "other";
+  message: string;
+  timestamp: string;
+  fromSocket: boolean;
+  groupId: string;
+  senderId: string;
+  senderFirstName: string;
+  senderLastName: string;
+  senderImage: string;
+}
+
 // Define the complete jotaiAtoms object
 const jotaiAtoms = {
   isLoginForm: atom(true),
@@ -45,6 +58,18 @@ const jotaiAtoms = {
   // New chatHistory atom
   offlineChatHistory: atom<offlineChat[]>([]),
   chatFriendsUidCacheHistory: atom<string[]>([]),
+  offlineGroupChatLatestMessage: atom<OfflineGroupChat>({
+    id: "",
+    sender: "user",
+    message: "",
+    timestamp: "",
+    fromSocket: false,
+    groupId: "",
+    senderId: "",
+    senderFirstName: "",
+    senderLastName: "",
+    senderImage: "",
+  }),
 };
 
 export default jotaiAtoms;

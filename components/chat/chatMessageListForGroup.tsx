@@ -20,6 +20,9 @@ const ChatMessageListForGroup: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentGroup, setCurrentGroup] = useAtom(jotaiAtoms.currentGroup);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const [offlineGroupChatLatest, setOfflineGroupChatLatest] = useAtom(
+    jotaiAtoms.offlineGroupChatLatestMessage
+  );
 
   useEffect(() => {
     const fetchGroupChatHistory = async () => {
@@ -49,6 +52,28 @@ const ChatMessageListForGroup: React.FC = () => {
 
     fetchGroupChatHistory();
   }, [currentGroup]);
+
+  useEffect(() => {
+    if (offlineGroupChatLatest.message !== "!TYPING...!") {
+      setGroupChats((prevChats: any) => {
+        if (
+          prevChats.length === 0 ||
+          prevChats[prevChats.length - 1].message !==
+            offlineGroupChatLatest.message
+        ) {
+          return [...prevChats, offlineGroupChatLatest];
+        }
+        return prevChats;
+      });
+    }
+  }, [offlineGroupChatLatest]);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [groupChats]);
 
   const renderGroupChat = (chat: GroupChat) => {
     const isUser = chat.sender === "user";
