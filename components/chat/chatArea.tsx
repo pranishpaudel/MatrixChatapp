@@ -47,6 +47,7 @@ const ChatArea = () => {
           senderUid: currentSenderId,
           offlineMessage: false,
           isRead: false,
+          isGroup,
           receiverUid: currentChatFriend.id,
           message,
           timestamp: new Date().toISOString(),

@@ -33,18 +33,21 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const [offlineChats, setOfflineChats] = useAtom(
     jotaiAtoms.offlineChatHistory
   ); // To store chats when receiving user is offline or not connected
-
+  const [currentGroup] = useAtom(jotaiAtoms.currentGroup);
+  console.log("Current Group", currentGroup);
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
     (msg) => {
       if (socketRef.current) {
         socketRef.current.emit("event:message", {
           message: msg,
           senderId: senderUserId,
-          receiverId: receivedUserId,
+          ...(currentGroup?.isSet
+            ? { isGroup: true, receiverId: currentGroup } // Send groupId if currentGroup is set
+            : { isGroup: false, receiverId: receivedUserId }), // Otherwise send receiverId
         });
       }
     },
-    [senderUserId, receivedUserId]
+    [senderUserId, receivedUserId, currentGroup] // Correct dependencies
   );
 
   const onMessageRec = useCallback(
@@ -69,6 +72,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
             sender: "other",
             offlineMessage: true,
             isRead: false,
+            isGroup: currentGroup.isSet,
             receiverUid: msg.receiverId,
             message: msg.message,
             timestamp: new Date().toISOString(),
@@ -77,7 +81,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
       });
       console.log("Offline chat history updated");
     },
-    [setUpdateMessageStatus, setOfflineChats]
+    [setUpdateMessageStatus, setOfflineChats, currentGroup]
   );
 
   useEffect(() => {

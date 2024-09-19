@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,8 +12,10 @@ model Message {
   content     String
   sender      User     @relation("SentMessages", fields: [senderId], references: [id])
   senderId    String
-  recipient   User     @relation("ReceivedMessages", fields: [recipientId], references: [id])
-  recipientId String
+  recipient   User?    @relation("ReceivedMessages", fields: [recipientId], references: [id])
+  recipientId String?
+  group       Group?   @relation(fields: [groupId], references: [id])
+  groupId     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -38,6 +37,7 @@ model User {
   friendConnections Friend[]  @relation("UserFriendConnections")
   sentMessages      Message[] @relation("SentMessages")
   receivedMessages  Message[] @relation("ReceivedMessages")
+  groups            Group[]   @relation("GroupMembers")
 }
 
 model Friend {
@@ -48,4 +48,13 @@ model Friend {
   friendId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Group {
+  id        String    @id @default(cuid())
+  name      String
+  members   User[]    @relation("GroupMembers")
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
