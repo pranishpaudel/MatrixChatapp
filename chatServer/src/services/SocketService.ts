@@ -51,10 +51,10 @@ class SocketService {
         console.log("Message Produced to Kafka Broker");
 
         if (isGroup) {
-          console.log("Group id vaneko", receiverId.id);
+          console.log("Group id vaneko", receiverId);
           // Emit the message to all members of the group
           try {
-            const groupMembers = await getGroupMembers(receiverId.id);
+            const groupMembers = await getGroupMembers(receiverId);
             console.log("Group members", groupMembers);
             groupMembers.forEach((memberId: string) => {
               const memberSocketId = this.users[memberId];

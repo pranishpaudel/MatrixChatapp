@@ -50,7 +50,7 @@ async function saveMessagesToDB(messages: any[]) {
         content: msg,
         senderId: senderId,
         recipientId: isGroup ? null : receiverId,
-        groupId: isGroup ? receiverId.id : null,
+        groupId: isGroup ? receiverId : null,
       })),
     });
     console.log("Messages saved to DB", messageDb);

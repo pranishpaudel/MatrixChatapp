@@ -34,7 +34,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
     jotaiAtoms.offlineChatHistory
   ); // To store chats when receiving user is offline or not connected
   const [currentGroup] = useAtom(jotaiAtoms.currentGroup);
-  console.log("Current Group", currentGroup);
+
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
     (msg) => {
       if (socketRef.current) {
@@ -42,7 +42,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
           message: msg,
           senderId: senderUserId,
           ...(currentGroup?.isSet
-            ? { isGroup: true, receiverId: currentGroup } // Send groupId if currentGroup is set
+            ? { isGroup: true, receiverId: currentGroup.id } // Send groupId if currentGroup is set
             : { isGroup: false, receiverId: receivedUserId }), // Otherwise send receiverId
         });
       }
@@ -54,7 +54,6 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
     (msg: { senderId: string; receiverId: string; message: string }) => {
       setUpdateMessageStatus((prevStatus) => !prevStatus);
 
-      console.log("Message received from server:", msg);
       setOfflineChats((prevChats) => {
         // Check if the last message is "!TYPING...!"
         const lastMessage = prevChats[prevChats.length - 1];
@@ -64,7 +63,12 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
         ) {
           return prevChats; // Do not add the typing message again
         }
-
+        console.log(
+          "Message received from server:",
+          msg.message,
+          "receiver",
+          msg.receiverId
+        );
         return [
           ...prevChats,
           {
