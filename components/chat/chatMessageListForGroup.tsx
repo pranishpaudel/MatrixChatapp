@@ -20,35 +20,35 @@ const ChatMessageListForGroup: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentGroup, setCurrentGroup] = useAtom(jotaiAtoms.currentGroup);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
-  
-  //   useEffect(() => {
-  //     const fetchGroupChatHistory = async () => {
-  //       setIsLoading(true);
-  //       try {
-  //         const response = await fetch("/api/getChatHistory", {
-  //           method: "POST",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //           body: JSON.stringify({
-  //             chatFriendUid: currentGroup.id,
-  //             isGroup: true,
-  //           }),
-  //         });
 
-  //         const data = await response.json();
-  //         if (data.chatHistory) {
-  //           setGroupChats(data.chatHistory);
-  //         }
-  //       } catch (error) {
-  //         console.error("Failed to fetch group chat history:", error);
-  //       } finally {
-  //         setIsLoading(false);
-  //       }
-  //     };
+  useEffect(() => {
+    const fetchGroupChatHistory = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch("/api/getChatHistory", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            chatFriendUid: currentGroup.id,
+            isGroup: true,
+          }),
+        });
 
-  //     fetchGroupChatHistory();
-  //   }, [currentGroup]);
+        const data = await response.json();
+        if (data.chatHistory) {
+          setGroupChats(data.chatHistory);
+        }
+      } catch (error) {
+        console.error("Failed to fetch group chat history:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchGroupChatHistory();
+  }, [currentGroup]);
 
   const renderGroupChat = (chat: GroupChat) => {
     const isUser = chat.sender === "user";

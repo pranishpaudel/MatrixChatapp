@@ -51,7 +51,12 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   );
 
   const onMessageRec = useCallback(
-    (msg: { senderId: string; receiverId: string; message: string }) => {
+    (msg: {
+      senderId: string;
+      receiverId: string;
+      isGroup: boolean;
+      message: string;
+    }) => {
       setUpdateMessageStatus((prevStatus) => !prevStatus);
 
       setOfflineChats((prevChats) => {
@@ -67,7 +72,9 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
           "Message received from server:",
           msg.message,
           "receiver",
-          msg.receiverId
+          msg.receiverId,
+          "isGroup",
+          msg.isGroup
         );
         return [
           ...prevChats,
@@ -77,7 +84,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
             sender: "other",
             offlineMessage: true,
             isRead: false,
-            isGroup: currentGroup.isSet,
+            isGroup: msg.isGroup,
             receiverUid: msg.receiverId,
             message: msg.message,
             timestamp: new Date().toISOString(),
@@ -86,7 +93,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
       });
       console.log("Offline chat history updated");
     },
-    [setUpdateMessageStatus, setOfflineChats, currentGroup]
+    [setUpdateMessageStatus, setOfflineChats]
   );
 
   useEffect(() => {

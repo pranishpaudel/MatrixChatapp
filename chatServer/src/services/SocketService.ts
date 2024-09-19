@@ -61,7 +61,12 @@ class SocketService {
               if (memberSocketId) {
                 this._io
                   .to(memberSocketId)
-                  .emit("message", { senderId, receiverId, message: msg });
+                  .emit("message", {
+                    senderId,
+                    receiverId,
+                    isGroup: true,
+                    message: msg,
+                  });
               }
             });
           } catch (error) {
@@ -73,7 +78,12 @@ class SocketService {
           if (receiverSocketId) {
             this._io
               .to(receiverSocketId)
-              .emit("message", { senderId, receiverId, message: msg });
+              .emit("message", {
+                senderId,
+                receiverId,
+                isGroup: false,
+                message: msg,
+              });
           }
         }
       }

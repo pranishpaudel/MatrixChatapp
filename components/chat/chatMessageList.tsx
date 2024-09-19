@@ -17,6 +17,7 @@ interface Chat {
 
 interface OfflineChat extends Chat {
   offlineMessage?: boolean;
+  isGroup?: boolean;
 }
 
 const ChatMessageList: React.FC = () => {
@@ -117,8 +118,9 @@ const ChatMessageList: React.FC = () => {
       ...offlineChatHistory
         .filter(
           (chat: OfflineChat) =>
-            chat.senderUid === receiverData.id ||
-            chat.receiverUid === receiverData.id
+            (chat.senderUid === receiverData.id ||
+              chat.receiverUid === receiverData.id) &&
+            chat.isGroup !== true
         )
         .map((chat: OfflineChat) => ({
           id: chat.id,
@@ -143,6 +145,7 @@ const ChatMessageList: React.FC = () => {
       const lastMessage = offlineChatHistory[offlineChatHistory.length - 1];
       setIsTyping(
         lastMessage.message === "!TYPING...!" &&
+          !lastMessage.isGroup &&
           (lastMessage.senderUid === receiverData.id ||
             lastMessage.receiverUid === receiverData.id)
       );
