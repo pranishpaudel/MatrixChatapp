@@ -18,25 +18,26 @@ interface DCInputFormProps {
   compType: "searchFriend" | "createGroup";
 }
 
+interface SearchResult {
+  id: string;
+  firstName: string | null;
+  lastName: string;
+  email: string;
+  image: string | null;
+}
+
 function DCInputForm({ onClose, compType }: DCInputFormProps) {
   const [searchText, setSearchText] = React.useState("");
   const [updateFriendStatus, setUpdateFriendStatus] = useAtom(
     jotaiAtoms.updateFriendStatus
   );
-  const [searchResults, setSearchResults] = React.useState<
-    {
-      id: string;
-      firstName: string | null;
-      lastName: string;
-      email: string;
-      image: string | null;
-    }[]
-  >([]);
+  const [searchResults, setSearchResults] = React.useState<SearchResult[]>([]);
   const [selectedFriendIds, setSelectedFriendIds] = React.useState<string[]>(
     []
   );
   const [groupName, setGroupName] = React.useState("");
-  const isGroup = compType === "createGroup" ? true : false;
+  const isGroup = compType === "createGroup";
+
   // Add friend function
   const addFriend = React.useCallback(async () => {
     if (selectedFriendIds.length === 0) return;
@@ -48,14 +49,14 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          friendId: selectedFriendIds[0], // Assuming single friend selection for add friend
+          friendId: selectedFriendIds[0],
         }),
       });
 
       if (response.ok) {
-        const data = await response.json();
+        await response.json();
         setUpdateFriendStatus(!updateFriendStatus);
-        onClose(); // Close the card after the friend is added successfully
+        onClose();
       }
     } catch (error) {
       console.error("Error adding friend:", error);
@@ -79,8 +80,8 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        onClose(); // Close the card after the group is created successfully
+        await response.json();
+        onClose();
       }
     } catch (error) {
       console.error("Error creating group:", error);
@@ -98,18 +99,35 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
   React.useEffect(() => {
     const searchContact = async () => {
       if (searchText) {
-        const response = await fetch(SEARCH_CONTACT_BY_NAME_ROUTE, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            searchText,
-            isGroup,
-          }),
-        });
-        const data = await response.json();
-        setSearchResults(data.data || []);
+        try {
+          const response = await fetch(SEARCH_CONTACT_BY_NAME_ROUTE, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              searchText,
+              isGroup,
+            }),
+          });
+          const data = await response.json();
+          const newResults = data.data || [];
+
+          if (isGroup) {
+            // Merge new results with existing ones, removing duplicates
+            setSearchResults((prevResults) => {
+              const combinedResults = [...prevResults, ...newResults];
+              return Array.from(
+                new Map(combinedResults.map((item) => [item.id, item])).values()
+              );
+            });
+          } else {
+            // Replace search results for friend search
+            setSearchResults(newResults);
+          }
+        } catch (error) {
+          console.error("Error searching contacts:", error);
+        }
       } else {
         setSearchResults([]);
       }
@@ -137,7 +155,7 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
           <Input
             type="text"
             id="groupName"
-            enableFocusRing={false}
+            value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
             placeholder="Enter group name"
             className="w-full h-[3em] text-slate-300 text-lg mb-4"
@@ -146,7 +164,7 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
         <Input
           type="text"
           id="search"
-          enableFocusRing={false}
+          value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           placeholder="Search for your friend"
           className="w-full h-[3em] text-slate-300 text-lg"
@@ -171,9 +189,8 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
                   <Avatar>
                     <AvatarImage
                       src={
-                        result.image
-                          ? result.image
-                          : "https://avatars.dicebear.com/api/avataaars/shadcn.svg"
+                        result.image ||
+                        "https://avatars.dicebear.com/api/avataaars/shadcn.svg"
                       }
                       alt="@shadcn"
                       height={40}
