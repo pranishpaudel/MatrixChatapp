@@ -110,12 +110,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
       }
       console.log("Offline chat history updated");
     },
-    [
-      setUpdateMessageStatus,
-      setOfflineChats,
-      setOfflineGroupChatLatest,
-      currentGroup,
-    ]
+    [setUpdateMessageStatus, setOfflineChats, setOfflineGroupChatLatest]
   );
 
   useEffect(() => {

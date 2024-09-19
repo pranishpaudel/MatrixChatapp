@@ -3,6 +3,7 @@ import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import formatTimestamp from "@/lib/formatTimestamp";
+import TypingEffect from "./TypingEffect";
 
 interface GroupChat {
   id: string | number;
@@ -20,11 +21,12 @@ interface GroupChat {
 const ChatMessageListForGroup: React.FC = () => {
   const [groupChats, setGroupChats] = useState<GroupChat[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentGroup, setCurrentGroup] = useAtom(jotaiAtoms.currentGroup);
+  const [currentGroup] = useAtom(jotaiAtoms.currentGroup);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
-  const [offlineGroupChatLatest, setOfflineGroupChatLatest] = useAtom(
+  const [offlineGroupChatLatest] = useAtom(
     jotaiAtoms.offlineGroupChatLatestMessage
   );
+  const [senderUserId] = useAtom(jotaiAtoms.currentSenderId);
 
   useEffect(() => {
     const fetchGroupChatHistory = async () => {
@@ -56,22 +58,26 @@ const ChatMessageListForGroup: React.FC = () => {
   }, [currentGroup]);
 
   useEffect(() => {
-    if (
-      offlineGroupChatLatest.message !== "!TYPING...!" &&
-      offlineGroupChatLatest.groupId === currentGroup.id
-    ) {
+    if (offlineGroupChatLatest.groupId === currentGroup.id) {
       setGroupChats((prevChats) => {
+        const filteredChats = prevChats.filter(
+          (chat) => chat.message !== "!TYPING...!"
+        );
+
         if (
-          prevChats.length === 0 ||
-          prevChats[prevChats.length - 1].message !==
+          filteredChats.length === 0 ||
+          filteredChats[filteredChats.length - 1].message !==
             offlineGroupChatLatest.message
         ) {
-          return [...prevChats, offlineGroupChatLatest];
+          // Only add the message if it's not from the current user
+          if (offlineGroupChatLatest.senderId !== senderUserId) {
+            return [...filteredChats, offlineGroupChatLatest];
+          }
         }
-        return prevChats;
+        return filteredChats;
       });
     }
-  }, [offlineGroupChatLatest, currentGroup.id]);
+  }, [offlineGroupChatLatest, currentGroup.id, senderUserId]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -82,6 +88,11 @@ const ChatMessageListForGroup: React.FC = () => {
 
   const renderGroupChat = (chat: GroupChat) => {
     const isUser = chat.sender === "user";
+    const showTypingEffect =
+      chat.message === "!TYPING...!" &&
+      chat.sender !== "user" &&
+      chat.senderId !== senderUserId;
+
     return (
       <div
         key={chat.id}
@@ -101,13 +112,11 @@ const ChatMessageListForGroup: React.FC = () => {
         )}
         <div className="relative bg-gray-800 p-4 rounded-lg shadow-lg max-w-md">
           <div
-            className={`${
-              isUser ? "bg-purple-600" : "bg-[#1E201E]"
-            } p-3 rounded-lg ${
-              isUser ? "text-gray-200" : "text-white"
+            className={`p-3 rounded-lg ${
+              isUser ? "bg-purple-600 text-gray-200" : "bg-[#1E201E] text-white"
             } text-lg break-words`}
           >
-            <p>{chat.message}</p>
+            {showTypingEffect ? <TypingEffect /> : <p>{chat.message}</p>}
           </div>
           <div className="text-gray-400 text-sm mt-1">
             {formatTimestamp(chat.timestamp)}
