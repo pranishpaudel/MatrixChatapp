@@ -46,10 +46,11 @@ const BATCH_INTERVAL = 5000; // 5 seconds
 async function saveMessagesToDB(messages: any[]) {
   try {
     const messageDb = await prismaClientForChat.message.createMany({
-      data: messages.map(({ senderId, receiverId, message: msg }) => ({
+      data: messages.map(({ senderId, receiverId, message: msg, isGroup }) => ({
         content: msg,
         senderId: senderId,
-        recipientId: receiverId,
+        recipientId: isGroup ? null : receiverId,
+        groupId: isGroup ? receiverId.id : null,
       })),
     });
     console.log("Messages saved to DB", messageDb);

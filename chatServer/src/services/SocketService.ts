@@ -45,9 +45,9 @@ class SocketService {
         const parsedMessage = JSON.parse(message);
         const { senderId, receiverId, message: msg, isGroup } = parsedMessage;
 
-        // if (msg !== "!TYPING...!") {
-        //   await produceMessage(parsedMessage);
-        // }
+        if (msg !== "!TYPING...!") {
+          await produceMessage(parsedMessage);
+        }
         console.log("Message Produced to Kafka Broker");
 
         if (isGroup) {
