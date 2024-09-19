@@ -7,6 +7,7 @@ import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import ChatMessageList from "./chatMessageList";
 import { useSocket } from "@/context/SocketProvider";
+import ChatMessageListForGroup from "./chatMessageListForGroup";
 
 const ChatArea = () => {
   const [message, setMessage] = useState("");
@@ -89,7 +90,11 @@ const ChatArea = () => {
       {currentChatFriend.isSet || currentGroup.isSet ? (
         <div className="ml-2 h-full flex flex-col">
           <div className="flex-grow overflow-hidden">
-            <ChatMessageList />
+            {!currentGroup.isSet ? (
+              <ChatMessageList />
+            ) : (
+              <ChatMessageListForGroup />
+            )}
           </div>
           <div id="input" className="mt-4 mb-4 flex justify-center">
             <div className="flex items-center w-[70%] space-x-2">

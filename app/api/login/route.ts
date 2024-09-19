@@ -48,7 +48,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       isProfileSetup,
     };
     const token = jwt.sign(tokenData, process.env.JWT_SECRET as string, {
-      expiresIn: "1h",
+      expiresIn: "1d",
     });
 
     const response = NextResponse.json({

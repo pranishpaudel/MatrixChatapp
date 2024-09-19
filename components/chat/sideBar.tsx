@@ -51,7 +51,9 @@ const SideBar = () => {
   const [offlineChatHistory, setOfflineChatHistory] = useAtom<OfflineChat[]>(
     jotaiAtoms.offlineChatHistory
   );
-
+  const [chatFriendsUidCacheHistory, setChatFriendsUidCacheHistory] = useAtom(
+    jotaiAtoms.chatFriendsUidCacheHistory
+  );
   const toggleFriendFormVisibility = () => {
     setFriendFormVisible(!isFriendFormVisible);
   };
@@ -118,6 +120,7 @@ const SideBar = () => {
   };
 
   const handleGroupClick = (index: number) => {
+    setChatFriendsUidCacheHistory([]);
     setSelectedGroupIndex(index);
     setSelectedFriendIndex(null); // Deselect friend when a group is selected
 
