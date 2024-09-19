@@ -45,23 +45,28 @@ class SocketService {
         const parsedMessage = JSON.parse(message);
         const { senderId, receiverId, message: msg, isGroup } = parsedMessage;
 
-        // if (msg !== "!TYPING...!") {
-        //   await produceMessage(parsedMessage);
-        // }
+        if (msg !== "!TYPING...!") {
+          await produceMessage(parsedMessage);
+        }
         console.log("Message Produced to Kafka Broker");
 
         if (isGroup) {
-          console.log("Group id vaneko", receiverId.id);
+          console.log("Group id vaneko", receiverId);
           // Emit the message to all members of the group
           try {
-            const groupMembers = await getGroupMembers(receiverId.id);
+            const groupMembers = await getGroupMembers(receiverId);
             console.log("Group members", groupMembers);
             groupMembers.forEach((memberId: string) => {
               const memberSocketId = this.users[memberId];
               if (memberSocketId) {
                 this._io
                   .to(memberSocketId)
-                  .emit("message", { senderId, receiverId, message: msg });
+                  .emit("message", {
+                    senderId,
+                    receiverId,
+                    isGroup: true,
+                    message: msg,
+                  });
               }
             });
           } catch (error) {
@@ -73,7 +78,12 @@ class SocketService {
           if (receiverSocketId) {
             this._io
               .to(receiverSocketId)
-              .emit("message", { senderId, receiverId, message: msg });
+              .emit("message", {
+                senderId,
+                receiverId,
+                isGroup: false,
+                message: msg,
+              });
           }
         }
       }

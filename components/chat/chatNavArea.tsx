@@ -7,32 +7,48 @@ import { EllipsisVertical } from "lucide-react";
 
 const ChatNavArea = () => {
   const [currentChatFriend] = useAtom(jotaiAtoms.currentChatFriend);
+  const [currentGroup] = useAtom(jotaiAtoms.currentGroup);
+
   return (
     <>
       {currentChatFriend.isSet ? (
-        <>
-          <div className="h-full flex flex-col">
-            <div className="flex-grow flex items-center justify-between px-7">
-              <div className="flex items-center space-x-3">
-                <Avatar>
-                  <AvatarImage
-                    src={
-                      currentChatFriend.image
-                        ? currentChatFriend.image
-                        : "https://github.com/shadcn.png"
-                    }
-                    alt="@shadcn"
-                  />
-                </Avatar>
-                <span className="text-lg font-semibold">
-                  {currentChatFriend.firstName} {currentChatFriend.lastName}
-                </span>
-              </div>
-              <EllipsisVertical className="ml-auto" />
+        <div className="h-full flex flex-col">
+          <div className="flex-grow flex items-center justify-between px-7">
+            <div className="flex items-center space-x-3">
+              <Avatar>
+                <AvatarImage
+                  src={
+                    currentChatFriend.image
+                      ? currentChatFriend.image
+                      : "https://github.com/shadcn.png"
+                  }
+                  alt="@shadcn"
+                />
+              </Avatar>
+              <span className="text-lg font-semibold">
+                {currentChatFriend.firstName} {currentChatFriend.lastName}
+              </span>
             </div>
-            <Separator className="w-full" />
+            <EllipsisVertical className="ml-auto" />
           </div>
-        </>
+          <Separator className="w-full" />
+        </div>
+      ) : currentGroup.isSet ? (
+        <div className="h-full flex flex-col">
+          <div className="flex-grow flex items-center justify-between px-7">
+            <div className="flex items-center space-x-3">
+              <Avatar>
+                <AvatarImage
+                  src={"https://github.com/shadcn.png"}
+                  alt="@group"
+                />
+              </Avatar>
+              <span className="text-lg font-semibold">{currentGroup.name}</span>
+            </div>
+            <EllipsisVertical className="ml-auto" />
+          </div>
+          <Separator className="w-full" />
+        </div>
       ) : (
         <></>
       )}

@@ -7,6 +7,7 @@ import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import ChatMessageList from "./chatMessageList";
 import { useSocket } from "@/context/SocketProvider";
+import ChatMessageListForGroup from "./chatMessageListForGroup";
 
 const ChatArea = () => {
   const [message, setMessage] = useState("");
@@ -16,6 +17,9 @@ const ChatArea = () => {
   const { sendMessage } = useSocket();
   const [offlineChatHistory, setOfflineChatHistory] = useAtom(
     jotaiAtoms.offlineChatHistory
+  );
+  const [, setOfflineGroupChatLatest] = useAtom(
+    jotaiAtoms.offlineGroupChatLatestMessage
   );
   const [updateMessageStatus, setUpdateMessageStatus] = useAtom(
     jotaiAtoms.updateMessageStatus
@@ -39,20 +43,36 @@ const ChatArea = () => {
     );
     if (message.trim()) {
       sendMessage(message);
-      setOfflineChatHistory((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
+      if (isGroup) {
+        setOfflineGroupChatLatest({
+          id: new Date().getTime(), // Unique ID based on timestamp
           sender: "user",
-          senderUid: currentSenderId,
-          offlineMessage: false,
-          isRead: false,
-          isGroup,
-          receiverUid: currentChatFriend.id,
           message,
           timestamp: new Date().toISOString(),
-        },
-      ]);
+          fromSocket: false,
+          groupId: currentGroup.id,
+          senderId: currentSenderId,
+          senderFirstName: "You",
+          senderLastName: "",
+          senderImage: "",
+        });
+      } else {
+        setOfflineChatHistory((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            sender: "user",
+            senderUid: currentSenderId,
+            offlineMessage: false,
+            isRead: false,
+            isGroup,
+            receiverUid: currentChatFriend.id,
+            message,
+            timestamp: new Date().toISOString(),
+          },
+        ]);
+      }
+
       setUpdateMessageStatus((prevStatus) => !prevStatus);
       setMessage("");
       setIsTyping(false); // Reset typing status after sending message
@@ -89,7 +109,11 @@ const ChatArea = () => {
       {currentChatFriend.isSet || currentGroup.isSet ? (
         <div className="ml-2 h-full flex flex-col">
           <div className="flex-grow overflow-hidden">
-            <ChatMessageList />
+            {!currentGroup.isSet ? (
+              <ChatMessageList />
+            ) : (
+              <ChatMessageListForGroup />
+            )}
           </div>
           <div id="input" className="mt-4 mb-4 flex justify-center">
             <div className="flex items-center w-[70%] space-x-2">
