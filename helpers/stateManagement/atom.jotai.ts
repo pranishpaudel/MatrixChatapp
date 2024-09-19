@@ -6,6 +6,7 @@ interface offlineChat {
   senderUid?: string;
   receiverUid?: string;
   offlineMessage?: boolean;
+  isGroup?: boolean;
   isRead: boolean;
   message: string;
   timestamp: string;
@@ -22,6 +23,11 @@ const jotaiAtoms = {
     firstName: "",
     lastName: "",
     image: "",
+    isSet: false,
+  }),
+  currentGroup: atom({
+    id: "",
+    name: "",
     isSet: false,
   }),
   updateMessageStatus: atom(false),

@@ -12,6 +12,7 @@ const ChatArea = () => {
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [currentChatFriend] = useAtom(jotaiAtoms.currentChatFriend);
+  const [currentGroup] = useAtom(jotaiAtoms.currentGroup);
   const { sendMessage } = useSocket();
   const [offlineChatHistory, setOfflineChatHistory] = useAtom(
     jotaiAtoms.offlineChatHistory
@@ -29,6 +30,13 @@ const ChatArea = () => {
   };
 
   const handleSendMessage = () => {
+    const isGroup = currentGroup.isSet;
+    console.log(
+      "currentGroup ko kura",
+      isGroup,
+      "sathy ko kura",
+      currentChatFriend.isSet
+    );
     if (message.trim()) {
       sendMessage(message);
       setOfflineChatHistory((prev) => [
@@ -39,6 +47,7 @@ const ChatArea = () => {
           senderUid: currentSenderId,
           offlineMessage: false,
           isRead: false,
+          isGroup,
           receiverUid: currentChatFriend.id,
           message,
           timestamp: new Date().toISOString(),
@@ -77,7 +86,7 @@ const ChatArea = () => {
 
   return (
     <>
-      {currentChatFriend.isSet ? (
+      {currentChatFriend.isSet || currentGroup.isSet ? (
         <div className="ml-2 h-full flex flex-col">
           <div className="flex-grow overflow-hidden">
             <ChatMessageList />

@@ -16,6 +16,7 @@ type Friend = {
 
 type Group = {
   groupName: string;
+  groupId: string;
 };
 
 interface OfflineChat {
@@ -24,6 +25,7 @@ interface OfflineChat {
   senderUid?: string;
   receiverUid?: string;
   offlineMessage?: boolean;
+  isGroup?: boolean;
   isRead: boolean;
   message: string;
   timestamp: string;
@@ -38,8 +40,12 @@ const SideBar = () => {
   const [currentChatFriend, setCurrentChatFriend] = useAtom(
     jotaiAtoms.currentChatFriend
   );
+  const [currentGroup, setCurrentGroup] = useAtom(jotaiAtoms.currentGroup);
   const [isFetching, setIsFetching] = useState(true);
   const [selectedFriendIndex, setSelectedFriendIndex] = useState<number | null>(
+    null
+  );
+  const [selectedGroupIndex, setSelectedGroupIndex] = useState<number | null>(
     null
   );
   const [offlineChatHistory, setOfflineChatHistory] = useAtom<OfflineChat[]>(
@@ -67,9 +73,10 @@ const SideBar = () => {
     fetch("/api/getGroupList")
       .then((response) => response.json())
       .then((data) => {
-        console.log("Fetched group data:", data); // Log fetched data
-        const groupList = data.groups.map((group: any) => ({
+        // console.log("Fetched group data:", data); // Log fetched data
+        const groupList = data.groups.map((group: Group) => ({
           groupName: group.groupName,
+          groupId: group.groupId,
         }));
         console.log("Processed group list:", groupList); // Log processed group list
         setGroupList(groupList);
@@ -82,6 +89,7 @@ const SideBar = () => {
 
   const handleFriendClick = (index: number) => {
     setSelectedFriendIndex(index);
+    setSelectedGroupIndex(null); // Deselect group when a friend is selected
 
     const selectedFriend = allFriendsInfo[index];
     setCurrentChatFriend({
@@ -104,6 +112,30 @@ const SideBar = () => {
       return chat;
     });
     setOfflineChatHistory(updatedOfflineChatHistory);
+
+    // Ensure group message is set to false
+    setCurrentGroup({ id: "", name: "", isSet: false });
+  };
+
+  const handleGroupClick = (index: number) => {
+    setSelectedGroupIndex(index);
+    setSelectedFriendIndex(null); // Deselect friend when a group is selected
+
+    const selectedGroup = groupList[index];
+    setCurrentGroup({
+      id: selectedGroup.groupId,
+      name: selectedGroup.groupName,
+      isSet: true,
+    });
+
+    // Ensure chat friend is set to false
+    setCurrentChatFriend({
+      id: "",
+      firstName: "",
+      lastName: "",
+      image: "",
+      isSet: false,
+    });
   };
 
   const hasUnreadMessages = (friendId: string) => {
@@ -150,7 +182,7 @@ const SideBar = () => {
                         ? friend.image
                         : "https://github.com/shadcn.png"
                     }
-                    alt={`${friend.firstName}`}
+                    alt={friend.firstName}
                   />
                 </Avatar>
                 <span>
@@ -183,13 +215,16 @@ const SideBar = () => {
           groupList.map((group: Group, index: number) => (
             <div
               key={index}
+              onClick={() => handleGroupClick(index)}
               className={`flex items-center space-x-3 text-slate-300 text-lg w-full py-2 px-[10%] cursor-pointer 
-              transition-colors duration-200 hover:bg-slate-600`}
+              transition-colors duration-200 hover:bg-slate-600 ${
+                selectedGroupIndex === index ? "bg-purple-700" : ""
+              }`}
             >
               <Avatar className="h-10 w-10">
                 <AvatarImage
                   src="https://github.com/shadcn.png"
-                  alt={`${group.groupName}`}
+                  alt={group.groupName}
                 />
               </Avatar>
               <span>{group.groupName}</span>

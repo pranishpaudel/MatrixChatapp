@@ -1,9 +1,12 @@
 import { Server } from "socket.io";
 import Redis from "ioredis";
 import { produceMessage } from "./kafka.js";
+import { getGroupMembers } from "./database.js"; // Assume this function queries the DB for group members
+
 interface iMessageFromFrontend {
   message: string;
   senderId: string;
+  isGroup: boolean;
   receiverId: string;
 }
 
@@ -25,6 +28,7 @@ sub.subscribe("MESSAGES");
 class SocketService {
   private _io: Server;
   private users: { [key: string]: string } = {}; // Map to store userId to socketId
+  private groups: { [key: string]: string[] } = {}; // Map to store groupId to userIds
 
   constructor() {
     console.log("SocketService constructor");
@@ -39,18 +43,38 @@ class SocketService {
     sub.on("message", async (channel, message) => {
       if (channel === "MESSAGES") {
         const parsedMessage = JSON.parse(message);
-        const { senderId, receiverId, message: msg } = parsedMessage;
+        const { senderId, receiverId, message: msg, isGroup } = parsedMessage;
 
-        if (msg !== "!TYPING...!") {
-          await produceMessage(parsedMessage);
-        }
+        // if (msg !== "!TYPING...!") {
+        //   await produceMessage(parsedMessage);
+        // }
         console.log("Message Produced to Kafka Broker");
-        // Emit the message to the specific receiver
-        const receiverSocketId = this.users[receiverId];
-        if (receiverSocketId) {
-          this._io
-            .to(receiverSocketId)
-            .emit("message", { senderId, receiverId, message: msg });
+
+        if (isGroup) {
+          console.log("Group id vaneko", receiverId.id);
+          // Emit the message to all members of the group
+          try {
+            const groupMembers = await getGroupMembers(receiverId.id);
+            console.log("Group members", groupMembers);
+            groupMembers.forEach((memberId: string) => {
+              const memberSocketId = this.users[memberId];
+              if (memberSocketId) {
+                this._io
+                  .to(memberSocketId)
+                  .emit("message", { senderId, receiverId, message: msg });
+              }
+            });
+          } catch (error) {
+            console.error("Error fetching group members:", error);
+          }
+        } else {
+          // Emit the message to the specific receiver
+          const receiverSocketId = this.users[receiverId];
+          if (receiverSocketId) {
+            this._io
+              .to(receiverSocketId)
+              .emit("message", { senderId, receiverId, message: msg });
+          }
         }
       }
     });
@@ -62,18 +86,29 @@ class SocketService {
       console.log("New client connected", socket.id);
 
       // Listen for user registration to map userId to socketId
-      socket.on("register", (userId: string) => {
-        this.users[userId] = socket.id;
-        console.log(`User ${userId} registered with socket ID ${socket.id}`);
-      });
+      socket.on(
+        "register",
+        (userId: string, isGroup: boolean, groupId?: string) => {
+          this.users[userId] = socket.id;
+          console.log(`User ${userId} registered with socket ID ${socket.id}`);
+        }
+      );
 
       socket.on(
         "event:message",
-        async ({ message, senderId, receiverId }: iMessageFromFrontend) => {
+        async ({
+          message,
+          senderId,
+          isGroup,
+          receiverId,
+        }: iMessageFromFrontend) => {
+          if (isGroup) {
+            console.log("Group message received");
+          }
           try {
             const result = await pub.publish(
               "MESSAGES",
-              JSON.stringify({ senderId, receiverId, message })
+              JSON.stringify({ senderId, receiverId, message, isGroup })
             );
             console.log("Message published to Redis", result);
           } catch (err) {
