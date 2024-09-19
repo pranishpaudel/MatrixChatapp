@@ -16,6 +16,7 @@ type Friend = {
 
 type Group = {
   groupName: string;
+  groupId: string;
 };
 
 interface OfflineChat {
@@ -72,9 +73,10 @@ const SideBar = () => {
     fetch("/api/getGroupList")
       .then((response) => response.json())
       .then((data) => {
-        console.log("Fetched group data:", data); // Log fetched data
-        const groupList = data.groups.map((group: any) => ({
+        // console.log("Fetched group data:", data); // Log fetched data
+        const groupList = data.groups.map((group: Group) => ({
           groupName: group.groupName,
+          groupId: group.groupId,
         }));
         console.log("Processed group list:", groupList); // Log processed group list
         setGroupList(groupList);
@@ -121,7 +123,7 @@ const SideBar = () => {
 
     const selectedGroup = groupList[index];
     setCurrentGroup({
-      id: selectedGroup.groupName,
+      id: selectedGroup.groupId,
       name: selectedGroup.groupName,
       isSet: true,
     });
