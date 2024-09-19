@@ -68,7 +68,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
           message: msg.message,
           timestamp: new Date().toISOString(),
           fromSocket: true,
-          groupId: currentGroup.id,
+          groupId: msg.receiverId,
           senderId: msg.senderId,
           senderFirstName: "FirstName", // Replace with actual data
           senderLastName: "LastName", // Replace with actual data

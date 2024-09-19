@@ -5,10 +5,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import formatTimestamp from "@/lib/formatTimestamp";
 
 interface GroupChat {
-  id: string;
+  id: string | number;
   sender: "user" | "other";
   message: string;
   timestamp: string;
+  fromSocket?: boolean;
+  groupId?: string;
   senderId: string;
   senderFirstName: string;
   senderLastName: string;
@@ -54,8 +56,11 @@ const ChatMessageListForGroup: React.FC = () => {
   }, [currentGroup]);
 
   useEffect(() => {
-    if (offlineGroupChatLatest.message !== "!TYPING...!") {
-      setGroupChats((prevChats: any) => {
+    if (
+      offlineGroupChatLatest.message !== "!TYPING...!" &&
+      offlineGroupChatLatest.groupId === currentGroup.id
+    ) {
+      setGroupChats((prevChats) => {
         if (
           prevChats.length === 0 ||
           prevChats[prevChats.length - 1].message !==
@@ -66,7 +71,7 @@ const ChatMessageListForGroup: React.FC = () => {
         return prevChats;
       });
     }
-  }, [offlineGroupChatLatest]);
+  }, [offlineGroupChatLatest, currentGroup.id]);
 
   useEffect(() => {
     if (chatContainerRef.current) {

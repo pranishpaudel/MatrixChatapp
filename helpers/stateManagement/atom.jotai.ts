@@ -18,7 +18,7 @@ interface OfflineGroupChat {
   message: string;
   timestamp: string;
   fromSocket: boolean;
-  groupId: string;
+  groupId?: string;
   senderId: string;
   senderFirstName: string;
   senderLastName: string;
