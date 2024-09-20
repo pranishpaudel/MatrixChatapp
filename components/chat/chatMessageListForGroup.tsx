@@ -90,6 +90,10 @@ const ChatMessageListForGroup: React.FC = () => {
       chat.sender !== "user" &&
       chat.senderId !== senderUserId;
 
+    if (chat.message === "!TYPING...!" && chat.senderId === senderUserId) {
+      return null;
+    }
+
     return (
       <div
         key={chat.id}
