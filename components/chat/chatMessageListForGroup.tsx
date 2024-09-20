@@ -69,10 +69,7 @@ const ChatMessageListForGroup: React.FC = () => {
           filteredChats[filteredChats.length - 1].message !==
             offlineGroupChatLatest.message
         ) {
-          // Only add the message if it's not from the current user
-          if (offlineGroupChatLatest.senderId !== senderUserId) {
-            return [...filteredChats, offlineGroupChatLatest];
-          }
+          return [...filteredChats, offlineGroupChatLatest];
         }
         return filteredChats;
       });
