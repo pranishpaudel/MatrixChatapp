@@ -4,6 +4,7 @@ import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import formatTimestamp from "@/lib/formatTimestamp";
 import TypingEffect from "./TypingEffect";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface GroupChat {
   id: string | number;
@@ -127,6 +128,22 @@ const ChatMessageListForGroup: React.FC = () => {
     );
   };
 
+  const renderSkeletons = () => {
+    const skeletons = [];
+    for (let i = 0; i < 5; i++) {
+      skeletons.push(
+        <div key={i} className="flex justify-start mb-4">
+          <Skeleton className="w-10 h-10 rounded-full mr-2" />
+          <div className="flex flex-col space-y-2">
+            <Skeleton className="w-64 h-6 rounded-lg" />
+            <Skeleton className="w-32 h-4 rounded-lg" />
+          </div>
+        </div>
+      );
+    }
+    return skeletons;
+  };
+
   return (
     <div className="h-full flex flex-col">
       <div
@@ -134,7 +151,7 @@ const ChatMessageListForGroup: React.FC = () => {
         className="flex-1 overflow-y-auto mb-4 space-y-4 p-2"
         style={{ maxHeight: "calc(100% - 20px)" }}
       >
-        {isLoading ? <div>Loading...</div> : groupChats.map(renderGroupChat)}
+        {isLoading ? renderSkeletons() : groupChats.map(renderGroupChat)}
       </div>
     </div>
   );
