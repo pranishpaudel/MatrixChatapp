@@ -8,6 +8,7 @@ import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import ChatMessageList from "./chatMessageList";
 import { useSocket } from "@/context/SocketProvider";
 import ChatMessageListForGroup from "./chatMessageListForGroup";
+import { GET_AWS_PRE_SIGNED_URL_FOR_UPLOAD_ROUTE } from "@/constants/routes";
 
 const ChatArea = () => {
   const [message, setMessage] = useState("");
@@ -28,11 +29,14 @@ const ChatArea = () => {
     jotaiAtoms.currentSenderId
   );
   const [isTyping, setIsTyping] = useState(false);
-
+  const [uploadProgress, setUploadProgress] = useState(0); // State to track upload progress
   const onEmojiClick = (emojiObject: any) => {
     setMessage((prevMessage) => prevMessage + emojiObject.emoji);
   };
 
+  useEffect(() => {
+    console.log("uploadProgress", uploadProgress);
+  }, [uploadProgress]);
   const handleSendMessage = () => {
     const isGroup = currentGroup.isSet;
     console.log(
@@ -94,6 +98,49 @@ const ChatArea = () => {
     }
   };
 
+  const handleAttachment = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    console.log(file);
+    //upload to s3 signed url
+    const response = await fetch(GET_AWS_PRE_SIGNED_URL_FOR_UPLOAD_ROUTE, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        fileName: file?.name,
+        fileType: file?.type,
+      }),
+    });
+    console.log(response);
+
+    //put data to response.url
+    const data = await response.json();
+    const uploadUrl = data.url;
+    console.log("upload url ko link", uploadUrl);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", uploadUrl, true);
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        setUploadProgress(percentComplete);
+      }
+    };
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        console.log("File uploaded successfully");
+        setUploadProgress(0); // Reset progress after upload
+      } else {
+        console.error("File upload failed");
+      }
+    };
+    xhr.onerror = () => {
+      console.error("File upload error");
+    };
+    xhr.send(file);
+  };
+
   useEffect(() => {
     if (isTyping) {
       const typingTimeout = setTimeout(() => {
@@ -128,7 +175,15 @@ const ChatArea = () => {
                   enableFocusRing={false}
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2 text-slate-300">
-                  <Paperclip className="cursor-pointer" />
+                  <label htmlFor="attachmentInput" className="cursor-pointer">
+                    <Paperclip />
+                  </label>
+                  <input
+                    id="attachmentInput"
+                    type="file"
+                    className="hidden"
+                    onChange={handleAttachment}
+                  />
                   <Smile
                     className="cursor-pointer"
                     onClick={() => setShowEmojiPicker((prev) => !prev)}

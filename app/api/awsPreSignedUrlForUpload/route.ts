@@ -25,7 +25,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const preSignedUrl = await putObject(
       fileName,
-      fileType,
+      fileType ? fileType : "application/octet-stream",
       JWTData.userId as string,
       60 * 5 // 5 minutes
     );
