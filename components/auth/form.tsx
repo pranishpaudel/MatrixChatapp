@@ -5,7 +5,6 @@ import { z } from "zod";
 import loginSchema from "@/zodSchemas/loginSchema";
 import signupSchema from "@/zodSchemas/signupSchema";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { LoaderCircle } from "lucide-react";
 import { useAtom } from "jotai";
 import {
@@ -20,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import axios from "axios";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { LOGIN_ROUTE, SIGNUP_ROUTE } from "@/constants/routes";
 
