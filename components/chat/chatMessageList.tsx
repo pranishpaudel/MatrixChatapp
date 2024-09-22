@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import formatTimestamp from "@/lib/formatTimestamp";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import TypingEffect from "./TypingEffect";
+import MessageAttachments from "./messageAttachments";
 
 interface Chat {
   id: number;
@@ -183,6 +184,11 @@ const ChatMessageList: React.FC = () => {
             } text-lg break-words`}
           >
             <p>{chat.message}</p>
+            {/* <MessageAttachments
+              fileName="marani"
+              fileType="img"
+              isUser={isUser}
+            /> */}
           </div>
           <div className="text-gray-400 text-sm mt-1">
             {formatTimestamp(chat.timestamp)}
