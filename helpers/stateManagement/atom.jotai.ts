@@ -7,7 +7,7 @@ interface offlineChat {
   receiverUid?: string;
   offlineMessage?: boolean;
   isGroup?: boolean;
-  isAttachment?: boolean;
+  attachmentInfo?: string;
   isRead: boolean;
   message: string;
   timestamp: string;

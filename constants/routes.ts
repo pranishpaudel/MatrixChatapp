@@ -11,3 +11,4 @@ export const CREATE_CHAT_GROUP_ROUTE = "/api/createChatGroup";
 export const GET_GROUP_LIST_ROUTE = "/api/getGroupList";
 export const GET_AWS_PRE_SIGNED_URL_FOR_UPLOAD_ROUTE =
   "/api/awsPreSignedUrlForUpload";
+export const GET_AWS_PRE_SIGNED_URL_FOR_DOWNLOAD_ROUTE = "/api/awsGetS3Object";

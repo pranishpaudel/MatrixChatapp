@@ -13,6 +13,7 @@ interface Chat {
   senderUid?: string;
   receiverUid?: string;
   message: string;
+  attachmentInfo?: string;
   timestamp: string;
 }
 
@@ -68,6 +69,7 @@ const ChatMessageList: React.FC = () => {
             offlineMessage: false,
             receiverUid: chat.receiverUid,
             message: chat.message,
+            attachmentInfo: chat.attachmentInfo,
             timestamp: chat.timestamp,
           }));
 
@@ -114,6 +116,7 @@ const ChatMessageList: React.FC = () => {
         id: chat.id,
         sender: chat.sender,
         message: chat.message,
+        attachmentInfo: chat.attachmentInfo,
         timestamp: chat.timestamp,
       })),
       ...offlineChatHistory
@@ -127,6 +130,7 @@ const ChatMessageList: React.FC = () => {
           id: chat.id,
           sender: chat.sender,
           message: chat.message,
+          attachmentInfo: chat.attachmentInfo,
           timestamp: chat.timestamp,
           offlineMessage: chat.offlineMessage,
         })),
@@ -157,6 +161,12 @@ const ChatMessageList: React.FC = () => {
 
   const renderChat = (chat: Chat) => {
     const isUser = chat.sender === "user";
+    const attachmentParts = chat.attachmentInfo
+      ? chat.attachmentInfo.split("|^^|")
+      : null;
+    const fileName = attachmentParts ? attachmentParts[0] : "";
+    const fileUrl = attachmentParts ? attachmentParts[1] : "";
+
     return (
       <div
         key={chat.id}
@@ -184,11 +194,13 @@ const ChatMessageList: React.FC = () => {
             } text-lg break-words`}
           >
             <p>{chat.message}</p>
-            {/* <MessageAttachments
-              fileName="marani"
-              fileType="img"
-              isUser={isUser}
-            /> */}
+            {chat.attachmentInfo && (
+              <MessageAttachments
+                fileName={fileName}
+                fileUrl={fileUrl}
+                isUser={isUser}
+              />
+            )}
           </div>
           <div className="text-gray-400 text-sm mt-1">
             {formatTimestamp(chat.timestamp)}

@@ -2,13 +2,13 @@ import { Paperclip, Download } from "lucide-react";
 
 interface MessageAttachmentsProps {
   fileName: string;
-  fileType: string;
+  fileUrl: string;
   isUser: boolean;
 }
 
 const MessageAttachments = ({
   fileName,
-  fileType,
+  fileUrl,
   isUser,
 }: MessageAttachmentsProps) => {
   return (
@@ -16,11 +16,12 @@ const MessageAttachments = ({
       <span>
         <Paperclip className={`${isUser ? "" : "text-purple-600"}`} />
       </span>
-      <span> {fileName}</span>
-      <span>
+      <span>{fileName}</span>
+      <a href={fileUrl} target="_blank" rel="noopener noreferrer">
         <Download className={`${isUser ? "" : "text-purple-600"}`} />
-      </span>
+      </a>
     </div>
   );
 };
+
 export default MessageAttachments;
