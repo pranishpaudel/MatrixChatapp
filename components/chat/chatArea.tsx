@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
-import { Paperclip, Smile, SendHorizontal } from "lucide-react";
+import { Paperclip, Smile, SendHorizontal, CheckCircle } from "lucide-react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
@@ -35,6 +35,11 @@ const ChatArea = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
   const [attachmentName, setAttachmentName] = useState<string | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<
+    "uploading" | "completed" | null
+  >(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const onEmojiClick = (emojiObject: any) => {
     setMessage((prevMessage) => prevMessage + emojiObject.emoji);
   };
@@ -90,6 +95,9 @@ const ChatArea = () => {
       setUploadedFileUrl(null);
       setAttachmentName(null);
       setIsTyping(false);
+      setErrorMessage(null); // Clear any previous error message
+    } else if (uploadedFileUrl) {
+      setErrorMessage("You cannot send an attachment without a message.");
     }
   };
 
@@ -114,6 +122,7 @@ const ChatArea = () => {
     if (!file) return;
 
     try {
+      setUploadStatus("uploading");
       const response = await fetch(GET_AWS_PRE_SIGNED_URL_FOR_UPLOAD_ROUTE, {
         method: "POST",
         headers: {
@@ -157,6 +166,8 @@ const ChatArea = () => {
           setUploadedFileUrl(downloadData.url);
           setAttachmentName(file.name);
           setUploadProgress(0);
+          setUploadStatus("completed");
+          setTimeout(() => setUploadStatus(null), 2000); // Unmount after 2 seconds
         } else {
           console.error("File upload failed");
         }
@@ -179,6 +190,21 @@ const ChatArea = () => {
       return () => clearTimeout(typingTimeout);
     }
   }, [isTyping]);
+
+  const UploadProgress = () => (
+    <div className="fixed bottom-4 right-4 bg-gray-800 text-white p-4 rounded shadow-lg">
+      {uploadStatus === "uploading" ? (
+        <div>
+          <p>Uploading: {uploadProgress}%</p>
+        </div>
+      ) : (
+        <div className="flex items-center">
+          <CheckCircle className="text-green-500 mr-2" />
+          <p>Upload Complete</p>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -235,8 +261,12 @@ const ChatArea = () => {
               </button>
             </div>
           </div>
+          {errorMessage && (
+            <div className="text-red-500 text-center mb-4">{errorMessage}</div>
+          )}
         </div>
       ) : null}
+      {uploadStatus && <UploadProgress />}
     </>
   );
 };
