@@ -99,6 +99,7 @@ const ChatArea = () => {
   };
 
   const handleAttachment = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
     const file = e.target.files?.[0];
     console.log(file);
     //upload to s3 signed url
