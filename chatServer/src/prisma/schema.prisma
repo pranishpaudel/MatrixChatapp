@@ -8,16 +8,28 @@ datasource db {
 }
 
 model Message {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   content     String
-  sender      User     @relation("SentMessages", fields: [senderId], references: [id])
+  sender      User        @relation("SentMessages", fields: [senderId], references: [id])
   senderId    String
-  recipient   User?    @relation("ReceivedMessages", fields: [recipientId], references: [id])
+  recipient   User?       @relation("ReceivedMessages", fields: [recipientId], references: [id])
   recipientId String?
-  group       Group?   @relation(fields: [groupId], references: [id])
+  group       Group?      @relation(fields: [groupId], references: [id])
   groupId     String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  attachment  Attachment? // Single attachment
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  fileName  String
+  fileType  String
+  url       String
+  messageId String   @unique
+  message   Message  @relation(fields: [messageId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model User {

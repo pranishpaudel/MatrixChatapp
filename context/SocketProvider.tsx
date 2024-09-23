@@ -84,27 +84,28 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
           ) {
             return prevChats; // Do not add the typing message again
           }
-          console.log(
-            "Message received from server:",
-            msg.message,
-            "receiver",
-            msg.receiverId,
-            "isGroup",
-            msg.isGroup
-          );
+
           return [
             ...prevChats,
-            {
-              id: prevChats.length + 1,
-              senderUid: msg.senderId,
-              sender: "other",
-              offlineMessage: true,
-              isRead: false,
-              isGroup: msg.isGroup,
-              receiverUid: msg.receiverId,
-              message: msg.message,
-              timestamp: new Date().toISOString(),
-            },
+            (() => {
+              const [message, attachmentName, uploadedFileUrl] =
+                msg.message.split("|^^|");
+              return {
+                id: prevChats.length + 1,
+                senderUid: msg.senderId,
+                sender: "other",
+                offlineMessage: true,
+                isRead: false,
+                isGroup: msg.isGroup,
+                attachmentInfo:
+                  attachmentName && uploadedFileUrl
+                    ? `${attachmentName}|^^|${uploadedFileUrl}`
+                    : "",
+                receiverUid: msg.receiverId,
+                message: message || msg.message,
+                timestamp: new Date().toISOString(),
+              };
+            })(),
           ];
         });
       }
