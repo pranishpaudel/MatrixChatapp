@@ -25,6 +25,7 @@
     "date-fns": "^4.1.0",
     "emoji-picker-react": "^4.12.0",
     "file-type": "^19.5.0",
+    "framer-motion": "^11.8.0",
     "jose": "^5.7.0",
     "jotai": "^2.9.3",
     "js-cookie": "^3.0.5",

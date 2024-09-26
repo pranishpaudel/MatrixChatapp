@@ -126,7 +126,10 @@ function AuthForm({ isLoginForm }: iFormProps) {
           />
         )}
         <div className="flex justify-center mt-28">
-          <Button type="submit" className="w-60 rounded-2xl">
+          <Button
+            type="submit"
+            className="w-60 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2"
+          >
             {!isSubmitting ? (
               isLoginForm ? (
                 "Login"
