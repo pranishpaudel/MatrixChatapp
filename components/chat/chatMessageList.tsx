@@ -157,6 +157,13 @@ const ChatMessageList: React.FC = () => {
 
   const renderChat = (chat: Chat) => {
     const isUser = chat.sender === "user";
+    const attachmentParts = chat.message.includes("|^^|")
+      ? chat.message.split("|^^|")
+      : null;
+    const messageText = attachmentParts ? attachmentParts[0] : chat.message;
+    const fileName = attachmentParts ? attachmentParts[1] : "";
+    const fileUrl = attachmentParts ? attachmentParts[2] : "";
+
     return (
       <div
         key={chat.id}
@@ -183,12 +190,14 @@ const ChatMessageList: React.FC = () => {
               isUser ? "text-gray-200" : "text-white"
             } text-lg break-words`}
           >
-            <p>{chat.message}</p>
-            {/* <MessageAttachments
-              fileName="marani"
-              fileType="img"
-              isUser={isUser}
-            /> */}
+            <p>{messageText}</p>
+            {attachmentParts && (
+              <MessageAttachments
+                fileName={fileName}
+                fileUrl={fileUrl}
+                isUser={isUser}
+              />
+            )}
           </div>
           <div className="text-gray-400 text-sm mt-1">
             {formatTimestamp(chat.timestamp)}

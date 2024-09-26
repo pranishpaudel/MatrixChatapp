@@ -1,14 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
-import { Paperclip, Smile, SendHorizontal } from "lucide-react";
+import { Paperclip, Smile, SendHorizontal, CheckCircle } from "lucide-react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import ChatMessageList from "./chatMessageList";
 import { useSocket } from "@/context/SocketProvider";
 import ChatMessageListForGroup from "./chatMessageListForGroup";
-import { GET_AWS_PRE_SIGNED_URL_FOR_UPLOAD_ROUTE } from "@/constants/routes";
+import {
+  GET_AWS_PRE_SIGNED_URL_FOR_DOWNLOAD_ROUTE,
+  GET_AWS_PRE_SIGNED_URL_FOR_UPLOAD_ROUTE,
+} from "@/constants/routes";
 
 const ChatArea = () => {
   const [message, setMessage] = useState("");
@@ -29,29 +32,37 @@ const ChatArea = () => {
     jotaiAtoms.currentSenderId
   );
   const [isTyping, setIsTyping] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0); // State to track upload progress
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
+  const [attachmentName, setAttachmentName] = useState<string | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<
+    "uploading" | "completed" | null
+  >(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const onEmojiClick = (emojiObject: any) => {
     setMessage((prevMessage) => prevMessage + emojiObject.emoji);
   };
 
   useEffect(() => {
     console.log("uploadProgress", uploadProgress);
-  }, [uploadProgress]);
+    console.log("uploadedFileUrl ko aaileko", uploadedFileUrl);
+  }, [uploadProgress, uploadedFileUrl]);
+
   const handleSendMessage = () => {
     const isGroup = currentGroup.isSet;
-    console.log(
-      "currentGroup ko kura",
-      isGroup,
-      "sathy ko kura",
-      currentChatFriend.isSet
-    );
-    if (message.trim()) {
-      sendMessage(message);
+    if (message.trim() || uploadedFileUrl) {
+      const fullMessage = uploadedFileUrl
+        ? `${message}|^^|${attachmentName}|^^|${uploadedFileUrl}`
+        : message;
+
+      sendMessage(fullMessage);
+
       if (isGroup) {
         setOfflineGroupChatLatest({
-          id: new Date().getTime(), // Unique ID based on timestamp
+          id: new Date().getTime(),
           sender: "user",
-          message,
+          message: fullMessage,
           timestamp: new Date().toISOString(),
           fromSocket: false,
           groupId: currentGroup.id,
@@ -71,7 +82,7 @@ const ChatArea = () => {
             isRead: false,
             isGroup,
             receiverUid: currentChatFriend.id,
-            message,
+            message: fullMessage,
             timestamp: new Date().toISOString(),
           },
         ]);
@@ -79,13 +90,18 @@ const ChatArea = () => {
 
       setUpdateMessageStatus((prevStatus) => !prevStatus);
       setMessage("");
-      setIsTyping(false); // Reset typing status after sending message
+      setUploadedFileUrl(null);
+      setAttachmentName(null);
+      setIsTyping(false);
+      setErrorMessage(null); // Clear any previous error message
+    } else if (uploadedFileUrl) {
+      setErrorMessage("You cannot send an attachment without a message.");
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Prevents adding a new line in the input field
+      e.preventDefault();
       handleSendMessage();
     }
   };
@@ -101,56 +117,92 @@ const ChatArea = () => {
   const handleAttachment = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const file = e.target.files?.[0];
-    console.log(file);
-    //upload to s3 signed url
-    const response = await fetch(GET_AWS_PRE_SIGNED_URL_FOR_UPLOAD_ROUTE, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        fileName: file?.name,
-        fileType: file?.type,
-      }),
-    });
-    console.log(response);
+    if (!file) return;
 
-    //put data to response.url
-    const data = await response.json();
-    const uploadUrl = data.url;
-    console.log("upload url ko link", uploadUrl);
+    try {
+      setUploadStatus("uploading");
+      const response = await fetch(GET_AWS_PRE_SIGNED_URL_FOR_UPLOAD_ROUTE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          fileType: file.type,
+        }),
+      });
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("PUT", uploadUrl, true);
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = Math.round((event.loaded / event.total) * 100);
-        setUploadProgress(percentComplete);
-      }
-    };
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        console.log("File uploaded successfully");
-        setUploadProgress(0); // Reset progress after upload
-      } else {
-        console.error("File upload failed");
-      }
-    };
-    xhr.onerror = () => {
-      console.error("File upload error");
-    };
-    xhr.send(file);
+      const data = await response.json();
+      const uploadUrl = data.url;
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("PUT", uploadUrl, true);
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round(
+            (event.loaded / event.total) * 100
+          );
+          setUploadProgress(percentComplete);
+        }
+      };
+      xhr.onload = async () => {
+        if (xhr.status === 200) {
+          const response = await fetch(
+            GET_AWS_PRE_SIGNED_URL_FOR_DOWNLOAD_ROUTE,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                fileName: file.name,
+                actionType: "open",
+              }),
+            }
+          );
+          const downloadData = await response.json();
+          setUploadedFileUrl(downloadData.url);
+          setAttachmentName(file.name);
+          setUploadProgress(0);
+          setUploadStatus("completed");
+          setTimeout(() => setUploadStatus(null), 2000); // Unmount after 2 seconds
+        } else {
+          console.error("File upload failed");
+        }
+      };
+      xhr.onerror = () => {
+        console.error("File upload error");
+      };
+      xhr.send(file);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
   };
 
   useEffect(() => {
     if (isTyping) {
       const typingTimeout = setTimeout(() => {
         setIsTyping(false);
-      }, 3000); // Reset typing status after 3 seconds of inactivity
+      }, 3000);
 
       return () => clearTimeout(typingTimeout);
     }
   }, [isTyping]);
+
+  const UploadProgress = () => (
+    <div className="fixed bottom-4 right-4 bg-gray-800 text-white p-4 rounded shadow-lg">
+      {uploadStatus === "uploading" ? (
+        <div>
+          <p>Uploading: {uploadProgress}%</p>
+        </div>
+      ) : (
+        <div className="flex items-center">
+          <CheckCircle className="text-green-500 mr-2" />
+          <p>Upload Complete</p>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -171,8 +223,8 @@ const ChatArea = () => {
                   placeholder="Enter your message"
                   className="w-full h-[4em] bg-gray-800 text-slate-300 text-lg pr-20"
                   value={message}
-                  onChange={handleTyping} // Handles typing status
-                  onKeyDown={handleKeyDown} // Handles Enter key
+                  onChange={handleTyping}
+                  onKeyDown={handleKeyDown}
                   enableFocusRing={false}
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2 text-slate-300">
@@ -207,8 +259,12 @@ const ChatArea = () => {
               </button>
             </div>
           </div>
+          {errorMessage && (
+            <div className="text-red-500 text-center mb-4">{errorMessage}</div>
+          )}
         </div>
       ) : null}
+      {uploadStatus && <UploadProgress />}
     </>
   );
 };
