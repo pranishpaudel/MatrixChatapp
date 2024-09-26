@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import formatTimestamp from "@/lib/formatTimestamp";
 import TypingEffect from "./TypingEffect";
 import { Skeleton } from "@/components/ui/skeleton";
+import MessageAttachments from "./messageAttachments";
 
 interface GroupChat {
   id: string | number;
@@ -95,6 +96,13 @@ const ChatMessageListForGroup: React.FC = () => {
       return null;
     }
 
+    const attachmentParts = chat.message.includes("|^^|")
+      ? chat.message.split("|^^|")
+      : null;
+    const messageText = attachmentParts ? attachmentParts[0] : chat.message;
+    const fileName = attachmentParts ? attachmentParts[1] : "";
+    const fileUrl = attachmentParts ? attachmentParts[2] : "";
+
     return (
       <div
         key={chat.id}
@@ -118,7 +126,14 @@ const ChatMessageListForGroup: React.FC = () => {
               isUser ? "bg-purple-600 text-gray-200" : "bg-[#1E201E] text-white"
             } text-lg break-words`}
           >
-            {showTypingEffect ? <TypingEffect /> : <p>{chat.message}</p>}
+            {showTypingEffect ? <TypingEffect /> : <p>{messageText}</p>}
+            {attachmentParts && (
+              <MessageAttachments
+                fileName={fileName}
+                fileUrl={fileUrl}
+                isUser={isUser}
+              />
+            )}
           </div>
           <div className="text-gray-400 text-sm mt-1">
             {formatTimestamp(chat.timestamp)}
