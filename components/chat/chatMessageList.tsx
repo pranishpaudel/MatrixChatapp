@@ -13,7 +13,6 @@ interface Chat {
   senderUid?: string;
   receiverUid?: string;
   message: string;
-  attachmentInfo?: string;
   timestamp: string;
 }
 
@@ -69,7 +68,6 @@ const ChatMessageList: React.FC = () => {
             offlineMessage: false,
             receiverUid: chat.receiverUid,
             message: chat.message,
-            attachmentInfo: chat.attachmentInfo,
             timestamp: chat.timestamp,
           }));
 
@@ -116,7 +114,6 @@ const ChatMessageList: React.FC = () => {
         id: chat.id,
         sender: chat.sender,
         message: chat.message,
-        attachmentInfo: chat.attachmentInfo,
         timestamp: chat.timestamp,
       })),
       ...offlineChatHistory
@@ -130,7 +127,6 @@ const ChatMessageList: React.FC = () => {
           id: chat.id,
           sender: chat.sender,
           message: chat.message,
-          attachmentInfo: chat.attachmentInfo,
           timestamp: chat.timestamp,
           offlineMessage: chat.offlineMessage,
         })),
@@ -161,11 +157,12 @@ const ChatMessageList: React.FC = () => {
 
   const renderChat = (chat: Chat) => {
     const isUser = chat.sender === "user";
-    const attachmentParts = chat.attachmentInfo
-      ? chat.attachmentInfo.split("|^^|")
+    const attachmentParts = chat.message.includes("|^^|")
+      ? chat.message.split("|^^|")
       : null;
-    const fileName = attachmentParts ? attachmentParts[0] : "";
-    const fileUrl = attachmentParts ? attachmentParts[1] : "";
+    const messageText = attachmentParts ? attachmentParts[0] : chat.message;
+    const fileName = attachmentParts ? attachmentParts[1] : "";
+    const fileUrl = attachmentParts ? attachmentParts[2] : "";
 
     return (
       <div
@@ -193,8 +190,8 @@ const ChatMessageList: React.FC = () => {
               isUser ? "text-gray-200" : "text-white"
             } text-lg break-words`}
           >
-            <p>{chat.message}</p>
-            {chat.attachmentInfo && (
+            <p>{messageText}</p>
+            {attachmentParts && (
               <MessageAttachments
                 fileName={fileName}
                 fileUrl={fileUrl}

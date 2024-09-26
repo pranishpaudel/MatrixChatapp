@@ -88,8 +88,6 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
           return [
             ...prevChats,
             (() => {
-              const [message, attachmentName, uploadedFileUrl] =
-                msg.message.split("|^^|");
               return {
                 id: prevChats.length + 1,
                 senderUid: msg.senderId,
@@ -97,12 +95,8 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
                 offlineMessage: true,
                 isRead: false,
                 isGroup: msg.isGroup,
-                attachmentInfo:
-                  attachmentName && uploadedFileUrl
-                    ? `${attachmentName}|^^|${uploadedFileUrl}`
-                    : "",
                 receiverUid: msg.receiverId,
-                message: message || msg.message,
+                message: msg.message,
                 timestamp: new Date().toISOString(),
               };
             })(),

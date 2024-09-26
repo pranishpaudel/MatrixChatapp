@@ -51,17 +51,18 @@ const ChatArea = () => {
 
   const handleSendMessage = () => {
     const isGroup = currentGroup.isSet;
-    if (message.trim()) {
-      sendMessage(
-        uploadedFileUrl
-          ? `${message}|^^|${attachmentName}|^^|${uploadedFileUrl}`
-          : message
-      );
+    if (message.trim() || uploadedFileUrl) {
+      const fullMessage = uploadedFileUrl
+        ? `${message}|^^|${attachmentName}|^^|${uploadedFileUrl}`
+        : message;
+
+      sendMessage(fullMessage);
+
       if (isGroup) {
         setOfflineGroupChatLatest({
           id: new Date().getTime(),
           sender: "user",
-          message,
+          message: fullMessage,
           timestamp: new Date().toISOString(),
           fromSocket: false,
           groupId: currentGroup.id,
@@ -80,11 +81,8 @@ const ChatArea = () => {
             offlineMessage: false,
             isRead: false,
             isGroup,
-            attachmentInfo: uploadedFileUrl
-              ? `${attachmentName}|^^|${uploadedFileUrl}`
-              : ("" as string),
             receiverUid: currentChatFriend.id,
-            message,
+            message: fullMessage,
             timestamp: new Date().toISOString(),
           },
         ]);
