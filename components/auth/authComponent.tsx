@@ -36,18 +36,28 @@ const AuthComponent = () => {
         <div className="w-full flex flex-col items-center mt-6 md:mt-10">
           <div className="flex justify-evenly w-full font-bold text-lg md:text-2xl">
             <div className="flex flex-col items-center">
-              <button onClick={() => setIsLoginForm(true)}>Login</button>
+              <button
+                onClick={() => setIsLoginForm(true)}
+                className={`${!isLoginForm ? "text-slate-300" : ""}`}
+              >
+                Login
+              </button>
               <Separator
                 className="w-full mt-2"
                 color={
                   isLoginForm
-                    ? "bg-black dark:bg-white"
+                    ? "bg-black dark:bg-purple-800"
                     : "bg-border dark:bg-border-dark"
                 }
               />
             </div>
             <div className="flex flex-col items-center">
-              <button onClick={() => setIsLoginForm(false)}>Signup</button>
+              <button
+                onClick={() => setIsLoginForm(false)}
+                className={`${isLoginForm ? "text-slate-300" : ""}`}
+              >
+                Signup
+              </button>
               <Separator
                 className="w-full mt-2"
                 color={

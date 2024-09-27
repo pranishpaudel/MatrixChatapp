@@ -85,6 +85,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
                   placeholder="Enter your email"
                   {...field}
                   className="w-full h-[55px] rounded-2xl"
+                  focusRingColor="blue-500"
                 />
               </FormControl>
               <FormMessage />
@@ -101,6 +102,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
                   placeholder="Enter your password"
                   {...field}
                   className="w-full h-[55px] rounded-2xl"
+                  focusRingColor="blue-500"
                 />
               </FormControl>
               <FormMessage />
@@ -118,6 +120,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
                     placeholder="Enter your password again"
                     {...field}
                     className="w-full h-[55px] rounded-2xl"
+                    focusRingColor="blue-500"
                   />
                 </FormControl>
                 <FormMessage />
