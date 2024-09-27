@@ -39,14 +39,22 @@ const AuthComponent = () => {
               <button onClick={() => setIsLoginForm(true)}>Login</button>
               <Separator
                 className="w-full mt-2"
-                color={isLoginForm ? "bg-black" : "bg-border"}
+                color={
+                  isLoginForm
+                    ? "bg-black dark:bg-white"
+                    : "bg-border dark:bg-border-dark"
+                }
               />
             </div>
             <div className="flex flex-col items-center">
               <button onClick={() => setIsLoginForm(false)}>Signup</button>
               <Separator
                 className="w-full mt-2"
-                color={!isLoginForm ? "bg-black" : "bg-border"}
+                color={
+                  !isLoginForm
+                    ? "bg-black dark:bg-white"
+                    : "bg-border dark:bg-border-dark"
+                }
               />
             </div>
           </div>
