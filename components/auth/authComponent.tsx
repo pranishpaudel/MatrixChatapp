@@ -7,7 +7,7 @@ import AuthForm from "./form";
 import { TypewriterEffectSmooth } from "../ui/typewriter-effect";
 import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
-
+import { TextGenerateEffect } from "../ui/text-generate-effect";
 const AuthComponent = () => {
   const [isLoginForm, setIsLoginForm] = useAtom(jotaiAtoms.isLoginForm);
   const words = [
@@ -23,6 +23,8 @@ const AuthComponent = () => {
     },
   ];
 
+  const wordsRiver = `Lets Get Started To Matrix ChatApp`;
+
   return (
     <>
       <div className="flex flex-col justify-start items-center h-auto  w-[90vw] md:w-[40vw] border-1 border-slate-200 shadow-lg rounded-lg p-4 md:p-8">
@@ -30,7 +32,7 @@ const AuthComponent = () => {
           <TypewriterEffectSmooth words={words} />
         </div>
         <div className="mt-4 text-center font-bold text-sm md:text-md">
-          Fill in the details to get started into our chat application
+          <TextGenerateEffect words={wordsRiver} />
         </div>
 
         <div className="w-full flex flex-col items-center mt-6 md:mt-10">

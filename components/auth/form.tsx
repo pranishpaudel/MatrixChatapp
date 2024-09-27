@@ -71,7 +71,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         {formSubmissionError && (
-          <div className="text-red-600 font-bold w-full flex justify-center items-center bg-slate-100 p-2 my-4 border border-red-600 rounded-lg shadow-md">
+          <div className="text-white font-bold w-full flex justify-center items-center p-2 my-4 border border-purple-300 bg-gray-800 rounded-lg shadow-md">
             {formSubmissionError}
           </div>
         )}
