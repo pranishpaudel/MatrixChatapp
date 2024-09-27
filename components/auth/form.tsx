@@ -57,7 +57,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
         setIsLoginFormTemp(true);
       }
       if (response.data.success && isLoginForm) {
-        window.location.href = "/";
+        window.location.href = "/chat";
       }
     } catch (error) {
       console.log(error);
