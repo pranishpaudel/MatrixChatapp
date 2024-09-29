@@ -12,6 +12,9 @@ import {
   GET_AWS_PRE_SIGNED_URL_FOR_DOWNLOAD_ROUTE,
   GET_AWS_PRE_SIGNED_URL_FOR_UPLOAD_ROUTE,
 } from "@/constants/routes";
+import { BackgroundBeamsWithCollision } from "../ui/background-beams-with-collision";
+import { TextGenerateEffect } from "../ui/text-generate-effect";
+import textGenerateEffectWords from "@/constants/chatAreaConstant";
 
 const ChatArea = () => {
   const [message, setMessage] = useState("");
@@ -263,7 +266,18 @@ const ChatArea = () => {
             <div className="text-red-500 text-center mb-4">{errorMessage}</div>
           )}
         </div>
-      ) : null}
+      ) : (
+        <>
+          <BackgroundBeamsWithCollision className="h-full flex justify-start items-start">
+            <h2 className="text-2xl relative z-20 md:text-4xl lg:text-7xl font-bold text-center text-black dark:text-white font-sans tracking-tight mt-4">
+              <TextGenerateEffect
+                words={textGenerateEffectWords}
+                textColor="text-slate-300"
+              />
+            </h2>
+          </BackgroundBeamsWithCollision>
+        </>
+      )}
       {uploadStatus && <UploadProgress />}
     </>
   );

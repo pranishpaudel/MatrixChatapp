@@ -4,44 +4,69 @@ import imageUrls from "@/constants/Images";
 import Image from "next/image";
 import { Separator } from "../ui/separator";
 import AuthForm from "./form";
-import { useState } from "react";
+import { TypewriterEffectSmooth } from "../ui/typewriter-effect";
 import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
-
+import { TextGenerateEffect } from "../ui/text-generate-effect";
 const AuthComponent = () => {
   const [isLoginForm, setIsLoginForm] = useAtom(jotaiAtoms.isLoginForm);
+  const words = [
+    {
+      text: "Welcome",
+    },
+    {
+      text: "to",
+    },
+    {
+      text: "Matrix ChatApp",
+      className: "text-blue-500 dark:text-purple-600",
+    },
+  ];
+
+  const wordsRiver = `Lets Get Started To Matrix ChatApp`;
 
   return (
     <>
       <div className="flex flex-col justify-start items-center h-auto  w-[90vw] md:w-[40vw] border-1 border-slate-200 shadow-lg rounded-lg p-4 md:p-8">
         <div className="flex items-center font-bold text-[30px] md:text-[45px] mt-4">
-          Welcome{"  "}
-          <Image
-            src={imageUrls.fingerEmoji}
-            alt="finger"
-            width={30}
-            height={30}
-            className="ml-2 md:w-[45px] md:h-[45px]"
-          />
+          <TypewriterEffectSmooth words={words} />
         </div>
         <div className="mt-4 text-center font-bold text-sm md:text-md">
-          Fill in the details to get started into our chat application
+          <TextGenerateEffect words={wordsRiver} />
         </div>
 
         <div className="w-full flex flex-col items-center mt-6 md:mt-10">
           <div className="flex justify-evenly w-full font-bold text-lg md:text-2xl">
             <div className="flex flex-col items-center">
-              <button onClick={() => setIsLoginForm(true)}>Login</button>
+              <button
+                onClick={() => setIsLoginForm(true)}
+                className={`${!isLoginForm ? "text-slate-300" : ""}`}
+              >
+                Login
+              </button>
               <Separator
                 className="w-full mt-2"
-                color={isLoginForm ? "bg-black" : "bg-border"}
+                color={
+                  isLoginForm
+                    ? "bg-black dark:bg-purple-800"
+                    : "bg-border dark:bg-border-dark"
+                }
               />
             </div>
             <div className="flex flex-col items-center">
-              <button onClick={() => setIsLoginForm(false)}>Signup</button>
+              <button
+                onClick={() => setIsLoginForm(false)}
+                className={`${isLoginForm ? "text-slate-300" : ""}`}
+              >
+                Signup
+              </button>
               <Separator
                 className="w-full mt-2"
-                color={!isLoginForm ? "bg-black" : "bg-border"}
+                color={
+                  !isLoginForm
+                    ? "bg-black dark:bg-white"
+                    : "bg-border dark:bg-border-dark"
+                }
               />
             </div>
           </div>

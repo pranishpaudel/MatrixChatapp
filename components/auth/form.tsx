@@ -57,7 +57,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
         setIsLoginFormTemp(true);
       }
       if (response.data.success && isLoginForm) {
-        window.location.href = "/";
+        window.location.href = "/chat";
       }
     } catch (error) {
       console.log(error);
@@ -71,7 +71,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         {formSubmissionError && (
-          <div className="text-red-600 font-bold w-full flex justify-center items-center bg-slate-100 p-2 my-4 border border-red-600 rounded-lg shadow-md">
+          <div className="text-white font-bold w-full flex justify-center items-center p-2 my-4 border border-purple-300 bg-gray-800 rounded-lg shadow-md">
             {formSubmissionError}
           </div>
         )}
@@ -85,6 +85,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
                   placeholder="Enter your email"
                   {...field}
                   className="w-full h-[55px] rounded-2xl"
+                  focusRingColor="blue-500"
                 />
               </FormControl>
               <FormMessage />
@@ -101,6 +102,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
                   placeholder="Enter your password"
                   {...field}
                   className="w-full h-[55px] rounded-2xl"
+                  focusRingColor="blue-500"
                 />
               </FormControl>
               <FormMessage />
@@ -118,6 +120,7 @@ function AuthForm({ isLoginForm }: iFormProps) {
                     placeholder="Enter your password again"
                     {...field}
                     className="w-full h-[55px] rounded-2xl"
+                    focusRingColor="blue-500"
                   />
                 </FormControl>
                 <FormMessage />
@@ -126,7 +129,10 @@ function AuthForm({ isLoginForm }: iFormProps) {
           />
         )}
         <div className="flex justify-center mt-28">
-          <Button type="submit" className="w-60 rounded-2xl">
+          <Button
+            type="submit"
+            className="w-60 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2"
+          >
             {!isSubmitting ? (
               isLoginForm ? (
                 "Login"
