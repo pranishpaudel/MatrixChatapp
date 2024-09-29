@@ -14,6 +14,7 @@ import {
 } from "@/constants/routes";
 import { BackgroundBeamsWithCollision } from "../ui/background-beams-with-collision";
 import { TextGenerateEffect } from "../ui/text-generate-effect";
+import textGenerateEffectWords from "@/constants/chatAreaConstant";
 
 const ChatArea = () => {
   const [message, setMessage] = useState("");
@@ -206,9 +207,6 @@ const ChatArea = () => {
     </div>
   );
 
-  const words =
-    "In Matrix Chatapp, experience effortless communication with our minimalist design, allowing you to start conversations or create groups in under a minute. New users can easily add friends through the '+' icon in the Direct Message section to begin chatting, while existing users can quickly reconnect with friends or form groups. Enjoy a seamless experience and stay connected with those who matter most.";
-
   return (
     <>
       {currentChatFriend.isSet || currentGroup.isSet ? (
@@ -272,7 +270,10 @@ const ChatArea = () => {
         <>
           <BackgroundBeamsWithCollision className="h-full flex justify-start items-start">
             <h2 className="text-2xl relative z-20 md:text-4xl lg:text-7xl font-bold text-center text-black dark:text-white font-sans tracking-tight mt-4">
-              <TextGenerateEffect words={words} textColor="text-slate-300" />
+              <TextGenerateEffect
+                words={textGenerateEffectWords}
+                textColor="text-slate-300"
+              />
             </h2>
           </BackgroundBeamsWithCollision>
         </>

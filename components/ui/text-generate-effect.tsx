@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, stagger, useAnimate } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -17,20 +17,41 @@ export const TextGenerateEffect = ({
   textColor?: string;
 }) => {
   const [scope, animate] = useAnimate();
-  let wordsArray = words.split(" ");
+  const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
+  const sentencesArray = words.includes("|") ? words.split("|") : [words];
+  const wordsArray = sentencesArray[currentSentenceIndex].split(" ");
+
   useEffect(() => {
-    animate(
-      "span",
-      {
-        opacity: 1,
-        filter: filter ? "blur(0px)" : "none",
-      },
-      {
-        duration: duration ? duration : 1,
-        delay: stagger(0.2),
-      }
-    );
-  }, [scope.current]);
+    const animateWords = async () => {
+      await animate(
+        "span",
+        {
+          opacity: 1,
+          filter: filter ? "blur(0px)" : "none",
+        },
+        {
+          duration: duration ? duration : 1,
+          delay: stagger(0.2),
+        }
+      );
+
+      // Wait for the animation to complete before transitioning to the next sentence
+      setTimeout(() => {
+        setCurrentSentenceIndex(
+          (prevIndex) => (prevIndex + 1) % sentencesArray.length
+        );
+      }, 1000); // Fixed 1-second delay
+    };
+
+    animateWords();
+  }, [
+    currentSentenceIndex,
+    animate,
+    duration,
+    filter,
+    sentencesArray.length,
+    wordsArray.length,
+  ]);
 
   const renderWords = () => {
     return (
