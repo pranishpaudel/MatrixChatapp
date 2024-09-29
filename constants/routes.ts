@@ -13,3 +13,4 @@ export const GET_AWS_PRE_SIGNED_URL_FOR_UPLOAD_ROUTE =
   "/api/awsPreSignedUrlForUpload";
 export const GET_AWS_PRE_SIGNED_URL_FOR_DOWNLOAD_ROUTE = "/api/awsGetS3Object";
 export const HANDLE_LOGOUT_ROUTE = "/api/logout";
+export const GET_GROUP_MEMBERS = "/api/getGroupMembers";
