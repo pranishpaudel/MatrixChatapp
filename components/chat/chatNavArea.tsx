@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { EllipsisVertical } from "lucide-react";
-
+import React from "react";
 const ChatNavArea = () => {
   const [currentChatFriend] = useAtom(jotaiAtoms.currentChatFriend);
   const [currentGroup] = useAtom(jotaiAtoms.currentGroup);
