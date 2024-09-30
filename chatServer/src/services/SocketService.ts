@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import Redis from "ioredis";
 import { produceMessage } from "./kafka.js";
 import { getGroupMembers } from "./database.js"; // Assume this function queries the DB for group members
+import { REDIS_CONNECTION_URL } from "./env.constant.js";
 
 interface iMessageFromFrontend {
   message: string;
@@ -10,8 +11,7 @@ interface iMessageFromFrontend {
   receiverId: string;
 }
 
-const serviceUri =
-  "rediss://default:AVNS_bZyrZ7T9-2PsZX49E8H@caching-972a5c3-sindsa26-d146.l.aivencloud.com:10664";
+const serviceUri = REDIS_CONNECTION_URL as string;
 const pub = new Redis(serviceUri);
 const sub = new Redis(serviceUri);
 
@@ -59,14 +59,12 @@ class SocketService {
             groupMembers.forEach((memberId: string) => {
               const memberSocketId = this.users[memberId];
               if (memberSocketId) {
-                this._io
-                  .to(memberSocketId)
-                  .emit("message", {
-                    senderId,
-                    receiverId,
-                    isGroup: true,
-                    message: msg,
-                  });
+                this._io.to(memberSocketId).emit("message", {
+                  senderId,
+                  receiverId,
+                  isGroup: true,
+                  message: msg,
+                });
               }
             });
           } catch (error) {
@@ -76,14 +74,12 @@ class SocketService {
           // Emit the message to the specific receiver
           const receiverSocketId = this.users[receiverId];
           if (receiverSocketId) {
-            this._io
-              .to(receiverSocketId)
-              .emit("message", {
-                senderId,
-                receiverId,
-                isGroup: false,
-                message: msg,
-              });
+            this._io.to(receiverSocketId).emit("message", {
+              senderId,
+              receiverId,
+              isGroup: false,
+              message: msg,
+            });
           }
         }
       }
