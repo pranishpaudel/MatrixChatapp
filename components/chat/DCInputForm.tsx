@@ -36,6 +36,7 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
     []
   );
   const [groupName, setGroupName] = React.useState("");
+  const [isCreatingGroup, setIsCreatingGroup] = React.useState(false);
   const isGroup = compType === "createGroup";
 
   // Add friend function
@@ -67,6 +68,8 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
   const createGroup = React.useCallback(async () => {
     if (!groupName || selectedFriendIds.length === 0) return;
 
+    setIsCreatingGroup(true);
+
     try {
       const response = await fetch(CREATE_CHAT_GROUP_ROUTE, {
         method: "POST",
@@ -81,12 +84,21 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
 
       if (response.ok) {
         await response.json();
+        setUpdateFriendStatus(!updateFriendStatus);
         onClose();
       }
     } catch (error) {
       console.error("Error creating group:", error);
+    } finally {
+      setIsCreatingGroup(false);
     }
-  }, [groupName, selectedFriendIds, onClose]);
+  }, [
+    groupName,
+    selectedFriendIds,
+    onClose,
+    setUpdateFriendStatus,
+    updateFriendStatus,
+  ]);
 
   // Trigger addFriend when selectedFriendIds changes for searchFriend
   React.useEffect(() => {
@@ -228,9 +240,11 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
           <Button
             className="mt-4 w-full"
             onClick={createGroup}
-            disabled={!groupName || selectedFriendIds.length === 0}
+            disabled={
+              !groupName || selectedFriendIds.length === 0 || isCreatingGroup
+            }
           >
-            Create Group
+            {isCreatingGroup ? "Creating..." : "Create Group"}
           </Button>
         )}
       </CardContent>
