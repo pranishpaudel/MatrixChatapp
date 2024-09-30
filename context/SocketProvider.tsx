@@ -37,6 +37,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const [, setOfflineGroupChatLatest] = useAtom(
     jotaiAtoms.offlineGroupChatLatestMessage
   );
+
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
     (msg) => {
       if (socketRef.current) {
@@ -113,7 +114,12 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
 
     // Register the user ID with the server
     if (senderUserId) {
-      _socket.emit("register", senderUserId);
+      _socket.emit(
+        "register",
+        senderUserId,
+        currentGroup?.isSet,
+        currentGroup?.id
+      );
     }
 
     _socket.on("message", onMessageRec);
@@ -134,7 +140,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
       _socket.off("message", onMessageRec);
       socketRef.current = null;
     };
-  }, [onMessageRec, senderUserId]);
+  }, [onMessageRec, senderUserId, currentGroup]);
 
   return (
     <SocketContext.Provider value={{ sendMessage }}>

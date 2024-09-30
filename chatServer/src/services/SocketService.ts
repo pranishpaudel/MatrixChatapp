@@ -28,7 +28,6 @@ sub.subscribe("MESSAGES");
 class SocketService {
   private _io: Server;
   private users: { [key: string]: string } = {}; // Map to store userId to socketId
-  private groups: { [key: string]: string[] } = {}; // Map to store groupId to userIds
 
   constructor() {
     console.log("SocketService constructor");
@@ -53,23 +52,12 @@ class SocketService {
         if (isGroup) {
           console.log("Group id vaneko", receiverId);
           // Emit the message to all members of the group
-          try {
-            const groupMembers = await getGroupMembers(receiverId);
-            console.log("Group members", groupMembers);
-            groupMembers.forEach((memberId: string) => {
-              const memberSocketId = this.users[memberId];
-              if (memberSocketId) {
-                this._io.to(memberSocketId).emit("message", {
-                  senderId,
-                  receiverId,
-                  isGroup: true,
-                  message: msg,
-                });
-              }
-            });
-          } catch (error) {
-            console.error("Error fetching group members:", error);
-          }
+          this._io.to(receiverId).emit("message", {
+            senderId,
+            receiverId,
+            isGroup: true,
+            message: msg,
+          });
         } else {
           // Emit the message to the specific receiver
           const receiverSocketId = this.users[receiverId];
@@ -94,9 +82,15 @@ class SocketService {
       // Listen for user registration to map userId to socketId
       socket.on(
         "register",
-        (userId: string, isGroup: boolean, groupId?: string) => {
+        async (userId: string, isGroup: boolean, groupId?: string) => {
           this.users[userId] = socket.id;
           console.log(`User ${userId} registered with socket ID ${socket.id}`);
+
+          if (isGroup && groupId) {
+            // Join the socket to the group room
+            socket.join(groupId);
+            console.log(`User ${userId} joined group ${groupId}`);
+          }
         }
       );
 
