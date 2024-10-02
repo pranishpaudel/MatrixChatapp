@@ -26,7 +26,7 @@ const ChatNavArea: React.FC = () => {
   const [hasFetchedMembers, setHasFetchedMembers] = useState(false);
 
   useEffect(() => {
-    if (isMenuOpen && currentGroup.isSet && currentGroup.id && !hasFetchedMembers) {
+    if (currentGroup.isSet && currentGroup.id && !hasFetchedMembers) {
       setIsLoading(true);
       fetch("/api/getGroupMembers", {
         method: "POST",
@@ -52,7 +52,7 @@ const ChatNavArea: React.FC = () => {
           setIsLoading(false);
         });
     }
-  }, [currentGroup.isSet, currentGroup.id, isMenuOpen, hasFetchedMembers]);
+  }, [currentGroup.isSet, currentGroup.id, hasFetchedMembers]);
 
   useEffect(() => {
     setHasFetchedMembers(false);
