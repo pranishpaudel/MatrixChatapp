@@ -7,6 +7,7 @@ import {
   ADD_FRIEND_ROUTE,
   SEARCH_CONTACT_BY_NAME_ROUTE,
   CREATE_CHAT_GROUP_ROUTE,
+  ADD_GROUP_MEMBERS_ROUTE, // New route for adding group members
 } from "@/constants/routes";
 import Lottie from "react-lottie";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -15,7 +16,8 @@ import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 
 interface DCInputFormProps {
   onClose: () => void;
-  compType: "searchFriend" | "createGroup";
+  compType: "searchFriend" | "createGroup" | "addMemberInGroup";
+  groupId?: string; // Add groupId for addMemberInGroup
 }
 
 interface SearchResult {
@@ -26,7 +28,7 @@ interface SearchResult {
   image: string | null;
 }
 
-function DCInputForm({ onClose, compType }: DCInputFormProps) {
+function DCInputForm({ onClose, compType, groupId }: DCInputFormProps) {
   const [searchText, setSearchText] = React.useState("");
   const [updateFriendStatus, setUpdateFriendStatus] = useAtom(
     jotaiAtoms.updateFriendStatus
@@ -37,7 +39,7 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
   );
   const [groupName, setGroupName] = React.useState("");
   const [isCreatingGroup, setIsCreatingGroup] = React.useState(false);
-  const isGroup = compType === "createGroup";
+  const isGroup = compType === "createGroup" || compType === "addMemberInGroup";
 
   // Add friend function
   const addFriend = React.useCallback(async () => {
@@ -100,12 +102,49 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
     updateFriendStatus,
   ]);
 
+  // Add member to group function
+  const addMemberToGroup = React.useCallback(async () => {
+    if (!groupId || selectedFriendIds.length === 0) return;
+
+    try {
+      const response = await fetch(ADD_GROUP_MEMBERS_ROUTE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          groupId,
+          newMember: selectedFriendIds[0],
+        }),
+      });
+
+      if (response.ok) {
+        await response.json();
+        setUpdateFriendStatus(!updateFriendStatus);
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error adding member to group:", error);
+    }
+  }, [
+    groupId,
+    selectedFriendIds,
+    onClose,
+    setUpdateFriendStatus,
+    updateFriendStatus,
+  ]);
+
   // Trigger addFriend when selectedFriendIds changes for searchFriend
   React.useEffect(() => {
     if (compType === "searchFriend" && selectedFriendIds.length > 0) {
       addFriend();
+    } else if (
+      compType === "addMemberInGroup" &&
+      selectedFriendIds.length > 0
+    ) {
+      addMemberToGroup();
     }
-  }, [selectedFriendIds, addFriend, compType]);
+  }, [selectedFriendIds, addFriend, addMemberToGroup, compType]);
 
   // Fetch the search results based on the search text
   React.useEffect(() => {
@@ -159,7 +198,9 @@ function DCInputForm({ onClose, compType }: DCInputFormProps) {
         <CardTitle className="text-md">
           {compType === "searchFriend"
             ? "Search your friend"
-            : "Create a group"}
+            : compType === "createGroup"
+            ? "Create a group"
+            : "Add member to group"}
         </CardTitle>
       </CardHeader>
       <CardContent>

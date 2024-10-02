@@ -8,6 +8,7 @@ import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Info, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import DCInputForm from "./DCInputForm"; // Adjust the import path accordingly
 
 const ChatNavArea: React.FC = () => {
   const [currentChatFriend] = useAtom(jotaiAtoms.currentChatFriend);
@@ -16,6 +17,7 @@ const ChatNavArea: React.FC = () => {
   const [groupMembers, setGroupMembers] = useAtom(jotaiAtoms.groupMembers);
   const [isLoading, setIsLoading] = useState(false);
   const [hasFetchedMembers, setHasFetchedMembers] = useState(false);
+  const [isDCInputFormVisible, setIsDCInputFormVisible] = useState(false); // New state for DCInputForm visibility
 
   useEffect(() => {
     if (currentGroup.isSet && currentGroup.id && !hasFetchedMembers) {
@@ -52,6 +54,14 @@ const ChatNavArea: React.FC = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handlePlusClick = () => {
+    setIsDCInputFormVisible(true);
+  };
+
+  const handleCloseDCInputForm = () => {
+    setIsDCInputFormVisible(false);
   };
 
   const renderContent = () => {
@@ -109,7 +119,7 @@ const ChatNavArea: React.FC = () => {
                   <h4 className="text-sm font-medium leading-none text-gray-300">
                     Group Members
                   </h4>
-                  <Plus className="cursor-pointer" />
+                  <Plus className="cursor-pointer" onClick={handlePlusClick} />
                 </div>
                 {isLoading ? (
                   <>
@@ -144,6 +154,15 @@ const ChatNavArea: React.FC = () => {
         )}
       </div>
       <Separator className="w-full bg-gray-700" />
+      {isDCInputFormVisible && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
+          <DCInputForm
+            onClose={handleCloseDCInputForm}
+            compType="addMemberInGroup"
+            groupId={currentGroup.id}
+          />
+        </div>
+      )}
     </div>
   );
 };
