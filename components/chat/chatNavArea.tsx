@@ -9,19 +9,11 @@ import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Info } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface GroupMember {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  image: string;
-}
-
 const ChatNavArea: React.FC = () => {
   const [currentChatFriend] = useAtom(jotaiAtoms.currentChatFriend);
   const [currentGroup] = useAtom(jotaiAtoms.currentGroup);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
+  const [groupMembers, setGroupMembers] = useAtom(jotaiAtoms.groupMembers);
   const [isLoading, setIsLoading] = useState(false);
   const [hasFetchedMembers, setHasFetchedMembers] = useState(false);
 

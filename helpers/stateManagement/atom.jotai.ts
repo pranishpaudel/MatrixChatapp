@@ -25,6 +25,14 @@ interface OfflineGroupChat {
   senderImage: string;
 }
 
+interface GroupMember {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  image: string;
+}
+
 // Define the complete jotaiAtoms object
 const jotaiAtoms = {
   isLoginForm: atom(true),
@@ -70,6 +78,7 @@ const jotaiAtoms = {
     senderLastName: "",
     senderImage: "",
   }),
+  groupMembers: atom<GroupMember[]>([]),
 };
 
 export default jotaiAtoms;
