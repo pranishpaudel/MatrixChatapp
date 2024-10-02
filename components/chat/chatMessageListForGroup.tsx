@@ -109,16 +109,21 @@ const ChatMessageListForGroup: React.FC = () => {
         className={`flex ${isUser ? "justify-end" : "justify-start"}`}
       >
         {!isUser && (
-          <Avatar className="mr-2">
-            <AvatarImage
-              src={chat.senderImage}
-              alt={`${chat.senderFirstName} ${chat.senderLastName}`}
-            />
-            <AvatarFallback>
-              {chat.senderFirstName[0]}
-              {chat.senderLastName[0]}
-            </AvatarFallback>
-          </Avatar>
+          <div className="flex flex-col items-center mr-2">
+            <Avatar className="mb-1">
+              <AvatarImage
+                src={chat.senderImage}
+                alt={`${chat.senderFirstName} ${chat.senderLastName}`}
+              />
+              <AvatarFallback>
+                {chat.senderFirstName[0]}
+                {chat.senderLastName[0]}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-xs text-gray-400 writing-vertical">
+              {chat.senderFirstName} {chat.senderLastName}
+            </span>
+          </div>
         )}
         <div className="relative bg-gray-800 p-4 rounded-lg shadow-lg max-w-md">
           <div
