@@ -9,23 +9,16 @@ import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Info } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface GroupMember {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  image: string;
-}
-
 const ChatNavArea: React.FC = () => {
   const [currentChatFriend] = useAtom(jotaiAtoms.currentChatFriend);
   const [currentGroup] = useAtom(jotaiAtoms.currentGroup);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
+  const [groupMembers, setGroupMembers] = useAtom(jotaiAtoms.groupMembers);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasFetchedMembers, setHasFetchedMembers] = useState(false);
 
   useEffect(() => {
-    if (isMenuOpen && currentGroup.isSet && currentGroup.id) {
+    if (currentGroup.isSet && currentGroup.id && !hasFetchedMembers) {
       setIsLoading(true);
       fetch("/api/getGroupMembers", {
         method: "POST",
@@ -42,6 +35,7 @@ const ChatNavArea: React.FC = () => {
         })
         .then((data) => {
           setGroupMembers(data.data.members);
+          setHasFetchedMembers(true);
         })
         .catch((error) => {
           console.error("Error fetching group members:", error);
@@ -50,7 +44,11 @@ const ChatNavArea: React.FC = () => {
           setIsLoading(false);
         });
     }
-  }, [currentGroup.isSet, currentGroup.id, isMenuOpen]);
+  }, [currentGroup.isSet, currentGroup.id, hasFetchedMembers]);
+
+  useEffect(() => {
+    setHasFetchedMembers(false);
+  }, [currentGroup.id]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

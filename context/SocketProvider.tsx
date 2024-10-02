@@ -37,6 +37,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const [, setOfflineGroupChatLatest] = useAtom(
     jotaiAtoms.offlineGroupChatLatestMessage
   );
+  const [groupMembers, setGroupMembers] = useAtom(jotaiAtoms.groupMembers);
 
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
     (msg) => {
@@ -62,6 +63,10 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
     }) => {
       setUpdateMessageStatus((prevStatus) => !prevStatus);
 
+      const senderDetails = groupMembers.find(
+        (member) => member.id === msg.senderId
+      );
+
       if (msg.isGroup) {
         setOfflineGroupChatLatest({
           id: new Date().getTime(), // Unique ID based on timestamp
@@ -71,9 +76,9 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
           fromSocket: true,
           groupId: msg.receiverId,
           senderId: msg.senderId,
-          senderFirstName: "FirstName", // Replace with actual data
-          senderLastName: "LastName", // Replace with actual data
-          senderImage: "ImageURL", // Replace with actual data
+          senderFirstName: senderDetails?.firstName || "Unknown", // Replace with actual data
+          senderLastName: senderDetails?.lastName || "Unknown", // Replace with actual data
+          senderImage: senderDetails?.image || "ImageURL", // Replace with actual data
         });
       } else {
         setOfflineChats((prevChats) => {
@@ -106,7 +111,12 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
       }
       console.log("Offline chat history updated");
     },
-    [setUpdateMessageStatus, setOfflineChats, setOfflineGroupChatLatest]
+    [
+      setUpdateMessageStatus,
+      setOfflineChats,
+      setOfflineGroupChatLatest,
+      groupMembers,
+    ]
   );
 
   useEffect(() => {
