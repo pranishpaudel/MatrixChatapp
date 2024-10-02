@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
-import { EllipsisVertical } from "lucide-react";
+import { Info } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface GroupMember {
@@ -98,10 +98,10 @@ const ChatNavArea: React.FC = () => {
     <div className="h-full flex flex-col bg-gray-900 text-white">
       <div className="flex-grow flex items-center justify-between px-7 relative">
         {renderContent()}
-        <EllipsisVertical
-          className="ml-auto cursor-pointer"
-          onClick={toggleMenu}
-        />
+
+        {currentGroup.isSet && (
+          <Info className="ml-auto cursor-pointer" onClick={toggleMenu} />
+        )}
 
         {isMenuOpen && (
           <div className="absolute right-0 top-full mt-2 z-10 dropdown-menu-adjust">
