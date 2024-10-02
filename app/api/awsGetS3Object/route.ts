@@ -26,12 +26,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const reqBody = await req.json();
     const { fileName, actionType } = reqBody as iGetObjectProps;
 
+    const maxExpirationTime = 7 * 24 * 60 * 60; // 7 days in seconds
     const s3GetUrl = await getObject(
       fileName,
       JWTData.userId as string,
-      60 * 60,
+      maxExpirationTime,
       actionType as "open" | "download"
-    ); // 1 hour expiration
+    );
+
     return NextResponse.json(
       {
         message: "Get Object Url Generated",
