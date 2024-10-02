@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
-import { Info } from "lucide-react";
+import { Info, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const ChatNavArea: React.FC = () => {
@@ -44,7 +44,7 @@ const ChatNavArea: React.FC = () => {
           setIsLoading(false);
         });
     }
-  }, [currentGroup.isSet, currentGroup.id, hasFetchedMembers]);
+  }, [currentGroup.isSet, currentGroup.id, hasFetchedMembers, setGroupMembers]);
 
   useEffect(() => {
     setHasFetchedMembers(false);
@@ -105,9 +105,12 @@ const ChatNavArea: React.FC = () => {
           <div className="absolute right-0 top-full mt-2 z-10 dropdown-menu-adjust">
             <ScrollArea className="h-72 w-48 rounded-md border border-gray-700 bg-gray-800">
               <div className="p-4">
-                <h4 className="mb-4 text-sm font-medium leading-none text-gray-300">
-                  Group Members
-                </h4>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-sm font-medium leading-none text-gray-300">
+                    Group Members
+                  </h4>
+                  <Plus className="cursor-pointer" />
+                </div>
                 {isLoading ? (
                   <>
                     <Skeleton className="h-6 w-full mb-2 bg-zinc-700" />
