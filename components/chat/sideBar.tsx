@@ -84,7 +84,7 @@ const SideBar = () => {
           groupName: group.groupName,
           groupId: group.groupId,
         }));
-        console.log("Processed group list:", groupList); // Log processed group list
+
         setGroupList(groupList);
       })
       .catch((error) => {

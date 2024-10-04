@@ -37,7 +37,7 @@ const ProfileComponent = () => {
         }),
       });
       const data = await response.json();
-      console.log(data);
+  
       if (data.success) {
         setFirstName(data.data.firstName);
         setLastName(data.data.lastName);

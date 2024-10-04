@@ -30,7 +30,6 @@ class SocketService {
   private users: { [key: string]: string } = {}; // Map to store userId to socketId
 
   constructor() {
-    console.log("SocketService constructor");
     this._io = new Server({
       cors: {
         allowedHeaders: ["*"],
@@ -73,10 +72,7 @@ class SocketService {
   }
 
   public initListeners() {
-    console.log("SocketService initListeners");
     this._io.on("connection", (socket) => {
-      console.log("New client connected", socket.id);
-
       // Listen for user registration to map userId to socketId
       socket.on(
         "register",
