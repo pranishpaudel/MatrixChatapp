@@ -1,10 +1,11 @@
+import localEnv from "@/env.localExport";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 const client = new S3Client({
-  region: process.env.AWS_REGION_ID,
+  region: localEnv.AWS_REGION_ID as string,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY as string,
-    secretAccessKey: process.env.AWS_ACCESS_SECRET as string,
+    accessKeyId: localEnv.AWS_ACCESS_KEY as string,
+    secretAccessKey: localEnv.AWS_ACCESS_SECRET as string,
   },
 });
 

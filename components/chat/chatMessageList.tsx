@@ -6,6 +6,7 @@ import formatTimestamp from "@/lib/formatTimestamp";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import TypingEffect from "./TypingEffect";
 import MessageAttachments from "./messageAttachments";
+import { GET_CHAT_HISTORY_ROUTE } from "@/constants/routes";
 
 interface Chat {
   id: number;
@@ -49,7 +50,7 @@ const ChatMessageList: React.FC = () => {
       }
       try {
         setIsLoadingOnlineChat(true);
-        const response = await fetch("/api/getChatHistory", {
+        const response = await fetch(GET_CHAT_HISTORY_ROUTE, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

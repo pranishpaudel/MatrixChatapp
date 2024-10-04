@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 import isJWTValidForApi from "@/helpers/jwtValidationFunctionForApi";
 import prisma from "@/prisma/prisma.config";
+import localEnv from "@/env.localExport";
 export async function POST(req: NextRequest, res: NextResponse) {
   const JWTData = await isJWTValidForApi(req);
 
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     isProfileSetup: checkExisitingUser.isProfileSetup,
   };
   //resign the token
-  const token = jwt.sign(tokenData, process.env.JWT_SECRET as string, {
+  const token = jwt.sign(tokenData, localEnv.JWT_SECRET as string, {
     expiresIn: "1h",
   });
   const response = NextResponse.json({
