@@ -1,23 +1,8 @@
 import { Kafka, Producer, Consumer } from "kafkajs";
-import fs from "fs";
 import prismaClientForChat from "../prisma/client.js";
+import { kafkaConfig } from "./env.constant.js";
 
-const caCert = fs.readFileSync(
-  "/Users/air/chatapp/chatServer/src/authCert/ca.pem",
-  "utf-8"
-);
-
-const kafka = new Kafka({
-  brokers: ["kafka-2f1552f-nopecha4-56d1.c.aivencloud.com:14143"],
-  ssl: {
-    ca: [caCert],
-  },
-  sasl: {
-    username: "avnadmin",
-    password: "AVNS_dkxyEppD1gJm4sq3r9b",
-    mechanism: "plain",
-  },
-});
+const kafka = new Kafka(kafkaConfig as any);
 
 let producer: null | Producer = null;
 export async function createProducer() {
