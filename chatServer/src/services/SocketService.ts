@@ -1,8 +1,7 @@
 import { Server } from "socket.io";
 import Redis from "ioredis";
 import { produceMessage } from "./kafka.js";
-import { getGroupMembers } from "./database.js"; // Assume this function queries the DB for group members
-import { REDIS_CONNECTION_URL } from "./env.constant.js";
+import { REDIS_CONNECTION_URL } from "../appConfig/env.constant.js";
 
 interface iMessageFromFrontend {
   message: string;
@@ -96,7 +95,6 @@ class SocketService {
           isGroup,
           receiverId,
         }: iMessageFromFrontend) => {
-         
           try {
             const result = await pub.publish(
               "MESSAGES",
