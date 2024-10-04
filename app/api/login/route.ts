@@ -4,6 +4,7 @@ import loginSchema from "@/zodSchemas/loginSchema";
 import { NextResponse, NextRequest } from "next/server";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
+import localEnv from "@/env.localExport";
 
 interface iLoginBody {
   email: string;
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       email: checkUserLogin.email,
       isProfileSetup,
     };
-    const token = jwt.sign(tokenData, process.env.JWT_SECRET as string, {
+    const token = jwt.sign(tokenData, localEnv.JWT_SECRET as string, {
       expiresIn: "1d",
     });
 

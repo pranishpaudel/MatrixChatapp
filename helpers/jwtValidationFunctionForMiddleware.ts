@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import jwtVerifiedUser from "@/types/jwtTypes";
+import localEnv from "@/env.localExport";
 
 interface JwtValidationResult {
   success: boolean;
@@ -13,7 +14,7 @@ const jwtValidationFunction = async function (
   token: string
 ): Promise<JwtValidationResult> {
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    const secret = new TextEncoder().encode(localEnv.JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);
     const verifiedJWT = payload as unknown as jwtVerifiedUser;
 
