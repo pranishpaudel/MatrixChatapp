@@ -109,7 +109,6 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
           ];
         });
       }
-      console.log("Offline chat history updated");
     },
     [
       setUpdateMessageStatus,

@@ -30,7 +30,6 @@ class SocketService {
   private users: { [key: string]: string } = {}; // Map to store userId to socketId
 
   constructor() {
-    console.log("SocketService constructor");
     this._io = new Server({
       cors: {
         allowedHeaders: ["*"],
@@ -47,10 +46,8 @@ class SocketService {
         if (msg !== "!TYPING...!") {
           await produceMessage(parsedMessage);
         }
-        console.log("Message Produced to Kafka Broker");
 
         if (isGroup) {
-          console.log("Group id vaneko", receiverId);
           // Emit the message to all members of the group
           this._io.to(receiverId).emit("message", {
             senderId,
@@ -75,10 +72,7 @@ class SocketService {
   }
 
   public initListeners() {
-    console.log("SocketService initListeners");
     this._io.on("connection", (socket) => {
-      console.log("New client connected", socket.id);
-
       // Listen for user registration to map userId to socketId
       socket.on(
         "register",
@@ -102,15 +96,12 @@ class SocketService {
           isGroup,
           receiverId,
         }: iMessageFromFrontend) => {
-          if (isGroup) {
-            console.log("Group message received");
-          }
+         
           try {
             const result = await pub.publish(
               "MESSAGES",
               JSON.stringify({ senderId, receiverId, message, isGroup })
             );
-            console.log("Message published to Redis", result);
           } catch (err) {
             console.error("Failed to publish message:", err);
           }

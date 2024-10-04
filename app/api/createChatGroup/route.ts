@@ -28,7 +28,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const { groupName, groupMembers } = reqBody as iCreateGroupBody;
 
     // Debugging: Log the groupMembers array
-    console.log("groupMembers:", groupMembers);
+
     const updatedGroupMembers = [...groupMembers, JWTData.userId] as string[];
 
     // Check if the group name already exists

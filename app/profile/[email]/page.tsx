@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/modeToggle";
 import { FilePlus } from "lucide-react";
+import React from "react";
 import {
   GET_USER_DETAILS_ROUTE,
   SAVE_USER_PROFILE_ROUTE,
@@ -61,7 +62,6 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
       reader.onloadend = () => {
         const base64String = reader.result as string; // Type assertion
         setAvatarImage(base64String as any);
-        console.log(base64String);
       };
 
       reader.readAsDataURL(file);
@@ -78,7 +78,7 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
         alert("All fields are required");
         return;
       }
-      console.log("submitting");
+  
       const response = await fetch(SAVE_USER_PROFILE_ROUTE, {
         method: "POST",
         headers: {
@@ -110,7 +110,6 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
           window.location.href = "/";
         }
       }
-      console.log(data);
     } catch (error) {
     } finally {
       setIsSubmitting(false);
