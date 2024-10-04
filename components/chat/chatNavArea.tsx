@@ -9,6 +9,7 @@ import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { Info, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import DCInputForm from "./DCInputForm"; // Adjust the import path accordingly
+import { GET_GROUP_MEMBERS } from "@/constants/routes";
 
 const ChatNavArea: React.FC = () => {
   const [currentChatFriend] = useAtom(jotaiAtoms.currentChatFriend);
@@ -22,7 +23,7 @@ const ChatNavArea: React.FC = () => {
   useEffect(() => {
     if (currentGroup.isSet && currentGroup.id && !hasFetchedMembers) {
       setIsLoading(true);
-      fetch("/api/getGroupMembers", {
+      fetch(GET_GROUP_MEMBERS, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

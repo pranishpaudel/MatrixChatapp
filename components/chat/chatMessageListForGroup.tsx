@@ -6,6 +6,7 @@ import formatTimestamp from "@/lib/formatTimestamp";
 import TypingEffect from "./TypingEffect";
 import { Skeleton } from "@/components/ui/skeleton";
 import MessageAttachments from "./messageAttachments";
+import { GET_CHAT_HISTORY_ROUTE } from "@/constants/routes";
 
 interface GroupChat {
   id: string | number;
@@ -34,7 +35,7 @@ const ChatMessageListForGroup: React.FC = () => {
     const fetchGroupChatHistory = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch("/api/getChatHistory", {
+        const response = await fetch(GET_CHAT_HISTORY_ROUTE, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

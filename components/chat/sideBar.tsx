@@ -6,6 +6,10 @@ import { Plus } from "lucide-react";
 import ProfileComponent from "./ProfileComponent";
 import { useEffect, useState } from "react";
 import DCInputForm from "./DCInputForm";
+import {
+  GET_FRIENDS_LIST_ROUTE,
+  GET_GROUP_LIST_ROUTE,
+} from "@/constants/routes";
 
 type Friend = {
   id: string;
@@ -64,7 +68,7 @@ const SideBar = () => {
 
   useEffect(() => {
     // Fetch friends list
-    fetch("/api/getFriendsList")
+    fetch(GET_FRIENDS_LIST_ROUTE)
       .then((response) => response.json())
       .then((data) => {
         setAllFriendsInfo(data.data); // Set entire array of friends
@@ -72,7 +76,7 @@ const SideBar = () => {
       });
 
     // Fetch group list
-    fetch("/api/getGroupList")
+    fetch(GET_GROUP_LIST_ROUTE)
       .then((response) => response.json())
       .then((data) => {
         // console.log("Fetched group data:", data); // Log fetched data
