@@ -47,10 +47,8 @@ class SocketService {
         if (msg !== "!TYPING...!") {
           await produceMessage(parsedMessage);
         }
-        console.log("Message Produced to Kafka Broker");
 
         if (isGroup) {
-          console.log("Group id vaneko", receiverId);
           // Emit the message to all members of the group
           this._io.to(receiverId).emit("message", {
             senderId,

@@ -15,7 +15,7 @@ import {
 import { BackgroundBeamsWithCollision } from "../ui/background-beams-with-collision";
 import { TextGenerateEffect } from "../ui/text-generate-effect";
 import textGenerateEffectWords from "@/constants/chatAreaConstant";
-
+import React from "react";
 const ChatArea = () => {
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -47,10 +47,7 @@ const ChatArea = () => {
     setMessage((prevMessage) => prevMessage + emojiObject.emoji);
   };
 
-  useEffect(() => {
-    console.log("uploadProgress", uploadProgress);
-    console.log("uploadedFileUrl ko aaileko", uploadedFileUrl);
-  }, [uploadProgress, uploadedFileUrl]);
+  useEffect(() => {}, [uploadProgress, uploadedFileUrl]);
 
   const handleSendMessage = () => {
     const isGroup = currentGroup.isSet;
