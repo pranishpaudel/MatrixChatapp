@@ -79,7 +79,6 @@ const SideBar = () => {
     fetch(GET_GROUP_LIST_ROUTE)
       .then((response) => response.json())
       .then((data) => {
-        // console.log("Fetched group data:", data); // Log fetched data
         const groupList = data.groups.map((group: Group) => ({
           groupName: group.groupName,
           groupId: group.groupId,

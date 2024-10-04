@@ -53,7 +53,6 @@ async function saveMessagesToDB(messages: any[]) {
         groupId: isGroup ? receiverId : null,
       })),
     });
-    console.log("Messages saved to DB", messageDb);
   } catch (error) {
     console.error("Error saving messages to DB", error);
   }

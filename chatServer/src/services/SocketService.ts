@@ -96,15 +96,12 @@ class SocketService {
           isGroup,
           receiverId,
         }: iMessageFromFrontend) => {
-          if (isGroup) {
-            console.log("Group message received");
-          }
+         
           try {
             const result = await pub.publish(
               "MESSAGES",
               JSON.stringify({ senderId, receiverId, message, isGroup })
             );
-            console.log("Message published to Redis", result);
           } catch (err) {
             console.error("Failed to publish message:", err);
           }

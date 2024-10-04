@@ -78,7 +78,7 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
         alert("All fields are required");
         return;
       }
-      console.log("submitting");
+  
       const response = await fetch(SAVE_USER_PROFILE_ROUTE, {
         method: "POST",
         headers: {
@@ -110,7 +110,6 @@ const Page: React.FC<{ params: ParamsType }> = ({ params }) => {
           window.location.href = "/";
         }
       }
-      console.log(data);
     } catch (error) {
     } finally {
       setIsSubmitting(false);
