@@ -1,6 +1,6 @@
 import { Kafka, Producer, Consumer } from "kafkajs";
 import prismaClientForChat from "../prisma/client.js";
-import { kafkaConfig } from "./env.constant.js";
+import { kafkaConfig } from "../appConfig/kafka.config.js";
 
 const kafka = new Kafka(kafkaConfig as any);
 
