@@ -1,4 +1,4 @@
-import prismaClientForChat from "../prisma/client.js";
+import prismaClientForChat from "../prisma/client";
 
 export async function getGroupMembers(groupId: string): Promise<string[]> {
   const group = await prismaClientForChat.group.findUnique({
