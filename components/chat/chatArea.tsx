@@ -51,6 +51,13 @@ const ChatArea = () => {
 
   const handleSendMessage = () => {
     const isGroup = currentGroup.isSet;
+
+    // Check if the upload is still in progress
+    if (uploadStatus === "uploading") {
+      setErrorMessage("Please wait for the attachment to finish uploading.");
+      return;
+    }
+
     if (message.trim() || uploadedFileUrl) {
       const fullMessage = uploadedFileUrl
         ? `${message}|^^|${attachmentName}|^^|${uploadedFileUrl}`
