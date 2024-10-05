@@ -8,5 +8,6 @@ const localEnv = {
   AWS_ACCESS_KEY: process.env.S3AWS_ACCESS_KEY,
   AWS_ACCESS_SECRET: process.env.S3AWS_ACCESS_SECRET,
   REDIS_DATABASE_ENDPOINT: process.env.REDIS_URL,
+  CHAT_SERVER_ENDPOINT: process.env.CHATSERVER_URL,
 };
 export default localEnv;

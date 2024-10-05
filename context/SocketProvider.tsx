@@ -1,4 +1,5 @@
 "use client";
+import localEnv from "@/env.localExport";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { useAtom } from "jotai";
 import React, { useCallback, useEffect, useRef } from "react";
@@ -119,7 +120,7 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   );
 
   useEffect(() => {
-    const _socket = io("http://localhost:8000");
+    const _socket = io(localEnv.CHAT_SERVER_ENDPOINT as string);
 
     // Register the user ID with the server
     if (senderUserId) {
