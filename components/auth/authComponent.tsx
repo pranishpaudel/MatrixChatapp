@@ -8,6 +8,7 @@ import { TypewriterEffectSmooth } from "../ui/typewriter-effect";
 import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { TextGenerateEffect } from "../ui/text-generate-effect";
+import React from "react";
 const AuthComponent = () => {
   const [isLoginForm, setIsLoginForm] = useAtom(jotaiAtoms.isLoginForm);
   const words = [

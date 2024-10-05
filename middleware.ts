@@ -22,6 +22,9 @@ export async function middleware(request: NextRequest) {
   if (!token || !isJwtValid) {
     return NextResponse.redirect(REDIRECTION_FOR_UNAUTHENTICATED);
   }
+  if (pathname === "/") {
+    return NextResponse.redirect(`${request.nextUrl.origin}/chat`);
+  }
   if (pathname.startsWith("/profile")) {
     const profileResponse = await handleProfileRoutes(
       request,
