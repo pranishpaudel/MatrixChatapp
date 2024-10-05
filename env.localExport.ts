@@ -3,10 +3,10 @@
 const localEnv = {
   POSTGRESQL_DATABASE_ENDPOINT: process.env.DATABASE_URL,
   JWT_SECRET: process.env.JWT_SECRET,
-  AWS_REGION_ID: process.env.AWS_REGION_ID,
-  AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME,
-  AWS_ACCESS_KEY: process.env.AWS_ACCESS_KEY,
-  AWS_ACCESS_SECRET: process.env.AWS_ACCESS_SECRET,
+  AWS_REGION_ID: process.env.S3AWS_REGION_ID,
+  AWS_BUCKET_NAME: process.env.S3AWS_BUCKET_NAME,
+  AWS_ACCESS_KEY: process.env.S3AWS_ACCESS_KEY,
+  AWS_ACCESS_SECRET: process.env.S3AWS_ACCESS_SECRET,
   REDIS_DATABASE_ENDPOINT: process.env.REDIS_URL,
 };
 export default localEnv;
