@@ -67,7 +67,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     return NextResponse.json(
       {
         message: "Internal Server Error",
-        localEnv,
         success: false,
       },
       { status: 500 }
