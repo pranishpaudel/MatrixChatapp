@@ -10,4 +10,22 @@ const localEnv = {
   REDIS_DATABASE_ENDPOINT: process.env.REDIS_URL,
   CHAT_SERVER_ENDPOINT: process.env.CHATSERVER_URL,
 };
+
+// Function to validate environment variables
+function validateEnvVariables(env: any) {
+  const missingVars = [];
+  for (const [key, value] of Object.entries(env)) {
+    if (!value) {
+      missingVars.push(key);
+    }
+  }
+  if (missingVars.length > 0) {
+    console.error(`Missing environment variables: ${missingVars.join(", ")}`);
+    process.exit(1); // Exit the application with an error code
+  }
+}
+
+// Validate the environment variables
+validateEnvVariables(localEnv);
+
 export default localEnv;
