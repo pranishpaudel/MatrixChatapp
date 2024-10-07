@@ -1,4 +1,4 @@
-//THIS FILE SENDS ENVIRONMENT VARIABLES TO ALL FILES
+// THIS FILE SENDS ENVIRONMENT VARIABLES TO ALL FILES
 
 const localEnv = {
   POSTGRESQL_DATABASE_ENDPOINT: process.env.DATABASE_URL,
@@ -20,8 +20,11 @@ function validateEnvVariables(env: any) {
     }
   }
   if (missingVars.length > 0) {
-    console.error(`Missing environment variables: ${missingVars.join(", ")}`);
-    process.exit(1); // Exit the application with an error code
+    const errorMessage = `Missing environment variables: ${missingVars.join(
+      ", "
+    )}`;
+    console.error(errorMessage);
+    throw new Error(errorMessage); 
   }
 }
 
