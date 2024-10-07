@@ -24,7 +24,7 @@ function validateEnvVariables(env: any) {
       ", "
     )}`;
     console.error(errorMessage);
-    throw new Error(errorMessage); 
+    throw new Error(errorMessage);
   }
 }
 
