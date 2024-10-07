@@ -18,5 +18,5 @@ export async function getGroupMembers(groupId: string): Promise<string[]> {
     throw new Error("Group not found");
   }
 
-  return group.members.map((member) => member.id);
+  return group.members.map((member: any) => member.id);
 }
