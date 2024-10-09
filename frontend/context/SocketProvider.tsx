@@ -120,8 +120,12 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   );
 
   useEffect(() => {
-    const _socket = io(localEnv.CHAT_SERVER_ENDPOINT as string);
-
+    const _socket = io(
+      localEnv.CHAT_SERVER_ENDPOINT
+        ? localEnv.CHAT_SERVER_ENDPOINT
+        : "http://localhost:8000"
+    );
+    console.log(localEnv.CHAT_SERVER_ENDPOINT, "Yo ho info");
     // Register the user ID with the server
     if (senderUserId) {
       _socket.emit(
