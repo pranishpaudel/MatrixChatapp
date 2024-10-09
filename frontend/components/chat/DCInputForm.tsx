@@ -102,6 +102,9 @@ function DCInputForm({ onClose, compType, groupId }: DCInputFormProps) {
         await response.json();
         setUpdateFriendStatus(!updateFriendStatus);
         onClose();
+        for (const friendId of selectedFriendIds) {
+          sendMessage(refreshText, currentSenderId, friendId);
+        }
       }
     } catch (error) {
       console.error("Error creating group:", error);
@@ -112,6 +115,8 @@ function DCInputForm({ onClose, compType, groupId }: DCInputFormProps) {
     groupName,
     selectedFriendIds,
     onClose,
+    currentSenderId,
+    sendMessage,
     setUpdateFriendStatus,
     updateFriendStatus,
   ]);
