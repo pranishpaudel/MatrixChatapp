@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import Redis from "ioredis";
 import { produceMessage } from "./kafka.js";
 import { REDIS_CONNECTION_URL } from "../appConfig/env.constant.js";
+import refreshText from "../appConfig/refreshText.js";
 
 interface iMessageFromFrontend {
   message: string;
@@ -42,7 +43,7 @@ class SocketService {
         const parsedMessage = JSON.parse(message);
         const { senderId, receiverId, message: msg, isGroup } = parsedMessage;
 
-        if (msg !== "!TYPING...!") {
+        if (msg !== "!TYPING...!" && msg !== refreshText) {
           await produceMessage(parsedMessage);
         }
 

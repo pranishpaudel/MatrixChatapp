@@ -1,4 +1,5 @@
 "use client";
+import refreshText from "@/constants/refreshText";
 import localEnv from "@/env.localExport";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
 import { useAtom } from "jotai";
@@ -10,7 +11,7 @@ interface SocketProviderProp {
 }
 
 interface ISocketContext {
-  sendMessage: (msg: string) => void;
+  sendMessage: (msg: string, senderId?: string, receiverId?: string) => void;
 }
 
 const SocketContext = React.createContext<ISocketContext | null>(null);
@@ -41,14 +42,18 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
   const [groupMembers, setGroupMembers] = useAtom(jotaiAtoms.groupMembers);
 
   const sendMessage: ISocketContext["sendMessage"] = useCallback(
-    (msg) => {
+    (msg, manualSenderId?: string, manualReceiverId?: string) => {
       if (socketRef.current) {
+        const isManual = manualSenderId && manualReceiverId;
         socketRef.current.emit("event:message", {
           message: msg,
-          senderId: senderUserId,
-          ...(currentGroup?.isSet
-            ? { isGroup: true, receiverId: currentGroup.id } // Send groupId if currentGroup is set
-            : { isGroup: false, receiverId: receivedUserId }), // Otherwise send receiverId
+          senderId: isManual ? manualSenderId : senderUserId,
+          isGroup: isManual ? false : currentGroup?.isSet,
+          receiverId: isManual
+            ? manualReceiverId
+            : currentGroup?.isSet
+            ? currentGroup.id
+            : receivedUserId,
         });
       }
     },
@@ -62,6 +67,10 @@ export const SocketProvider: React.FC<SocketProviderProp> = ({ children }) => {
       isGroup: boolean;
       message: string;
     }) => {
+      if (msg.message === refreshText) {
+        //refresh page
+        location.reload();
+      }
       setUpdateMessageStatus((prevStatus) => !prevStatus);
 
       const senderDetails = groupMembers.find(
