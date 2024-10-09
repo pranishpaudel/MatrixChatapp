@@ -13,6 +13,8 @@ import Lottie from "react-lottie";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useAtom } from "jotai";
 import jotaiAtoms from "@/helpers/stateManagement/atom.jotai";
+import { useSocket } from "@/context/SocketProvider";
+import refreshText from "@/constants/refreshText";
 
 interface DCInputFormProps {
   onClose: () => void;
@@ -37,10 +39,14 @@ function DCInputForm({ onClose, compType, groupId }: DCInputFormProps) {
   const [selectedFriendIds, setSelectedFriendIds] = React.useState<string[]>(
     []
   );
+  const { sendMessage } = useSocket();
+  const [currentSenderId, setCurrentSenderId] = useAtom(
+    jotaiAtoms.currentSenderId
+  );
+
   const [groupName, setGroupName] = React.useState("");
   const [isCreatingGroup, setIsCreatingGroup] = React.useState(false);
   const isGroup = compType === "createGroup" || compType === "addMemberInGroup";
-
   // Add friend function
   const addFriend = React.useCallback(async () => {
     if (selectedFriendIds.length === 0) return;
@@ -59,12 +65,20 @@ function DCInputForm({ onClose, compType, groupId }: DCInputFormProps) {
       if (response.ok) {
         await response.json();
         setUpdateFriendStatus(!updateFriendStatus);
+        sendMessage(refreshText, currentSenderId, selectedFriendIds[0]);
         onClose();
       }
     } catch (error) {
       console.error("Error adding friend:", error);
     }
-  }, [selectedFriendIds, onClose, setUpdateFriendStatus, updateFriendStatus]);
+  }, [
+    selectedFriendIds,
+    onClose,
+    setUpdateFriendStatus,
+    updateFriendStatus,
+    currentSenderId,
+    sendMessage,
+  ]);
 
   // Create group function
   const createGroup = React.useCallback(async () => {
