@@ -4,7 +4,7 @@ import { createS3FolderInBucket } from "@/utils/awsReusableFunctions/awsCommands
 import signupSchema from "@/zodSchemas/signupSchema";
 import { NextResponse, NextRequest } from "next/server";
 import { z } from "zod";
-
+import bcrypt from "bcrypt";
 interface iSignupBody {
   email: string;
   password: string;
@@ -36,10 +36,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
         success: false,
       });
     }
-
+    const hashedPassword = await bcrypt.hash(password, 10);
     // Create the new user in the database
     const user = await prisma.user.create({
-      data: { email, password },
+      data: { email, password: hashedPassword },
     });
 
     if (user) {
