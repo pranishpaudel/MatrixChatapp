@@ -82,5 +82,4 @@ To deploy this project first lets deploy the backend server
 
 ## Demo
 
-Insert gif or li![chatapp](https://github.com/user-attachments/assets/abcdac7b-82f6-414b-8821-ea122d3cd831)
-nk to demo
+![chatapp](https://github.com/user-attachments/assets/abcdac7b-82f6-414b-8821-ea122d3cd831)
