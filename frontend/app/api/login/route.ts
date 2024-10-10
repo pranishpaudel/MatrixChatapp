@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import handleZodError from "@/lib/Errors/handleZodError";
 import prisma from "@/prisma/prisma.config";
 import loginSchema from "@/zodSchemas/loginSchema";
@@ -18,9 +19,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const { email, password } = reqBody as iLoginBody;
 
     const checkExisitingUser = await prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
     if (!checkExisitingUser) {
       return NextResponse.json({
@@ -28,24 +27,24 @@ export async function POST(req: NextRequest, res: NextResponse) {
         success: false,
       });
     }
-    const checkUserLogin = await prisma.user.findFirst({
-      where: {
-        email,
-        password,
-      },
-    });
 
-    if (!checkUserLogin) {
+    // Verify the password
+    const passwordMatch = await bcrypt.compare(
+      password,
+      checkExisitingUser.password
+    );
+
+    if (!passwordMatch) {
       return NextResponse.json({
         message: `Invalid password`,
         success: false,
       });
     }
 
-    const isProfileSetup = checkUserLogin?.isProfileSetup;
+    const isProfileSetup = checkExisitingUser?.isProfileSetup;
     const tokenData = {
-      id: checkUserLogin.id,
-      email: checkUserLogin.email,
+      id: checkExisitingUser.id,
+      email: checkExisitingUser.email,
       isProfileSetup,
     };
     const token = jwt.sign(tokenData, localEnv.JWT_SECRET as string, {
