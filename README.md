@@ -1,7 +1,9 @@
 
 # Matrix ChatApp
 
-Introducing my sleek, scalable chat app—built for simplicity and speed. Users can sign up, log in, and start chatting instantly. With core features and fast performance, it scales effortlessly as your community grows. Perfect for friends or work, messaging stays easy and efficient.## Features
+Introducing my sleek, scalable chat app—built for simplicity and speed. Users can sign up, log in, and start chatting instantly. With core features and fast performance, it scales effortlessly as your community grows. Perfect for friends or work, messaging stays easy and efficient.
+
+## Features
 
 - **Fast and Secure Chat System**: Implements robust security measures for a seamless chat experience.
 - **Highly Scalable Architecture**: Designed to handle high user demand efficiently with scalable solutions.
